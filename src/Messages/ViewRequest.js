@@ -1,4 +1,4 @@
-import { db } from "/Users/evem/Desktop/a/src/firebaseConfig.js";
+import { db } from "../firebaseConfig.js";
 import { readDocument } from "./Functions";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
@@ -36,14 +36,14 @@ function ViewRequest() {
         fetchRequest();
     }, []);
 
- 
+
     const handleApprove = async () => {
         if (status === "open") {
             try {
                 const docRef = doc(db, "testRequests", "GyoWFB4xGRqWYM5IYbDp");
                 await setDoc(docRef, { status: "in process" }, { merge: true });
                 setStatus("in process");
-                navigate('/thankyou');
+                navigate('/VerificationPhone');
             } catch (error) {
                 console.error("Error updating status:", error);
             }

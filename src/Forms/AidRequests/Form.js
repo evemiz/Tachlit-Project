@@ -25,11 +25,13 @@ function RequestForm() {
       phoneNumber: contact,
       city: citySelectedOption,
       langueges: langSelectedOptions,
-      volunteering : volSelectedOptions, 
+      volunteering : volSelectedOptions,
       date : date,
       time : time,
       comments : comments,
-      status: "open"
+      status: "open",
+      volunteerFeedback: "",
+      seekerFeedback: ""
     };
 
     if(validateData(formData)){
@@ -70,7 +72,6 @@ function RequestForm() {
             id="contact"
             value={contact}
             onChange={(e) => setContact(e.target.value)}
-            placeholder="xxx-xxxxxxx"
             required
           />
 

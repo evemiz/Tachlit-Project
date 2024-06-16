@@ -31,7 +31,7 @@ function VolunteerForm() {
       days: daySelectedOptions.map(option => option.value),
       emergency: available,
       volunteering : volSelectedOptions.map(option => option.value), 
-      vehicle: vehicle
+      vehicle: vehicle,
     };
 
     if(validateData(formData)){
@@ -75,7 +75,6 @@ function VolunteerForm() {
                         onChange={(e) =>
                             setContact(e.target.value)
                         }
-                        placeholder="xxx-xxxxxxx"
                         required
                     />
 
