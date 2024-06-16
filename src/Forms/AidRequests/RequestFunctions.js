@@ -2,7 +2,7 @@ import { db } from '../../firebaseConfig.js';
 import { doc, addDoc, collection, deleteDoc, getDocs } from 'firebase/firestore';
 
 export function validateData(data) {
-  const { firstName, lastName, phoneNumber, city, langueges, volunteering, date, time, comments } = data;
+  const { firstName, lastName, phoneNumber, city, langueges, volunteering, date, time } = data;
 
   // Check required fields
   if (!firstName || !lastName || !phoneNumber || !city || !langueges || !volunteering || !date || !time) {

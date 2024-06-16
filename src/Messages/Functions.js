@@ -1,4 +1,4 @@
-import {db} from '/Users/Halel/.vscode/Tachlit-Project/src/firebaseConfig.js';
+import {db} from '../firebaseConfig.js';
 import { doc, getDoc } from 'firebase/firestore';
 
 export const readDocument = async (collectionName, documentId) => {
