@@ -1,4 +1,4 @@
-import { db } from "/Users/evem/Desktop/a/src/firebaseConfig.js";
+import { db } from "/Users/Halel/.vscode/Tachlit-Project/src/firebaseConfig.js";
 import { readDocument } from "./Functions";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
@@ -36,7 +36,7 @@ function ViewRequest() {
         fetchRequest();
     }, []);
 
- 
+
     const handleApprove = async () => {
         if (status === "open") {
             try {

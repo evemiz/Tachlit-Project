@@ -25,7 +25,7 @@ function RequestForm() {
       phoneNumber: contact,
       city: citySelectedOption,
       langueges: langSelectedOptions,
-      volunteering : volSelectedOptions, 
+      volunteering : volSelectedOptions,
       date : date,
       time : time,
       comments : comments,

@@ -1,4 +1,4 @@
-import { db } from '/Users/evem/Desktop/a/src/firebaseConfig.js';
+import { db } from '../../firebaseConfig.js';
 import { doc, addDoc, collection, deleteDoc, getDocs } from 'firebase/firestore';
 
 export function validateData(data) {

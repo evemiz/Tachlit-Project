@@ -1,4 +1,4 @@
-import { db } from "/Users/evem/Desktop/a/src/firebaseConfig.js";
+import { db } from '../firebaseConfig.js';
 import { readDocument } from "./Functions";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
@@ -57,7 +57,7 @@ function CloseRequest () {
             <h2>צור איתנו קשר בווצאפ</h2>
             <button className="whatsapp-button" onClick={openWhatsAppChat}>
                 <FontAwesomeIcon icon={faWhatsapp} size="2x" />
-            </button>          
+            </button>
           </header>
         </div>
       );
