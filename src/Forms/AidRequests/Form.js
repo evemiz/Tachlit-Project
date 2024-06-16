@@ -29,7 +29,9 @@ function RequestForm() {
       date : date,
       time : time,
       comments : comments,
-      status: "open"
+      status: "open",
+      volunteerFeedback: "",
+      seekerFeedback: ""
     };
 
     if(validateData(formData)){
@@ -70,7 +72,6 @@ function RequestForm() {
             id="contact"
             value={contact}
             onChange={(e) => setContact(e.target.value)}
-            placeholder="xxx-xxxxxxx"
             required
           />
 

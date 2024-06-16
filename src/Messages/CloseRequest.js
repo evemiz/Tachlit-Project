@@ -1,4 +1,4 @@
-import { db } from "/Users/evem/Desktop/a/src/firebaseConfig.js";
+import { db } from "../firebaseConfig.js";
 import { readDocument } from "./Functions";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +31,7 @@ function CloseRequest () {
                 const docRef = doc(db, "testRequests", "GyoWFB4xGRqWYM5IYbDp");
                 await setDoc(docRef, { status: "close" }, { merge: true });
                 setStatus("close");
-                navigate('/thankyou');
+                navigate('/VolunteerFeedback');
             } catch (error) {
                 console.error("Error updating status:", error);
             }
@@ -43,7 +43,7 @@ function CloseRequest () {
 
     const openWhatsAppChat = () => {
         // Replace with the WhatsApp chat link (replace placeholders with actual phone number and message)
-        const phoneNumber = "+9720545559682";
+        const phoneNumber = "+972545559682";
         const whatsappUrl = `https://wa.me/${phoneNumber}`;
         window.open(whatsappUrl, "_blank");
     };

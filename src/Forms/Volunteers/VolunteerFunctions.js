@@ -1,8 +1,8 @@
-import { db } from '/Users/evem/Desktop/a/src/firebaseConfig.js';
+import { db } from '../../firebaseConfig.js';
 import { doc, addDoc, collection, deleteDoc, getDocs } from 'firebase/firestore';
 
 export function validateData(data) {
-  const { firstName, lastName, phoneNumber, city, langueges, days, emergency, volunteering, vehicle } = data;
+  const { firstName, lastName, phoneNumber, city, langueges, days, volunteering } = data;
 
   // Check required fields
   if (!firstName || !lastName || !phoneNumber || !city) {

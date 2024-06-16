@@ -1,4 +1,4 @@
-import {db} from '/Users/evem/Desktop/a/src/firebaseConfig.js';
+import {db} from '../firebaseConfig.js';
 import { doc, getDoc } from 'firebase/firestore';
 
 export const readDocument = async (collectionName, documentId) => {
