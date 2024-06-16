@@ -6,7 +6,7 @@ const getColumnDisplayName = (columnName) => {
     firstName: 'שם פרטי',
     lastName: 'שם משפחה',
     phoneNumber: 'מספר טלפון',
-    languages: 'שפות',
+    langueges: 'שפות',
     city: 'עיר',
     days: 'ימים',
     volunteering: 'התנדבויות',
