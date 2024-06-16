@@ -1,5 +1,5 @@
-import { db } from '/Users/evem/Documents/studing/tachlit - project/code/src/firebaseConfig.js';
 import { doc, addDoc, collection, deleteDoc, getDocs } from 'firebase/firestore';
+import { db } from '../firebaseConfig.js';
 
 export function validateData(data) {
   //...
@@ -9,14 +9,14 @@ export function validateData(data) {
 
 // Function to read documents from a collection
 export const readDocuments = async (collectionName) => {
-    try {
-      const querySnapshot = await getDocs(collection(db, collectionName));
-      return querySnapshot.docs.map(doc => doc.dataV());
-    } catch (error) {
-      console.error("Error getting documents: ", error);
-    }
+  try {
+    const querySnapshot = await getDocs(collection(db, collectionName));
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error("Error getting documents: ", error);
+    throw error;
+  }
 };
-
 
 // Function to add a document to a collection with a custom ID (if provided)
 export const addDocument = async (collectionName, data) => {

@@ -1,5 +1,9 @@
 .App {
   text-align: center;
+  /* display: flex; */
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
 }
 
 .App-logo {
@@ -35,4 +39,30 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* Allows horizontal scrolling if table overflows */
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%; /* Ensure table takes the full width of the container */
+}
+
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  white-space: nowrap; /* Prevent content from wrapping */
+}
+
+.table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: right;
+  background-color: #f2f2f2;
+  color: black;
 }

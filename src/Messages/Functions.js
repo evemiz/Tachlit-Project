@@ -13,6 +13,6 @@ export const readDocument = async (collectionName, documentId) => {
         }
     } catch (error) {
         console.error("Error getting document:", error);
-        throw error; 
+        throw error;
     }
 };

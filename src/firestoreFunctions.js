@@ -2,8 +2,8 @@ import { db } from './firebaseConfig';
 import { doc, addDoc, collection, deleteDoc, getDocs } from 'firebase/firestore';
 
 export const data = {
-    name: '', 
-    phoneNumber: '', 
+    name: '',
+    phoneNumber: '',
     city: '',
     langueges: [true, false, false, false, false], //[hebrew, english, french, russian, spanish]
     days: [false, false, false, false, false, false, false],
@@ -32,7 +32,7 @@ const validateData = (data) => {
     ) {
       return false; // Missing fields, incorrect types, or empty strings
     }
-  
+
     // Check if the elements in 'langueges', 'days', and 'volunteering' arrays are boolean
     if (
       !data.langueges.every(item => typeof item === 'boolean') ||
@@ -41,7 +41,7 @@ const validateData = (data) => {
     ) {
       return false; // Arrays contain non-boolean elements
     }
-  
+
     return true;
   };
 
@@ -55,8 +55,8 @@ export const readDocuments = async (collectionName) => {
       console.error("Error getting documents: ", error);
     }
 };
-  
-  
+
+
 // Function to add a document to a collection with a custom ID (if provided)
 export const addDocument = async (collectionName, data) => {
     if(!validateData(data))

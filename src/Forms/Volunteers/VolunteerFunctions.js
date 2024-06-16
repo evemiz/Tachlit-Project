@@ -1,5 +1,5 @@
-import { db } from '../../firebaseConfig.js';
 import { doc, addDoc, collection, deleteDoc, getDocs } from 'firebase/firestore';
+import { db } from '../../firebaseConfig.js';
 
 export function validateData(data) {
   const { firstName, lastName, phoneNumber, city, langueges, days, volunteering } = data;
