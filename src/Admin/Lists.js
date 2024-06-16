@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { readDocuments } from './AdminFunctions'; // Adjust the import path as necessary
 import '../App.css'; // Adjust the import path as necessary
+import citiesInIsrael from '../Forms/Cities.js'; // Adjust the import path as necessary
+import languages from '../Forms/Languges.js'; // Adjust the import path as necessary
+import days from '../Forms/Days.js'; // Adjust the import path as necessary
 
 const availableCollections = ['test', 'testRequests']; // Add your collection names here
 
@@ -10,7 +13,7 @@ const getColumnDisplayName = (columnName) => {
     firstName: 'שם פרטי',
     lastName: 'שם משפחה',
     phoneNumber: 'מספר טלפון',
-    langueges: 'שפות',
+    languages: 'שפות',
     city: 'עיר',
     days: 'ימים',
     volunteering: 'התנדבויות',
@@ -18,27 +21,53 @@ const getColumnDisplayName = (columnName) => {
     date: 'תאריך',
     time: 'שעה',
     comments: 'הערות',
-    status: 'סטטוס',
-    emergency: 'זמינות לחירום',
-    vehicle: 'רכב',
-
+    status: 'סטטוס'
     // Add more mappings as necessary
   };
   return columnMapping[columnName] || columnName;
 };
 
-
 // Define the fixed column order
-const fixedColumnOrder = ['firstName', 'lastName', 'phoneNumber', 'langueges', 'city', 'days', 'volunteering', 'email', 'date', 'time', 'comments', 'status','emergency','vehicle'];
+const fixedColumnOrder = ['firstName', 'lastName', 'phoneNumber', 'languages', 'city', 'days', 'volunteering', 'email', 'date', 'time', 'comments', 'status'];
+
+// Define predefined options for each filter (example)
+const filterOptions = {
+  city: citiesInIsrael,
+  languages: languages,
+  days: days
+};
 
 function Lists() {
-  const [collectionName, setCollectionName] = useState(availableCollections[0]);
+  const [collectionName, setCollectionName] = useState('');
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({});
+  const [showFilters, setShowFilters] = useState(false);
 
   const handleCollectionChange = (event) => {
     setCollectionName(event.target.value);
+    setFilters({});
+    setShowFilters(false);
+  };
+
+  const handleFilterChange = (event, key) => {
+    const { value, checked } = event.target;
+    setFilters(prevFilters => {
+      const newFilters = { ...prevFilters };
+      if (!newFilters[key]) {
+        newFilters[key] = {};
+      }
+      if (checked) {
+        newFilters[key][value] = true;
+      } else {
+        delete newFilters[key][value];
+        if (Object.keys(newFilters[key]).length === 0) {
+          delete newFilters[key];
+        }
+      }
+      return newFilters;
+    });
   };
 
   const fetchDocuments = async () => {
@@ -60,7 +89,9 @@ function Lists() {
   };
 
   useEffect(() => {
-    fetchDocuments();
+    if (collectionName) {
+      fetchDocuments();
+    }
   }, [collectionName]);
 
   const getColumns = () => {
@@ -70,7 +101,23 @@ function Lists() {
     return fixedColumnOrder.filter(column => docKeys.includes(column));
   };
 
+  const getFilteredDocuments = () => {
+    if (Object.keys(filters).length === 0) return documents;
+    return documents.filter(doc =>
+      Object.keys(filters).every(key =>
+        Object.keys(filters[key]).some(value =>
+          filters[key][value] && (
+            (typeof doc[key] === 'object' && doc[key] !== null && 'value' in doc[key] && doc[key].value === value) ||
+            (Array.isArray(doc[key]) && doc[key].includes(value)) ||
+            (typeof doc[key] === 'string' && doc[key] === value)
+          )
+        )
+      )
+    );
+  };
+
   const columns = getColumns();
+  const filteredDocuments = getFilteredDocuments();
 
   return (
     <div dir="rtl" className='App'>
@@ -79,6 +126,7 @@ function Lists() {
         <label>
           :בחר רשימה
           <select value={collectionName} onChange={handleCollectionChange}>
+            <option value=""> </option>
             {availableCollections.map((collection) => (
               <option key={collection} value={collection}>
                 {collection}
@@ -86,11 +134,38 @@ function Lists() {
             ))}
           </select>
         </label>
-        <button onClick={fetchDocuments}>אישור</button>
+        <button onClick={fetchDocuments} disabled={!collectionName}>אישור</button>
       </div>
+      {collectionName && (
+        <>
+          <button onClick={() => setShowFilters(!showFilters)}>
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </button>
+          {showFilters && (
+            <div>
+              {Object.keys(filterOptions).map((key) => (
+                <div key={key}>
+                  <label>{getColumnDisplayName(key)}:</label>
+                  {filterOptions[key].map((value) => (
+                    <div key={value}>
+                      <input
+                        type="checkbox"
+                        value={value}
+                        checked={filters[key]?.[value] || false}
+                        onChange={(event) => handleFilterChange(event, key)}
+                      />
+                      {value}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-      {documents.length > 0 ? (
+      {filteredDocuments.length > 0 ? (
         <div className="table-container">
           <table className="table">
             <thead>
@@ -101,7 +176,7 @@ function Lists() {
               </tr>
             </thead>
             <tbody>
-              {documents.map((doc, index) => (
+              {filteredDocuments.map((doc, index) => (
                 <tr key={index}>
                   {columns.map((column) => (
                     <td key={column}>
