@@ -125,7 +125,7 @@ function Lists() {
   console.log('Filtered Documents:', filteredDocuments);
 
   return (
-    <div dir="rtl" className='App'>
+    <div dir="rtl" className='List'>
       <h1>צפייה ברשימות</h1>
       <div>
         <label>
