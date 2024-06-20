@@ -14,6 +14,7 @@ import WrongPage from './Messages/Wrong';
 import GetFeedback from './Messages/GetFeedback';
 import VolunteerFeedback from './Messages/VolunteerFeadback';
 import VerificationPhone from './Messages/PhoneVerification';
+import SignUpVol from './Forms/Volunteers/SignUpNewVolunteer';
 
 const App = () => {
   return (
@@ -47,6 +48,9 @@ const App = () => {
           <button>
             <Link to="/GetFeedback">Go to GetFeedback</Link>
           </button>
+          <button>
+            <Link to="/SignUpVol">Go to SignUp Volunteer</Link>
+          </button>
         </nav>
         <Routes>
           <Route path="/VolunteerForm" element={<VolunteerForm />} />
@@ -64,6 +68,7 @@ const App = () => {
           <Route path="/ThanksFeedback" element={<ThanksFeedback />} />
           <Route path="/VolunteerFeedback" element={<VolunteerFeedback />} />
           <Route path="/VerificationPhone" element={<VerificationPhone />} />
+          <Route path="/SignUpVol" element={<SignUpVol />} />
           <Route path="/" element={<Home />} />
         </Routes>
       </div>

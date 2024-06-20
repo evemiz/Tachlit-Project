@@ -39,7 +39,7 @@ function VolunteerForm() {
     };
 
     if(validateData(formData)){
-      addDocument("Volunteers", formData);
+      addDocument("NewVolunteers", formData);
     }
 
   };
