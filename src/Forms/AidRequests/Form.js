@@ -4,11 +4,13 @@ import volunteerings from '../Volunteerings';
 import langueges from '../Languges'
 import { React, useState } from "react";
 import Select from 'react-select';
-import {validateData, addDocument} from "./RequestFunctions.js"
+import {validateData, addDocument, addFieldToDocument} from "./RequestFunctions.js"
+import FindVolunteers from './Submit.js';
 
 function RequestForm() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [id, setId] = useState("");
   const [contact, setContact] = useState("");
   const [citySelectedOption, setCitySelectedOption] = useState("");
   const [volSelectedOptions, setVolSelectedOptions] = useState("");
@@ -17,25 +19,29 @@ function RequestForm() {
   const [time, setTime] = useState("");
   const [comments, setComments] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = {
       firstName: firstName,
       lastName: lastName,
+      id:id,
       phoneNumber: contact,
-      city: citySelectedOption,
-      langueges: langSelectedOptions,
-      volunteering : volSelectedOptions,
+      city: citySelectedOption ? citySelectedOption.label : "",
+      langueges: langSelectedOptions ? langSelectedOptions.label : "",
+      volunteering : volSelectedOptions ? volSelectedOptions.label : "",
       date : date,
       time : time,
       comments : comments,
       status: "open",
       volunteerFeedback: "",
-      seekerFeedback: ""
+      seekerFeedback: "",
     };
 
     if(validateData(formData)){
-      addDocument("testRequests", formData);
+      const docRef = await addDocument('AidRequests', formData);
+      const volunteerIds = await FindVolunteers(citySelectedOption ? citySelectedOption.label : "", langSelectedOptions ? langSelectedOptions.label : "", volSelectedOptions ? volSelectedOptions.label : "");
+      console.log(volunteerIds);
+      addFieldToDocument('AidRequests', docRef.id, 'matches', volunteerIds);
     }
   };
 
@@ -62,6 +68,16 @@ function RequestForm() {
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             dir="rtl"
+            required
+          />
+
+        <label htmlFor="id">מספר תעדות זהות</label>
+          <input
+            type="text"
+            name="id"
+            id="id"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
             required
           />
 

@@ -1,5 +1,5 @@
 import { db } from '../../firebaseConfig.js';
-import { doc, addDoc, collection, deleteDoc, getDocs } from 'firebase/firestore';
+import { doc, addDoc, collection, deleteDoc, getDocs, updateDoc } from 'firebase/firestore';
 
 export function validateData(data) {
   const { firstName, lastName, phoneNumber, city, langueges, volunteering, date, time } = data;
@@ -50,6 +50,21 @@ export const deleteDocument = async (collectionName, id) => {
   } catch (error) {
     console.error("Error deleting document: ", error);
     return false;
+  }
+};
+
+// Function to add a field to a specific document in a collection
+export const addFieldToDocument = async (collectionName, documentId, fieldName, fieldValue) => {
+  try {
+      const docRef = doc(db, collectionName, documentId);
+      await updateDoc(docRef, {
+          [fieldName]: fieldValue
+      });
+      console.log(`Field '${fieldName}' added to document '${documentId}' in collection '${collectionName}'`);
+      return true;
+  } catch (error) {
+      console.error("Error adding field to document: ", error);
+      return false;
   }
 };
 
