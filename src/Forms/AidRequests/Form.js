@@ -1,11 +1,13 @@
 import '../style.css';
 import citiesInIsrael from '../Cities';
 import volunteerings from '../Volunteerings';
-import langueges from '../Languges'
+import langues from '../Languges';
 import { React, useState } from "react";
 import Select from 'react-select';
-import {validateData, addDocument, addFieldToDocument} from "./RequestFunctions.js"
-import FindVolunteers from './Submit.js';
+import {validateData, addDocument, addFieldToDocument} from "./RequestFunctions.js";
+import days from '../Days.js';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';
 
 function RequestForm() {
   const [firstName, setFirstName] = useState("");
@@ -18,31 +20,84 @@ function RequestForm() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [comments, setComments] = useState("");
+  const [dayOfWeek, setDayOfWeek] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = {
       firstName: firstName,
       lastName: lastName,
-      id:id,
+      id: id,
       phoneNumber: contact,
       city: citySelectedOption ? citySelectedOption.label : "",
       langueges: langSelectedOptions ? langSelectedOptions.label : "",
-      volunteering : volSelectedOptions ? volSelectedOptions.label : "",
-      date : date,
-      time : time,
-      comments : comments,
+      volunteering: volSelectedOptions ? volSelectedOptions.label : "",
+      date: date,
+      day: dayOfWeek,
+      time: time,
+      comments: comments,
       status: "open",
       volunteerFeedback: "",
       seekerFeedback: "",
     };
+  
+    if (validateData(formData)) {
+      try {
+        const docRef = await addDocument('AidRequests', formData);
+  
+        const volunteersCollection = collection(db, 'Volunteers');
+  
+        // First query: Filter by city
+        let qCity = query(volunteersCollection, where('city', '==', citySelectedOption.label));
+        const queryCitySnapshot = await getDocs(qCity);
+  
+        // Filter city results further by language
+        let filteredDocs = queryCitySnapshot.docs;
+        if (langSelectedOptions.label) {
+          filteredDocs = filteredDocs.filter(doc => {
+            const data = doc.data();
+            return data.langueges && data.langueges.includes(langSelectedOptions.label);
+          });
+        }
+  
+        // Filter city and language results further by volunteering
+        if (volSelectedOptions.label) {
+          filteredDocs = filteredDocs.filter(doc => {
+            const data = doc.data();
+            return data.volunteering && data.volunteering.includes(volSelectedOptions.label);
+          });
+        }
 
-    if(validateData(formData)){
-      const docRef = await addDocument('AidRequests', formData);
-      const volunteerIds = await FindVolunteers(citySelectedOption ? citySelectedOption.label : "", langSelectedOptions ? langSelectedOptions.label : "", volSelectedOptions ? volSelectedOptions.label : "");
-      console.log(volunteerIds);
-      addFieldToDocument('AidRequests', docRef.id, 'matches', volunteerIds);
+        // Filter city, language and volunteering results further by day
+        if (volSelectedOptions.label) {
+          filteredDocs = filteredDocs.filter(doc => {
+            const data = doc.data();
+            return data.days && data.days.includes(dayOfWeek);
+          });
+        }
+  
+        // Extract IDs of matching volunteers
+        const volunteerIds = filteredDocs.map(doc => doc.id);
+        console.log('Volunteer IDs:', volunteerIds);
+  
+        // Add matching volunteer IDs to the aid request document
+        await addFieldToDocument('AidRequests', docRef.id, 'matches', volunteerIds);
+      } catch (error) {
+        console.error('Error during handleSubmit:', error);
+      }
     }
+  };
+  
+
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+    setDate(selectedDate);
+    const dateObj = new Date(selectedDate);
+    setDayOfWeek(getDayName(dateObj.getDay()));
+  };
+
+  const getDayName = (dayIndex) => {
+    return days[dayIndex];
   };
 
   return (
@@ -71,7 +126,7 @@ function RequestForm() {
             required
           />
 
-        <label htmlFor="id">מספר תעדות זהות</label>
+          <label htmlFor="id">מספר תעדות זהות</label>
           <input
             type="text"
             name="id"
@@ -95,17 +150,17 @@ function RequestForm() {
           <Select
             name="select"
             id="select"
-            options={citiesInIsrael.map(city => ({ value: city, label: city}))}
+            options={citiesInIsrael.map(city => ({ value: city, label: city }))}
             value={citySelectedOption}
             onChange={setCitySelectedOption}
             placeholder="בחר עיר מגורים"
           />
 
-        <label>שפה מועדפת</label>
+          <label>שפה מועדפת</label>
           <Select
             name="select"
             id="select"
-            options={langueges.map(lang => ({ value: lang, label: lang}))}
+            options={langues.map(lang => ({ value: lang, label: lang }))}
             value={langSelectedOptions}
             onChange={setLangSelectedOptions}
             placeholder="בחר שפה "
@@ -127,7 +182,7 @@ function RequestForm() {
             name="date"
             id="date"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={handleDateChange}
             required
           />
 
