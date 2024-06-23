@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { readDocuments, addDocument } from './AdminFunctions'; // Adjust the import path as necessary
+import { readDocuments, addDocument, deleteDocument } from './AdminFunctions'; // Adjust the import path as necessary
 import './List.css'; // Adjust the import path as necessary
 import citiesInIsrael from '../Forms/Cities.js'; // Adjust the import path as necessary
 import languages from '../Forms/Languges.js'; // Adjust the import path as necessary
 import days from '../Forms/Days.js'; // Adjust the import path as necessary
+import volunteering from '../Forms/Volunteerings.js'; // Adjust the import path as necessary
+
 import FilterSidebar from './FilterSidebar'; // Import the new FilterSidebar component
 import Select from 'react-select'; // Import react-select for dropdowns
 
@@ -37,7 +39,8 @@ const fixedColumnOrder = ['firstName', 'lastName', 'phoneNumber', 'langueges', '
 const filterOptions = {
   city: citiesInIsrael,
   langueges: languages,
-  days: days
+  days: days,
+  volunteering: volunteering
 };
 
 // Define the data types for each column
@@ -48,7 +51,7 @@ const columnDataTypes = {
   langueges: 'array',
   city: 'object',
   days: 'array',
-  volunteering: 'string',
+  volunteering: 'array',
   email: 'string',
   date: 'date',
   time: 'string',
@@ -71,6 +74,7 @@ function Lists() {
   const handleCollectionChange = (event) => {
     setCollectionName(event.target.value);
     setFilters({});
+    setDocuments([]); // Clear previous documents when collection changes
   };
 
   const handleFilterChange = (event, key) => {
@@ -120,9 +124,9 @@ function Lists() {
         if (columnDataTypes[key] === 'boolean') {
           formattedRecord[key] = value === 'true';
         } else if (columnDataTypes[key] === 'array') {
-          formattedRecord[key] = value.split(',').map(item => item.trim());
+          formattedRecord[key] = value.map(item => item.value); // Ensure the value is an array of selected options
         } else if (columnDataTypes[key] === 'object') {
-          formattedRecord[key] = { value, label: value };
+          formattedRecord[key] = { value: value.value, label: value.label };
         } else if (columnDataTypes[key] === 'date') {
           formattedRecord[key] = new Date(value);
         } else {
@@ -157,11 +161,19 @@ function Lists() {
     }));
   };
 
-  useEffect(() => {
+  const handleDeleteRecord = async (id) => {
     if (collectionName) {
-      fetchDocuments();
+      const confirmDelete = window.confirm('Are you sure you want to delete this record?');
+      if (confirmDelete) {
+        try {
+          await deleteDocument(collectionName, id);
+          fetchDocuments(); // Refresh the document list after deletion
+        } catch (err) {
+          console.error('Error deleting document:', err);
+        }
+      }
     }
-  }, [collectionName]);
+  };
 
   const getColumns = () => {
     if (documents.length === 0) return [];
@@ -191,7 +203,6 @@ function Lists() {
 
   const columns = getColumns();
   const filteredDocuments = getFilteredDocuments();
-
 
   return (
     <div dir="rtl" className='List'>
@@ -255,7 +266,7 @@ function Lists() {
                       name={column}
                       options={filterOptions[column].map(item => ({ value: item, label: item }))}
                       isMulti
-                      value={newRecord[column]}
+                      value={newRecord[column] || []}
                       onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
                       placeholder={`Select ${getColumnDisplayName(column)}`}
                     />
@@ -263,7 +274,7 @@ function Lists() {
                     <Select
                       name={column}
                       options={filterOptions[column].map(item => ({ value: item, label: item }))}
-                      value={newRecord[column]}
+                      value={newRecord[column] || null}
                       onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
                       placeholder={`Select ${getColumnDisplayName(column)}`}
                     />
@@ -298,6 +309,7 @@ function Lists() {
                   {columns.map((key) => (
                     <th key={key}>{getColumnDisplayName(key)}</th>
                   ))}
+                  <th>פעולות</th> {/* Add column for actions */}
                 </tr>
               </thead>
               <tbody>
@@ -320,6 +332,9 @@ function Lists() {
                           : doc[column]}
                       </td>
                     ))}
+                    <td>
+                      <button onClick={() => handleDeleteRecord(doc.id)}>מחק</button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
