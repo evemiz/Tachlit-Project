@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { readDocuments } from './AdminFunctions'; // Adjust the import path as necessary
+import { readDocuments, addDocument } from './AdminFunctions'; // Adjust the import path as necessary
 import './List.css'; // Adjust the import path as necessary
 import citiesInIsrael from '../Forms/Cities.js'; // Adjust the import path as necessary
 import languages from '../Forms/Languges.js'; // Adjust the import path as necessary
 import days from '../Forms/Days.js'; // Adjust the import path as necessary
 import FilterSidebar from './FilterSidebar'; // Import the new FilterSidebar component
+import Select from 'react-select'; // Import react-select for dropdowns
 
 const availableCollections = ['test', 'testRequests']; // Add your collection names here
+
 const getColumnDisplayName = (columnName) => {
   const columnMapping = {
     firstName: 'שם פרטי',
@@ -20,20 +22,40 @@ const getColumnDisplayName = (columnName) => {
     date: 'תאריך',
     time: 'שעה',
     comments: 'הערות',
-    status: 'סטטוס'
+    status: 'סטטוס',
+    emergency: 'חירום',
+    vehicle: 'רכב'
     // Add more mappings as necessary
   };
   return columnMapping[columnName] || columnName;
 };
 
 // Define the fixed column order
-const fixedColumnOrder = ['firstName', 'lastName', 'phoneNumber', 'langueges', 'city', 'days', 'volunteering', 'email', 'date', 'time', 'comments', 'status'];
+const fixedColumnOrder = ['firstName', 'lastName', 'phoneNumber', 'langueges', 'city', 'days', 'volunteering', 'email', 'date', 'time', 'comments', 'status', 'emergency', 'vehicle'];
 
 // Define predefined options for each filter (example)
 const filterOptions = {
   city: citiesInIsrael,
   langueges: languages,
   days: days
+};
+
+// Define the data types for each column
+const columnDataTypes = {
+  firstName: 'string',
+  lastName: 'string',
+  phoneNumber: 'string',
+  langueges: 'array',
+  city: 'object',
+  days: 'array',
+  volunteering: 'string',
+  email: 'string',
+  date: 'date',
+  time: 'string',
+  comments: 'string',
+  status: 'string',
+  vehicle: 'boolean',
+  emergency: 'boolean'
 };
 
 function Lists() {
@@ -43,6 +65,8 @@ function Lists() {
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({});
   const [showFilters, setShowFilters] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newRecord, setNewRecord] = useState({});
 
   const handleCollectionChange = (event) => {
     setCollectionName(event.target.value);
@@ -87,6 +111,52 @@ function Lists() {
     }
   };
 
+  const handleAddRecord = async (e) => {
+    e.preventDefault();
+    if (collectionName) {
+      // Convert newRecord to match the expected data types
+      const formattedRecord = {};
+      for (const [key, value] of Object.entries(newRecord)) {
+        if (columnDataTypes[key] === 'boolean') {
+          formattedRecord[key] = value === 'true';
+        } else if (columnDataTypes[key] === 'array') {
+          formattedRecord[key] = value.split(',').map(item => item.trim());
+        } else if (columnDataTypes[key] === 'object') {
+          formattedRecord[key] = { value, label: value };
+        } else if (columnDataTypes[key] === 'date') {
+          formattedRecord[key] = new Date(value);
+        } else {
+          formattedRecord[key] = value;
+        }
+      }
+      try {
+        const result = await addDocument(collectionName, formattedRecord);
+        if (result) {
+          setNewRecord({});
+          fetchDocuments(); // Refresh the document list
+          setShowAddForm(false); // Hide the form after adding the record
+        }
+      } catch (err) {
+        console.error('Error adding document:', err);
+      }
+    }
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setNewRecord(prevRecord => ({
+      ...prevRecord,
+      [name]: value
+    }));
+  };
+
+  const handleSelectChange = (selectedOption, name) => {
+    setNewRecord(prevRecord => ({
+      ...prevRecord,
+      [name]: selectedOption
+    }));
+  };
+
   useEffect(() => {
     if (collectionName) {
       fetchDocuments();
@@ -122,7 +192,6 @@ function Lists() {
   const columns = getColumns();
   const filteredDocuments = getFilteredDocuments();
 
-  console.log('Filtered Documents:', filteredDocuments);
 
   return (
     <div dir="rtl" className='List'>
@@ -142,9 +211,14 @@ function Lists() {
         <button className="lists-button" onClick={fetchDocuments} disabled={!collectionName}>אישור</button>
       </div>
       {collectionName && (
-        <button className="lists-button" onClick={() => setShowFilters(!showFilters)}>
-          {showFilters ? 'הסתר סינון' : 'סנן'}
-        </button>
+        <>
+          <button className="lists-button" onClick={() => setShowFilters(!showFilters)}>
+            {showFilters ? 'הסתר סינון' : 'סנן'}
+          </button>
+          <button className="lists-button" onClick={() => setShowAddForm(!showAddForm)}>
+            {showAddForm ? 'הסתר טופס' : 'הוסף'}
+          </button>
+        </>
       )}
       <div className={`content ${showFilters ? 'sidebar-open' : ''}`}>
         <FilterSidebar
@@ -153,6 +227,67 @@ function Lists() {
           filterOptions={filterOptions}
           showFilters={showFilters}
         />
+        {showAddForm && (
+          <div className="add-form">
+            <form onSubmit={handleAddRecord}>
+              {columns.map((column) => (
+                <div key={column}>
+                  <label>{getColumnDisplayName(column)}:</label>
+                  {columnDataTypes[column] === 'boolean' ? (
+                    <>
+                      <input
+                        type="radio"
+                        name={column}
+                        value="true"
+                        checked={newRecord[column] === 'true'}
+                        onChange={handleInputChange}
+                      /> כן
+                      <input
+                        type="radio"
+                        name={column}
+                        value="false"
+                        checked={newRecord[column] === 'false'}
+                        onChange={handleInputChange}
+                      /> לא
+                    </>
+                  ) : columnDataTypes[column] === 'array' ? (
+                    <Select
+                      name={column}
+                      options={filterOptions[column].map(item => ({ value: item, label: item }))}
+                      isMulti
+                      value={newRecord[column]}
+                      onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
+                      placeholder={`Select ${getColumnDisplayName(column)}`}
+                    />
+                  ) : columnDataTypes[column] === 'object' ? (
+                    <Select
+                      name={column}
+                      options={filterOptions[column].map(item => ({ value: item, label: item }))}
+                      value={newRecord[column]}
+                      onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
+                      placeholder={`Select ${getColumnDisplayName(column)}`}
+                    />
+                  ) : columnDataTypes[column] === 'date' ? (
+                    <input
+                      type="date"
+                      name={column}
+                      value={newRecord[column] || ''}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      name={column}
+                      value={newRecord[column] || ''}
+                      onChange={handleInputChange}
+                    />
+                  )}
+                </div>
+              ))}
+              <button className="lists-button" type="submit">אשר</button>
+            </form>
+          </div>
+        )}
         {loading && <p>Loading...</p>}
         {error && <p style={{ color: 'red' }}>Error: {error}</p>}
         {filteredDocuments.length > 0 ? (
