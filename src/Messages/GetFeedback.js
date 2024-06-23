@@ -1,7 +1,7 @@
 import { React, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
-import { db } from "/Users/evem/Desktop/a/src/firebaseConfig.js";
+import { db } from "../firebaseConfig.js";
 
 const GetFeedback = () => {
 const [feedback, setFeedback] = useState("");
