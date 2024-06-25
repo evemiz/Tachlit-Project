@@ -1,4 +1,4 @@
-import { doc, addDoc, collection, deleteDoc, getDocs } from 'firebase/firestore';
+import { doc, addDoc, collection, deleteDoc, getDocs,setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig.js';
 
 export function validateData(data) {
@@ -25,7 +25,17 @@ export const addDocument = async (collectionName, data) => {
         console.error('Invalid data');
     else{
         try {
-            const docRef = await addDoc(collection(db, collectionName), data);
+            const docId = data.id;
+            if (!docId) {
+                console.error('Document ID is missing in the data');
+                return null;
+            }
+
+            // Create a document reference with the custom ID
+            const docRef = doc(collection(db, collectionName), docId);
+
+            // Use setDoc to create the document with the specified ID and data
+            await setDoc(docRef, data);
             console.log("Document written with ID: ", docRef.id);
             return docRef;
           } catch (error) {
@@ -46,6 +56,7 @@ export const deleteDocument = async (collectionName, id) => {
     return false;
   }
 };
+
 
 
 // Function to update a document in a collection

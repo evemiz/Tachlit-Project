@@ -9,7 +9,7 @@ import volunteering from '../Forms/Volunteerings.js'; // Adjust the import path 
 import FilterSidebar from './FilterSidebar'; // Import the new FilterSidebar component
 import Select from 'react-select'; // Import react-select for dropdowns
 
-const availableCollections = ['test', 'testRequests']; // Add your collection names here
+const availableCollections = ['test', 'testRequests', 'NewVolunteers']; // Add your collection names here
 
 const getColumnDisplayName = (columnName) => {
   const columnMapping = {
@@ -17,23 +17,24 @@ const getColumnDisplayName = (columnName) => {
     lastName: 'שם משפחה',
     phoneNumber: 'מספר טלפון',
     langueges: 'שפות',
+    id: 'ת.ז.',
     city: 'עיר',
     days: 'ימים',
     volunteering: 'התנדבויות',
-    email: 'Email',
+    mail: 'Email',
     date: 'תאריך',
     time: 'שעה',
     comments: 'הערות',
     status: 'סטטוס',
     emergency: 'חירום',
-    vehicle: 'רכב'
+    vehicle: 'רכב',
     // Add more mappings as necessary
   };
   return columnMapping[columnName] || columnName;
 };
 
 // Define the fixed column order
-const fixedColumnOrder = ['firstName', 'lastName', 'phoneNumber', 'langueges', 'city', 'days', 'volunteering', 'email', 'date', 'time', 'comments', 'status', 'emergency', 'vehicle'];
+const fixedColumnOrder = ['firstName', 'lastName', 'id', 'phoneNumber', 'langueges', 'city', 'days', 'volunteering', 'mail', 'date', 'time', 'comments', 'status', 'emergency', 'vehicle'];
 
 // Define predefined options for each filter (example)
 const filterOptions = {
@@ -52,13 +53,14 @@ const columnDataTypes = {
   city: 'object',
   days: 'array',
   volunteering: 'array',
-  email: 'string',
+  mail: 'string',
   date: 'date',
   time: 'string',
   comments: 'string',
   status: 'string',
   vehicle: 'boolean',
-  emergency: 'boolean'
+  emergency: 'boolean',
+  id: 'string'
 };
 
 function Lists() {
@@ -177,7 +179,7 @@ function Lists() {
 
   const getColumns = () => {
     if (documents.length === 0) return [];
-    const docKeys = Object.keys(documents[0]).filter(key => key !== 'id');
+    const docKeys = Object.keys(documents[0]).filter(key => key);
     // Ensure the columns appear in the fixed order if they exist in the data
     return fixedColumnOrder.filter(column => docKeys.includes(column));
   };
