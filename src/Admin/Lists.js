@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { readDocuments, addDocument, deleteDocument } from './AdminFunctions'; // Adjust the import path as necessary
+import { readDocuments, addDocument, deleteDocument, updateDocument } from './AdminFunctions'; // Adjust the import path as necessary
 import './List.css'; // Adjust the import path as necessary
 import citiesInIsrael from '../Forms/Cities.js'; // Adjust the import path as necessary
 import languages from '../Forms/Languges.js'; // Adjust the import path as necessary
@@ -72,6 +72,8 @@ function Lists() {
   const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newRecord, setNewRecord] = useState({});
+  const [editMode, setEditMode] = useState(false);
+  const [currentEditId, setCurrentEditId] = useState(null);
 
   const handleCollectionChange = (event) => {
     setCollectionName(event.target.value);
@@ -136,14 +138,18 @@ function Lists() {
         }
       }
       try {
-        const result = await addDocument(collectionName, formattedRecord);
-        if (result) {
-          setNewRecord({});
-          fetchDocuments(); // Refresh the document list
-          setShowAddForm(false); // Hide the form after adding the record
+        if (editMode) {
+          await updateDocument(collectionName, currentEditId, formattedRecord);
+        } else {
+          await addDocument(collectionName, formattedRecord);
         }
+        setNewRecord({});
+        fetchDocuments(); // Refresh the document list
+        setShowAddForm(false); // Hide the form after adding/updating the record
+        setEditMode(false);
+        setCurrentEditId(null);
       } catch (err) {
-        console.error('Error adding document:', err);
+        console.error(`Error ${editMode ? 'updating' : 'adding'} document:`, err);
       }
     }
   };
@@ -177,9 +183,16 @@ function Lists() {
     }
   };
 
+  const handleEditRecord = (doc) => {
+    setNewRecord(doc);
+    setEditMode(true);
+    setCurrentEditId(doc.id);
+    setShowAddForm(true);
+  };
+
   const getColumns = () => {
     if (documents.length === 0) return [];
-    const docKeys = Object.keys(documents[0]).filter(key => key);
+    const docKeys = Object.keys(documents[0]).filter(key => key );
     // Ensure the columns appear in the fixed order if they exist in the data
     return fixedColumnOrder.filter(column => docKeys.includes(column));
   };
@@ -252,14 +265,14 @@ function Lists() {
                         type="radio"
                         name={column}
                         value="true"
-                        checked={newRecord[column] === 'true'}
+                        checked={newRecord[column] === true}
                         onChange={handleInputChange}
                       /> כן
                       <input
                         type="radio"
                         name={column}
                         value="false"
-                        checked={newRecord[column] === 'false'}
+                        checked={newRecord[column] === false}
                         onChange={handleInputChange}
                       /> לא
                     </>
@@ -297,7 +310,7 @@ function Lists() {
                   )}
                 </div>
               ))}
-              <button className="lists-button" type="submit">אשר</button>
+              <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
             </form>
           </div>
         )}
@@ -335,6 +348,7 @@ function Lists() {
                       </td>
                     ))}
                     <td>
+                      <button onClick={() => handleEditRecord(doc)}>ערוך</button>
                       <button onClick={() => handleDeleteRecord(doc.id)}>מחק</button>
                     </td>
                   </tr>
