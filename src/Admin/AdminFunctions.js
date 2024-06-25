@@ -59,7 +59,17 @@ export const deleteDocument = async (collectionName, id) => {
 
 
 
-// Function to update a document in a collection
-export const updateDocument = async (collection, docId, data) => {
-    //...
+export const updateDocument = async (collectionName, docId, data) => {
+  if (!validateData(data)) {
+    console.error('Invalid data');
+  } else {
+    try {
+      const docRef = doc(db, collectionName, docId);
+      await setDoc(docRef, data, { merge: true });
+      console.log("Document updated with ID: ", docId);
+      return docRef;
+    } catch (error) {
+      console.error("Error updating document: ", error);
+    }
+  }
 };

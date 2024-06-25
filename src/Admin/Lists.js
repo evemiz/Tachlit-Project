@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import Modal from 'react-modal';
 import { readDocuments, addDocument, deleteDocument, updateDocument } from './AdminFunctions'; // Adjust the import path as necessary
 import './List.css'; // Adjust the import path as necessary
 import citiesInIsrael from '../Forms/Cities.js'; // Adjust the import path as necessary
 import languages from '../Forms/Languges.js'; // Adjust the import path as necessary
 import days from '../Forms/Days.js'; // Adjust the import path as necessary
 import volunteering from '../Forms/Volunteerings.js'; // Adjust the import path as necessary
-
 import FilterSidebar from './FilterSidebar'; // Import the new FilterSidebar component
 import Select from 'react-select'; // Import react-select for dropdowns
 
@@ -63,6 +63,8 @@ const columnDataTypes = {
   id: 'string'
 };
 
+Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
+
 function Lists() {
   const [collectionName, setCollectionName] = useState('');
   const [documents, setDocuments] = useState([]);
@@ -74,6 +76,9 @@ function Lists() {
   const [newRecord, setNewRecord] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [currentEditId, setCurrentEditId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalAction, setModalAction] = useState(() => {});
 
   const handleCollectionChange = (event) => {
     setCollectionName(event.target.value);
@@ -119,6 +124,12 @@ function Lists() {
     }
   };
 
+  const confirmAction = (action, message) => {
+    setModalAction(() => action);
+    setModalMessage(message);
+    setIsModalOpen(true);
+  };
+
   const handleAddRecord = async (e) => {
     e.preventDefault();
     if (collectionName) {
@@ -130,24 +141,23 @@ function Lists() {
         } else if (columnDataTypes[key] === 'array') {
           formattedRecord[key] = value.map(item => item.value); // Ensure the value is an array of selected options
         } else if (columnDataTypes[key] === 'object') {
-          formattedRecord[key] = { value: value.value, label: value.label };
+          formattedRecord[key] = value ? { value: value.value, label: value.label } : null;
         } else if (columnDataTypes[key] === 'date') {
-          formattedRecord[key] = new Date(value);
+          formattedRecord[key] = value ? new Date(value) : null;
         } else {
-          formattedRecord[key] = value;
+          formattedRecord[key] = value || null; // Handle undefined values
         }
       }
+      // Filter out undefined values
+      const cleanedRecord = Object.fromEntries(
+        Object.entries(formattedRecord).filter(([_, v]) => v !== undefined)
+      );
       try {
         if (editMode) {
-          await updateDocument(collectionName, currentEditId, formattedRecord);
+          confirmAction(() => updateDocument(collectionName, currentEditId, cleanedRecord), '?האם אתה בטוח שברצונך לערוך רשומה זו');
         } else {
-          await addDocument(collectionName, formattedRecord);
+          confirmAction(() => addDocument(collectionName, cleanedRecord),  '?האם אתה בטוח שברצונך להוסיף רשומה זו');
         }
-        setNewRecord({});
-        fetchDocuments(); // Refresh the document list
-        setShowAddForm(false); // Hide the form after adding/updating the record
-        setEditMode(false);
-        setCurrentEditId(null);
       } catch (err) {
         console.error(`Error ${editMode ? 'updating' : 'adding'} document:`, err);
       }
@@ -169,22 +179,21 @@ function Lists() {
     }));
   };
 
-  const handleDeleteRecord = async (id) => {
+  const handleDeleteRecord = (id) => {
     if (collectionName) {
-      const confirmDelete = window.confirm('Are you sure you want to delete this record?');
-      if (confirmDelete) {
-        try {
-          await deleteDocument(collectionName, id);
-          fetchDocuments(); // Refresh the document list after deletion
-        } catch (err) {
-          console.error('Error deleting document:', err);
-        }
-      }
+      confirmAction(() => deleteDocument(collectionName, id), '?האם אתה בטוח שברצונך למחוק רשומה זו');
     }
   };
 
   const handleEditRecord = (doc) => {
-    setNewRecord(doc);
+    // Convert arrays back to the format expected by react-select
+    const formattedDoc = { ...doc };
+    for (const key in formattedDoc) {
+      if (columnDataTypes[key] === 'array' && Array.isArray(formattedDoc[key])) {
+        formattedDoc[key] = formattedDoc[key].map(item => ({ value: item, label: item }));
+      }
+    }
+    setNewRecord(formattedDoc);
     setEditMode(true);
     setCurrentEditId(doc.id);
     setShowAddForm(true);
@@ -192,7 +201,7 @@ function Lists() {
 
   const getColumns = () => {
     if (documents.length === 0) return [];
-    const docKeys = Object.keys(documents[0]).filter(key => key );
+    const docKeys = Object.keys(documents[0]).filter(key => key);
     // Ensure the columns appear in the fixed order if they exist in the data
     return fixedColumnOrder.filter(column => docKeys.includes(column));
   };
@@ -218,6 +227,16 @@ function Lists() {
 
   const columns = getColumns();
   const filteredDocuments = getFilteredDocuments();
+
+  const handleModalConfirm = async () => {
+    await modalAction();
+    setIsModalOpen(false);
+    fetchDocuments(); // Refresh documents after action
+  };
+
+  const handleModalCancel = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <div dir="rtl" className='List'>
@@ -329,15 +348,16 @@ function Lists() {
               </thead>
               <tbody>
                 {filteredDocuments.map((doc, index) => (
-                  <tr key={index}>
+                  <tr key={doc.id || index}> {/* Ensure each row has a unique key */}
                     {columns.map((column) => (
-                      <td key={column}>
+                      <td key={`${doc.id}-${column}`}>
                         {Array.isArray(doc[column])
-                          ? doc[column].map(item =>
-                              typeof item === 'object' && item !== null && 'label' in item
-                                ? item.label
-                                : item
-                            ).join(', ')
+                          ? doc[column].map((item, idx) => (
+                              <span key={`${doc.id}-${column}-${idx}`}>
+                                {typeof item === 'object' && item !== null && 'label' in item ? item.label : item}
+                                {idx < doc[column].length - 1 ? ', ' : ''}
+                              </span>
+                            ))
                           : typeof doc[column] === 'boolean'
                           ? doc[column] ? '✓' : '✗'
                           : typeof doc[column] === 'object' && doc[column] !== null && 'label' in doc[column]
@@ -360,6 +380,20 @@ function Lists() {
           !loading && <p>No documents found</p>
         )}
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={handleModalCancel}
+        contentLabel="Confirmation"
+        className="Modal"
+        overlayClassName="Overlay"
+      >
+        <h2>Confirm Action</h2>
+        <p>{modalMessage}</p>
+        <div className="modal-buttons">
+          <button className="modal-button confirm" onClick={handleModalConfirm}>אשר</button>
+          <button className="modal-button cancel" onClick={handleModalCancel}>בטל</button>
+        </div>
+      </Modal>
     </div>
   );
 }
