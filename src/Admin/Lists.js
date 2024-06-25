@@ -50,7 +50,7 @@ const columnDataTypes = {
   lastName: 'string',
   phoneNumber: 'string',
   langueges: 'array',
-  city: 'object',
+  city: 'string',
   days: 'array',
   volunteering: 'array',
   mail: 'string',
@@ -79,6 +79,8 @@ function Lists() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalAction, setModalAction] = useState(() => {});
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleCollectionChange = (event) => {
     setCollectionName(event.target.value);
@@ -232,10 +234,20 @@ function Lists() {
     await modalAction();
     setIsModalOpen(false);
     fetchDocuments(); // Refresh documents after action
+    setSuccessMessage('!הפעולה בוצעה בהצלחה');
+    setIsSuccessModalOpen(true);
+    setNewRecord({});
+    setEditMode(false);
+    setCurrentEditId(null);
+    setShowAddForm(false);
   };
 
   const handleModalCancel = () => {
     setIsModalOpen(false);
+  };
+
+  const handleSuccessModalClose = () => {
+    setIsSuccessModalOpen(false);
   };
 
   return (
@@ -284,14 +296,14 @@ function Lists() {
                         type="radio"
                         name={column}
                         value="true"
-                        checked={newRecord[column] === true}
+                        checked={newRecord[column] === 'true'}
                         onChange={handleInputChange}
                       /> כן
                       <input
                         type="radio"
                         name={column}
                         value="false"
-                        checked={newRecord[column] === false}
+                        checked={newRecord[column] === 'false'}
                         onChange={handleInputChange}
                       /> לא
                     </>
@@ -392,6 +404,19 @@ function Lists() {
         <div className="modal-buttons">
           <button className="modal-button confirm" onClick={handleModalConfirm}>אשר</button>
           <button className="modal-button cancel" onClick={handleModalCancel}>בטל</button>
+        </div>
+      </Modal>
+      <Modal
+        isOpen={isSuccessModalOpen}
+        onRequestClose={handleSuccessModalClose}
+        contentLabel="Success"
+        className="Modal"
+        overlayClassName="Overlay"
+      >
+        <h2>פעולה הצליחה</h2>
+        <p>{successMessage}</p>
+        <div className="modal-buttons">
+          <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
         </div>
       </Modal>
     </div>
