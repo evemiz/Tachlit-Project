@@ -1,5 +1,3 @@
-
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
@@ -14,6 +12,7 @@ function AdminMain() {
   const [email, setEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [message, setMessage] = useState("");
 
   const handleLogout = () => {
@@ -36,11 +35,17 @@ function AdminMain() {
     setEmail("");
     setOldPassword("");
     setNewPassword("");
+    setConfirmNewPassword("");
     setMessage("");
   };
 
   const handleChangePassword = (e) => {
     e.preventDefault();
+    if (newPassword !== confirmNewPassword) {
+      setMessage("הסיסמאות אינן תואמות.");
+      return;
+    }
+
     const user = auth.currentUser;
 
     if (user && user.email === email) {
@@ -73,7 +78,7 @@ function AdminMain() {
         <Link to="/Lists">Go to Lists</Link>
       </button>
       <button>
-        <Link to="/SignUp">Go to SignUp</Link>
+        <Link to="/SignUp">Go to SignUpNewAdmin</Link>
       </button>
       <button onClick={handleLogout}>התנתקות</button>
       <button onClick={openModal}>שינוי סיסמה</button>
@@ -103,6 +108,13 @@ function AdminMain() {
             placeholder="סיסמה חדשה"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
+            dir="rtl"
+          />
+          <input
+            type="password"
+            placeholder="הקש שוב את סיסמתך"
+            value={confirmNewPassword}
+            onChange={(e) => setConfirmNewPassword(e.target.value)}
             dir="rtl"
           />
           <button type="submit">שנה סיסמה</button>

@@ -15,6 +15,9 @@ import WrongPage from './Messages/Wrong';
 import GetFeedback from './Messages/GetFeedback';
 import VolunteerFeedback from './Messages/VolunteerFeadback';
 import VerificationPhone from './Messages/PhoneVerification';
+import LoginVolunteer from './volunteer/VolunteerLogIn'
+import VolunteerMain from './volunteer/VolunteerMain';
+
 
 const Home = () => (
   <div>
@@ -44,7 +47,7 @@ const App = () => {
             <Link to="/Login">Go to Login</Link>
           </button>
           <button>
-            <Link to="/SignUp">Go to SignUp</Link>
+            <Link to="/SignUp">Go to SignUpNewAdmin</Link>
           </button>
           <button>
             <Link to="/ViewRequest">Go to ViewRequest</Link>
@@ -54,6 +57,9 @@ const App = () => {
           </button>
           <button>
             <Link to="/GetFeedback">Go to GetFeedback</Link>
+          </button>
+          <button>
+            <Link to="/VolunteerLogIn">Go to VolunteerLogIn</Link>
           </button>
         </nav>
         <Routes>
@@ -73,6 +79,12 @@ const App = () => {
           <Route path="/ThanksFeedback" element={<ThanksFeedback />} />
           <Route path="/VolunteerFeedback" element={<VolunteerFeedback />} />
           <Route path="/VerificationPhone" element={<VerificationPhone />} />
+          <Route path="/VolunteerLogIn" element={<LoginVolunteer />} />
+          <Route path="/VolunteerMain" element={<VolunteerMain />} />
+
+
+
+
           <Route path="/" element={<Home />} />
         </Routes>
       </div>
