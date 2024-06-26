@@ -34,12 +34,12 @@ function VolunteerForm() {
       langueges: langSelectedOptions.map(option => option.value),
       days: daySelectedOptions.map(option => option.value),
       emergency: available,
-      volunteering : volSelectedOptions.map(option => option.value), 
+      volunteering : volSelectedOptions.map(option => option.value),
       vehicle: vehicle,
     };
 
     if(validateData(formData)){
-      addDocument("NewVolunteers", formData);
+      addDocument("NewVolunteers", formData,'id');
     }
 
   };
@@ -111,7 +111,7 @@ function VolunteerForm() {
             value={citySelectedOption}
             onChange={setCitySelectedOption}
             placeholder="בחר עיר מגורים"
-          />            
+          />
 
           <label>תחומי התנדבות</label>
           <Select

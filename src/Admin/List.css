@@ -1,62 +1,90 @@
 .List {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 90%;
-  }
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  margin: 0 auto; /* Center the List component */
+}
 
- /* General styles for the Lists component */
-.lists-container {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 90%;
-  }
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* Allows horizontal scrolling if table overflows */
+}
 
-  /* Styles for the buttons specific to the Lists component */
-  .lists-button {
-    background-color: #4CAF50; /* Green background */
-    border: none; /* Remove borders */
-    color: white; /* White text */
-    padding: 10px 20px; /* Some padding */
-    text-align: center; /* Centered text */
-    text-decoration: none; /* Remove underline */
-    display: inline-block; /* Make the buttons inline-block */
-    font-size: 16px; /* Increase font size */
-    margin: 4px 2px; /* Some margin */
-    transition-duration: 0.4s; /* Transition effect */
-    cursor: pointer; /* Pointer/hand icon on hover */
-    width: auto;
+.table {
+  border-collapse: collapse;
+  width: 100%; /* Ensure table takes the full width of the container */
+  align-items: center;
+}
 
-  }
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  white-space: nowrap; /* Prevent content from wrapping */
+}
 
+.table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: center;
+  align-items: center;
+  background-color: #f2f2f2;
+  color: black;
+}
 
+.lists-button {
+  margin: 10px;
+  width: auto;
 
-  /* Styles for the table container */
-  .table-container {
-    width: 100%;
-    overflow-x: auto; /* Allows horizontal scrolling if table overflows */
-  }
+}
+/* List.css */
+.Modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  z-index: 1000;
+}
 
-  /* Styles for the table */
-  .table {
-    border-collapse: collapse;
-    width: 100%; /* Ensure table takes the full width of the container */
-  }
+.Overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
 
-  .table th,
-  .table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    white-space: nowrap; /* Prevent content from wrapping */
-  }
+.modal-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
 
-  .table th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: center;
-    background-color: #f2f2f2;
-    color: black;
-  }
+.modal-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-button.confirm {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.modal-button.cancel {
+  background-color: #f44336;
+  color: white;
+}

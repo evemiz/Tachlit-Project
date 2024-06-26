@@ -40,17 +40,17 @@ function RequestForm() {
       volunteerFeedback: "",
       seekerFeedback: "",
     };
-  
+
     if (validateData(formData)) {
       try {
         const docRef = await addDocument('AidRequests', formData);
-  
+
         const volunteersCollection = collection(db, 'Volunteers');
-  
+
         // First query: Filter by city
         let qCity = query(volunteersCollection, where('city', '==', citySelectedOption.label));
         const queryCitySnapshot = await getDocs(qCity);
-  
+
         // Filter city results further by language
         let filteredDocs = queryCitySnapshot.docs;
         if (langSelectedOptions.label) {
@@ -59,7 +59,7 @@ function RequestForm() {
             return data.langueges && data.langueges.includes(langSelectedOptions.label);
           });
         }
-  
+
         // Filter city and language results further by volunteering
         if (volSelectedOptions.label) {
           filteredDocs = filteredDocs.filter(doc => {
@@ -75,11 +75,11 @@ function RequestForm() {
             return data.days && data.days.includes(dayOfWeek);
           });
         }
-  
+
         // Extract IDs of matching volunteers
         const volunteerIds = filteredDocs.map(doc => doc.id);
         console.log('Volunteer IDs:', volunteerIds);
-  
+
         // Add matching volunteer IDs to the aid request document
         await addFieldToDocument('AidRequests', docRef.id, 'matches', volunteerIds);
       } catch (error) {
@@ -87,7 +87,7 @@ function RequestForm() {
       }
     }
   };
-  
+
 
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
