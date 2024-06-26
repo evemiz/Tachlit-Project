@@ -7,19 +7,21 @@ const getColumnDisplayName = (columnName) => {
     lastName: 'שם משפחה',
     phoneNumber: 'מספר טלפון',
     langueges: 'שפות',
+    id: 'ת.ז.',
     city: 'עיר',
     days: 'ימים',
     volunteering: 'התנדבויות',
-    email: 'Email',
+    mail: 'Email',
     date: 'תאריך',
     time: 'שעה',
     comments: 'הערות',
-    status: 'סטטוס'
+    status: 'סטטוס',
+    emergency: 'חירום',
+    vehicle: 'רכב',
     // Add more mappings as necessary
   };
   return columnMapping[columnName] || columnName;
 };
-
 const FilterSidebar = ({ filters, handleFilterChange, filterOptions, showFilters }) => {
   return (
     <div className={`sidebar ${showFilters ? 'open' : 'closed'}`}>
