@@ -15,9 +15,9 @@ const VolunteerFeedback = () => {
             navigate('/thankyou');
         } catch (error) {
             console.error("Error updating status:", error);
-        }    
+        }
     };
-    
+
   return (
     <div className="App">
       <header className="App-header">

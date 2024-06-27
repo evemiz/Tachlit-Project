@@ -14,7 +14,7 @@ const handleSubmit = async () => {
         navigate('/ThanksFeedback');
     } catch (error) {
         console.error("Error updating status:", error);
-    }    
+    }
 };
 
   return (

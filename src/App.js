@@ -25,6 +25,7 @@ const Home = () => (
     <p>Select an option from above to navigate</p>
   </div>
 );
+import SignUpVol from './Forms/Volunteers/SignUpNewVolunteer';
 
 const App = () => {
   return (
@@ -58,9 +59,6 @@ const App = () => {
           <button>
             <Link to="/GetFeedback">Go to GetFeedback</Link>
           </button>
-          <button>
-            <Link to="/VolunteerLogIn">Go to VolunteerLogIn</Link>
-          </button>
         </nav>
         <Routes>
           <Route path="/VolunteerForm" element={<VolunteerForm />} />
@@ -79,12 +77,6 @@ const App = () => {
           <Route path="/ThanksFeedback" element={<ThanksFeedback />} />
           <Route path="/VolunteerFeedback" element={<VolunteerFeedback />} />
           <Route path="/VerificationPhone" element={<VerificationPhone />} />
-          <Route path="/VolunteerLogIn" element={<LoginVolunteer />} />
-          <Route path="/VolunteerMain" element={<VolunteerMain />} />
-
-
-
-
           <Route path="/" element={<Home />} />
         </Routes>
       </div>

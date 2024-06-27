@@ -11,7 +11,9 @@ import {validateData, addDocument} from "./VolunteerFunctions.js"
 function VolunteerForm() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [id, setId] = useState("");
   const [contact, setContact] = useState("");
+  const [mail, setMail] = useState("");
   const [citySelectedOption, setCitySelectedOption] = useState("");
   const [volSelectedOptions, setVolSelectedOptions] = useState([]);
   const [daySelectedOptions, setDaySelectedOptions] = useState([]);
@@ -25,17 +27,19 @@ function VolunteerForm() {
     const formData = {
       firstName: firstName,
       lastName: lastName,
+      id: id,
       phoneNumber: contact,
-      city: citySelectedOption,
+      mail: mail,
+      city: citySelectedOption ? citySelectedOption.label : "",
       langueges: langSelectedOptions.map(option => option.value),
       days: daySelectedOptions.map(option => option.value),
       emergency: available,
-      volunteering : volSelectedOptions.map(option => option.value), 
+      volunteering : volSelectedOptions.map(option => option.value),
       vehicle: vehicle,
     };
 
     if(validateData(formData)){
-      addDocument("test", formData);
+      addDocument("NewVolunteers", formData,'id');
     }
 
   };
@@ -66,6 +70,16 @@ function VolunteerForm() {
             required
           />
 
+        <label htmlFor="id">מספר תעדות זהות</label>
+          <input
+            type="text"
+            name="id"
+            id="id"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            required
+          />
+
           <label htmlFor="tel">מספר טלפון</label>
                     <input
                         type="tel"
@@ -78,6 +92,18 @@ function VolunteerForm() {
                         required
                     />
 
+            <label htmlFor="mail">כתובת מייל</label>
+                    <input
+                        type="tel"
+                        name="mail"
+                        id="mail"
+                        value={mail}
+                        onChange={(e) =>
+                            setMail(e.target.value)
+                        }
+                        required
+                    />
+
           <label>עיר מגורים</label>
           <Select
             name="select"
@@ -85,7 +111,7 @@ function VolunteerForm() {
             value={citySelectedOption}
             onChange={setCitySelectedOption}
             placeholder="בחר עיר מגורים"
-          />            
+          />
 
           <label>תחומי התנדבות</label>
           <Select
