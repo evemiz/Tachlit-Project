@@ -1,5 +1,9 @@
 import { doc, addDoc, collection, deleteDoc, getDocs,setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig.js';
+import { doc as doc1, getDoc as getDoc1 } from 'firebase/firestore';
+import { sendSignInLinkToEmail } from 'firebase/auth';
+import { auth } from '../firebaseConfig.js'; // Adjust the import path as necessary
+
 
 export function validateData(data) {
   return true;
@@ -73,3 +77,47 @@ export const updateDocument = async (collectionName, docId, data) => {
     }
   }
 };
+
+
+
+// Function to move a document from one collection to another
+export const MoveDoc = async (docId) => {
+  try {
+    const docRef = doc1(db, 'NewVolunteers', docId);
+    const docSnap = await getDoc1(docRef);
+
+    if (docSnap.exists()) {
+      const docData = docSnap.data();
+      
+      // Add the document to the Volunteers collection
+      await addDocument('Volunteers', { ...docData, id: docId });
+      
+      // Delete the document from the NewVolunteers collection
+      await deleteDocument('NewVolunteers', docId);
+      
+      console.log("Document moved from NewVolunteers to Volunteers with ID: ", docId);
+    } else {
+      console.error("No such document!");
+    }
+  } catch (error) {
+    console.error("Error moving document: ", error);
+  }
+};
+
+// Function to send approval email
+export const sendApprovalEmail = async (email, volunteerId) => {
+  const actionCodeSettings = {
+    url: `https://your-app-url.com/VolunteerRegister/${volunteerId}`,
+    handleCodeInApp: true,
+  };
+
+  try {
+    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+    window.localStorage.setItem('emailForSignIn', email);
+    console.log("קישור להגדרת סיסמה נשלח לאימייל של המתנדב החדש.");
+  } catch (error) {
+    console.error("Error sending sign-in link:", error.code, error.message);
+    throw error;
+  }
+};
+ 

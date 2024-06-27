@@ -17,6 +17,7 @@ import VolunteerFeedback from './Messages/VolunteerFeadback';
 import VerificationPhone from './Messages/PhoneVerification';
 import LoginVolunteer from './volunteer/VolunteerLogIn'
 import VolunteerMain from './volunteer/VolunteerMain';
+import SignUpVol from './Forms/Volunteers/SignUpNewVolunteer';
 
 
 const Home = () => (
@@ -25,7 +26,6 @@ const Home = () => (
     <p>Select an option from above to navigate</p>
   </div>
 );
-import SignUpVol from './Forms/Volunteers/SignUpNewVolunteer';
 
 const App = () => {
   return (
