@@ -4,7 +4,8 @@ import RequestForm from './Forms/AidRequests/Form';
 import AdminMain from './Admin/AdminMain';
 import Lists from './Admin/Lists';
 import Login from './Admin/login';
-import SignUp from './Admin/SignUpNewAdmin';
+import SignUpNewAdmin from './Admin/SignUpNewAdmin';
+import FinishSignUp from './Admin/finishSignUp';
 import ViewRequest from './Messages/ViewRequest';
 import ThankYouPage from './Messages/ThankYou';
 import ThanksFeedback from './Messages/ThanksFeedback';
@@ -14,9 +15,19 @@ import WrongPage from './Messages/Wrong';
 import GetFeedback from './Messages/GetFeedback';
 import VolunteerFeedback from './Messages/VolunteerFeadback';
 import VerificationPhone from './Messages/PhoneVerification';
+import LoginVolunteer from './volunteer/VolunteerLogIn'
+import VolunteerMain from './volunteer/VolunteerMain';
 import SignUpVol from './Forms/Volunteers/SignUpNewVolunteer';
 import '@fontsource/rubik';
 
+
+
+const Home = () => (
+  <div>
+    <h1>Welcome to the App</h1>
+    <p>Select an option from above to navigate</p>
+  </div>
+);
 
 const App = () => {
   return (
@@ -39,7 +50,7 @@ const App = () => {
             <Link to="/Login">Go to Login</Link>
           </button>
           <button>
-            <Link to="/SignUp">Go to SignUp</Link>
+            <Link to="/SignUp">Go to SignUpNewAdmin</Link>
           </button>
           <button>
             <Link to="/ViewRequest">Go to ViewRequest</Link>
@@ -50,9 +61,6 @@ const App = () => {
           <button>
             <Link to="/GetFeedback">Go to GetFeedback</Link>
           </button>
-          <button>
-            <Link to="/SignUpVol">Go to SignUp Volunteer</Link>
-          </button>
         </nav>
         <Routes>
           <Route path="/VolunteerForm" element={<VolunteerForm />} />
@@ -60,7 +68,8 @@ const App = () => {
           <Route path="/AdminMain" element={<AdminMain />} />
           <Route path="/Lists" element={<Lists />} />
           <Route path="/Login" element={<Login />} />
-          <Route path="/SignUp" element={<SignUp />} />
+          <Route path="/SignUp" element={<SignUpNewAdmin />} />
+          <Route path="/finishSignUp" element={<FinishSignUp />} />
           <Route path="/ViewRequest" element={<ViewRequest />} />
           <Route path="/thankyou" element={<ThankYouPage />} />
           <Route path="/RequestInProcessPage" element={<RequestInProcessPage />} />
@@ -70,19 +79,11 @@ const App = () => {
           <Route path="/ThanksFeedback" element={<ThanksFeedback />} />
           <Route path="/VolunteerFeedback" element={<VolunteerFeedback />} />
           <Route path="/VerificationPhone" element={<VerificationPhone />} />
-          <Route path="/SignUpVol" element={<SignUpVol />} />
           <Route path="/" element={<Home />} />
         </Routes>
       </div>
     </Router>
   );
 };
-
-const Home = () => (
-  <div>
-    <h1>Welcome to the App</h1>
-    <p>Select an option from above to navigate</p>
-  </div>
-);
 
 export default App;
