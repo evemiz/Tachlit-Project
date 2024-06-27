@@ -23,6 +23,8 @@
   .sidebar button {
     display: block;
     margin-bottom: 10px;
+    border-radius: 50px !important;
+
   }
 
   .filter-group {

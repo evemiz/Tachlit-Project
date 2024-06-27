@@ -3,7 +3,7 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Rubik';
   background-color: #f4f4f4;
   padding: 2%;
   direction: rtl;
@@ -45,6 +45,7 @@ button {
   border-radius: 5px;
   font-size: 14px;
   margin-bottom: 10px;
+
 }
 
 .form-group {
@@ -86,15 +87,19 @@ textarea {
 button {
   background-color: #4CAF50;
   color: white;
-  border: none;
+  /* border: none; */
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s;
   width: auto;
+  border-radius: 50px !important;
+
 }
 
 button:hover {
   background-color: #45a049;
+    border-radius: 50px !important;
+
 }
 
 .Button_list {
@@ -103,6 +108,8 @@ button:hover {
   border: 1px solid #ccc; /* Add border */
   padding: 8px 16px; /* Add padding for better appearance */
   cursor: pointer; /* Change cursor to pointer to indicate interactivity */
+  border-radius: 50px !important;
+
 }
 
 .Button_list.active {
