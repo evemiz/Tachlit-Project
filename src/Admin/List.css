@@ -1,28 +1,46 @@
+
 .List {
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  padding: 10px 20px;
+  transition: transform 0.2s;
+  width: 90%;
   text-align: center;
+  margin: 0 auto; /* Center the List component */
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 90%;
-  margin: 0 auto; /* Center the List component */
+  font-family: 'Rubik';
+  color: #555;
+
+
+
 }
 
 .table-container {
   width: 100%;
   overflow-x: auto; /* Allows horizontal scrolling if table overflows */
+  font-family: 'Rubik';
+  align-items: center;
 }
 
 .table {
   border-collapse: collapse;
   width: 100%; /* Ensure table takes the full width of the container */
   align-items: center;
+  font-family: 'Rubik';
+
 }
 
 .table th,
 .table td {
-  border: 1px solid #ddd;
+  border: 1px solid #009ba6;
   padding: 8px;
   white-space: nowrap; /* Prevent content from wrapping */
+  font-family: 'Rubik';
+
 }
 
 .table th {
@@ -32,13 +50,34 @@
   align-items: center;
   background-color: #f2f2f2;
   color: black;
+  font-family: 'Rubik';
+
 }
 
 .lists-button {
-  margin: 10px;
+  color: #ffffff;
+  background-color: #009ba6;
+  border: 2px solid #009ba6;
+  padding: 10px 20px; /* Adjust the padding as needed */
+  font-size: 16px; /* Adjust the font size as needed */
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 5px; /* Adjust the border-radius if needed */
+  transition: background-color 0.3s ease, color 0.3s ease;
   width: auto;
+  border-radius: 50px !important;
+  font-weight: bold;
+
+
 
 }
+
+.list-button:hover {
+  background-color: #ffffff;
+  color: #555;
+}
+
+
 /* List.css */
 .Modal {
   position: fixed;
@@ -70,6 +109,8 @@
   display: flex;
   justify-content: space-around;
   margin-top: 20px;
+  border-radius: 50px !important;
+  font-family: 'Rubik';
 }
 
 .modal-button {
@@ -77,6 +118,8 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  border-radius: 50px !important;
+  font-family: 'Rubik';
 }
 
 .modal-button.confirm {
@@ -88,3 +131,6 @@
   background-color: #f44336;
   color: white;
 }
+
+
+

@@ -15,6 +15,8 @@ import GetFeedback from './Messages/GetFeedback';
 import VolunteerFeedback from './Messages/VolunteerFeadback';
 import VerificationPhone from './Messages/PhoneVerification';
 import SignUpVol from './Forms/Volunteers/SignUpNewVolunteer';
+import '@fontsource/rubik';
+
 
 const App = () => {
   return (

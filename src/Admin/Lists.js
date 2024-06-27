@@ -8,6 +8,8 @@ import days from '../Forms/Days.js'; // Adjust the import path as necessary
 import volunteering from '../Forms/Volunteerings.js'; // Adjust the import path as necessary
 import FilterSidebar from './FilterSidebar'; // Import the new FilterSidebar component
 import Select from 'react-select'; // Import react-select for dropdowns
+import '@fontsource/rubik';
+
 
 const availableCollections = ['test', 'testRequests', 'NewVolunteers']; // Add your collection names here
 
