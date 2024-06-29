@@ -204,3 +204,95 @@ menuButton a:hover {
   padding: 5px 0;
 }
 
+/*מתנדב*/
+.VolunteerMain {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  position: absolute; /* מוודא שה-div יתפוס את כל המסך */
+  top: 0;
+  left: 0;
+}
+
+.VolunteerMain h1 {
+  font-size: 3.5em; /* גודל גופן מותאם אישית */
+  font-weight: bold; /* אופציונלי: שינוי עובי הגופן */
+  text-align: center; /* אופציונלי: מיקום הכותרת במרכז */
+  margin-top: 5%; /* אופציונלי: הוספת ריווח מלמעלה */
+}
+
+.VolunteerMain volunteerMainButton {
+  display: inline-block;
+  width: 12%; /* הגדרת רוחב הכפתור */
+  height: 5%; /* הגדרת גובה הכפתור */
+  background-color: #009ba6; /* הגדרת צבע הרקע */
+  color: white; /* צבע הטקסט */
+  font-size: 150%; /* גודל הגופן */
+  border: none; /* הסרת מסגרת הכפתור */
+  border-radius: 10px; /* פינות מעוגלות, אופציונלי */
+  margin: 4%; /* רווח בין הכפתורים */
+  margin-top: 30%;
+  cursor: pointer; /* שינוי צורת הסמן */
+  text-align: center; /* מיקום הטקסט במרכז הכפתור */
+}
+
+.VolunteerMain volunteerMainButton a {
+  color: white; /* צבע הקישור */
+  text-decoration: none; /* הסרת הקו התחתון של הקישור */
+  display: flex;
+  justify-content: center;
+  height: 100%; /* מוודא שהקישור יתפוס את כל גובה הכפתור */
+}
+
+/*מנהל*/
+.AdminMAinPage {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  position: absolute; /* מוודא שה-div יתפוס את כל המסך */
+  top: 0;
+  left: 0;
+}
+
+.AdminMAinPage h1 {
+  font-size: 3.5em; /* גודל גופן מותאם אישית */
+  font-weight: bold; /* אופציונלי: שינוי עובי הגופן */
+  text-align: center; /* אופציונלי: מיקום הכותרת במרכז */
+  margin-top: 5%; /* אופציונלי: הוספת ריווח מלמעלה */
+}
+
+.AdminMAinPage adminMainButton {
+  display: inline-block;
+  width: 12%; /* הגדרת רוחב הכפתור */
+  height: 5%; /* הגדרת גובה הכפתור */
+  background-color: #009ba6; /* הגדרת צבע הרקע */
+  color: white; /* צבע הטקסט */
+  font-size: 150%; /* גודל הגופן */
+  border: none; /* הסרת מסגרת הכפתור */
+  border-radius: 10px; /* פינות מעוגלות, אופציונלי */
+  margin: 4%; /* רווח בין הכפתורים */
+  margin-top: 30%;
+  cursor: pointer; /* שינוי צורת הסמן */
+  text-align: center; /* מיקום הטקסט במרכז הכפתור */
+
+}
+
+.AdminMAinPage adminMainButton a {
+  color: white; /* צבע הקישור */
+  text-decoration: none; /* הסרת הקו התחתון של הקישור */
+  display: flex;
+  justify-content: center;
+  height: 100%; /* מוודא שהקישור יתפוס את כל גובה הכפתור */
+  
+  
+}
+
+
+
+
+
+
+
+
