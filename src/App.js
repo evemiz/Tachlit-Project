@@ -19,13 +19,16 @@ import LoginVolunteer from './volunteer/VolunteerLogIn'
 import VolunteerMain from './volunteer/VolunteerMain';
 import SignUpVol from './Forms/Volunteers/SignUpNewVolunteer';
 import '@fontsource/rubik';
-import './App.css';
+import './App.css'; // ייבוא של קובץ ה-CSS
+import './styles.css';
+
+
 
 
 const Home = () => (
   <div>
-    <h1>Welcome to the App</h1>
-    <p>Select an option from above to navigate</p>
+    <h1></h1>
+    <p></p>
   </div>
 );
 
@@ -34,36 +37,22 @@ const App = () => {
     <Router>
       <div>
         <nav>
-          <button>
-            <Link to="/VolunteerForm">Go to Volunteer Form</Link>
-          </button>
-          <button>
-            <Link to="/RequestForm">Go to Aid Request Form</Link>
-          </button>
-          {/* <button>
-            <Link to="/AdminMain">Go to AdminMain</Link>
-          </button> */}
-          {/* <button>
-            <Link to="/Lists">Go to Lists</Link>
-          </button> */}
-          <button>
-            <Link to="/Login">Admin Log-In</Link>
-          </button>
-          <button>
-            <Link to="/LoginVolunteer">Volunteer Log-In</Link>
-          </button>
-          {/* <button>
-            <Link to="/SignUp">Go to SignUpNewAdmin</Link>
-          </button> */}
-          <button>
-            <Link to="/ViewRequest">Go to ViewRequest</Link>
-          </button>
-          <button>
-            <Link to="/CloseRequest">Go to CloseRequest</Link>
-          </button>
-          <button>
-            <Link to="/GetFeedback">Go to GetFeedback</Link>
-          </button>
+          <menuButton>
+            <Link to="/VolunteerForm">טופס התנדבות</Link>
+          </menuButton>
+
+          <menuButton>
+            <Link to="/RequestForm">טופס בקשת סיוע</Link>
+          </menuButton>
+
+          <menuButton>
+            <Link to="/Login">התחבר כמנהל</Link>
+          </menuButton>
+
+          <menuButton>
+            <Link to="/LoginVolunteer">התחבר כמתנדב</Link>
+          </menuButton>
+
         </nav>
         <Routes>
           <Route path="/VolunteerForm" element={<VolunteerForm />} />
@@ -88,6 +77,8 @@ const App = () => {
 
           <Route path="/" element={<Home />} />
         </Routes>
+
+
       </div>
     </Router>
   );

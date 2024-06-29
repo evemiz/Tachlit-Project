@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { auth, db } from "../firebaseConfig"; // Import db from firebaseConfig
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -35,7 +36,7 @@ function Login() {
   };
 
   return (
-    <div className="App">
+    <div className="LogInModel">
       <form onSubmit={handleLogin}>
         <input
           type="email"
