@@ -774,7 +774,7 @@ function Lists() {
                 </div>
               ))}
               <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
-              {editMode && <button type="button" onClick={() => handleApproveVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
+              {collectionName=='NewVolunteers'&&editMode && <button type="button" onClick={() => handleApproveVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
             </form>
           </div>
         )}
