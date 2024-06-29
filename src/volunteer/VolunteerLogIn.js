@@ -28,7 +28,7 @@ function LoginVolunteer() {
   };
 
   return (
-    <div className="App">
+    <div className="LogInModel">
       <form onSubmit={handleLogin}>
         <input
           type="email"

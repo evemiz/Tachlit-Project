@@ -12,7 +12,19 @@ body {
     width: 500px;
     text-align: center;
     margin: auto;
-    margin-top: 20px;
+    margin-top: 32px;
+    font-family: 'Rubik';
+  }
+  .LogInModel  {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    padding: 10px 20px;
+    transition: transform 0.2s;
+    width: 500px;
+    text-align: center;
+    margin: auto;
+    margin-top: 18%;
     font-family: 'Rubik';
   }
 
@@ -71,7 +83,7 @@ body {
     border-radius: 50px;
     margin: 15px;
     border: none;
-    color: white;
+    color: white !important;
     cursor: pointer;
     background-color: #009ba6;
     width: 40%;

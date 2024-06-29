@@ -1,3 +1,5 @@
+
+
 * {
   box-sizing: border-box;
 }
@@ -7,6 +9,8 @@ body {
   background-color: #f4f4f4;
   padding: 2%;
   direction: rtl;
+  background-image: url('/public/b.png');
+  background-size: cover;
 }
 
 .container {
@@ -84,10 +88,12 @@ textarea {
   width: 100%;
 }
 
+
+
 button {
-  background-color: #4CAF50;
-  color: white;
-  /* border: none; */
+  background-color: #009ba6;
+  color: white !important;
+  border: none;
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s;
@@ -97,9 +103,46 @@ button {
 }
 
 button:hover {
-  background-color: #45a049;
-    border-radius: 50px !important;
+  background-color: #009ba6;
+}
 
+button a {
+  color: white !important;
+  text-decoration: none; /* להסרת קו תחתון */
+}
+
+button a:hover {
+  color: white !important;
+  text-decoration: none; /* להסרת קו תחתון גם כאשר מרחפים מעל הקישור */
+}
+
+menuButton {
+  background-color: #000000;
+  color: white !important;
+  border: none;
+  cursor: pointer;
+  font-size: 17px;
+  padding-right: 30px;
+  padding-left: 30px;
+  font-weight: 700;
+  transition: background-color 0.3s;
+  width: auto;
+  
+
+}
+
+menuButton:hover {
+  background-color: #009ba6;
+}
+
+menuButton a {
+  color: white !important;
+  text-decoration: none; /* להסרת קו תחתון */
+}
+
+menuButton a:hover {
+  color: white !important;
+  text-decoration: none; /* להסרת קו תחתון גם כאשר מרחפים מעל הקישור */
 }
 
 .Button_list {
@@ -115,6 +158,8 @@ button:hover {
 .Button_list.active {
   background-color: #f9f9f9; /* Change background color when button is active */
 }
+
+
 
 .checkbox-list {
   display: none;
@@ -158,3 +203,4 @@ button:hover {
 .city-list {
   padding: 5px 0;
 }
+
