@@ -40,18 +40,21 @@ const App = () => {
           <button>
             <Link to="/RequestForm">Go to Aid Request Form</Link>
           </button>
-          <button>
+          {/* <button>
             <Link to="/AdminMain">Go to AdminMain</Link>
-          </button>
-          <button>
+          </button> */}
+          {/* <button>
             <Link to="/Lists">Go to Lists</Link>
+          </button> */}
+          <button>
+            <Link to="/Login">Admin Log-In</Link>
           </button>
           <button>
-            <Link to="/Login">Go to Login</Link>
+            <Link to="/LoginVolunteer">Volunteer Log-In</Link>
           </button>
-          <button>
+          {/* <button>
             <Link to="/SignUp">Go to SignUpNewAdmin</Link>
-          </button>
+          </button> */}
           <button>
             <Link to="/ViewRequest">Go to ViewRequest</Link>
           </button>
@@ -79,6 +82,10 @@ const App = () => {
           <Route path="/ThanksFeedback" element={<ThanksFeedback />} />
           <Route path="/VolunteerFeedback" element={<VolunteerFeedback />} />
           <Route path="/VerificationPhone" element={<VerificationPhone />} />
+          <Route path="/LoginVolunteer" element={<LoginVolunteer />} />
+          <Route path="/VolunteerMain" element={<VolunteerMain />} />
+
+
           <Route path="/" element={<Home />} />
         </Routes>
       </div>
