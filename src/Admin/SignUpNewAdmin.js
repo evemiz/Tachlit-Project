@@ -1,7 +1,7 @@
-
 import React, { useState } from "react";
-import { auth } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 import { sendSignInLinkToEmail } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 function SignUp() {
   const [email, setEmail] = useState("");
@@ -12,7 +12,7 @@ function SignUp() {
     return regex.test(email);
   };
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     if (!validateEmail(email)) {
       setMessage("האימייל שהוזן אינו תקין");
@@ -20,22 +20,25 @@ function SignUp() {
     }
 
     const actionCodeSettings = {
-      url: 'http://localhost:3000/finishSignUp', // כתובת ה-URL שתחזיר את המשתמש לאחר ההגדרה
+      url: 'http://localhost:3000/finishSignUp', // Adjust the URL as needed
       handleCodeInApp: true,
     };
 
-    sendSignInLinkToEmail(auth, email, actionCodeSettings)
-      .then(() => {
-        window.localStorage.setItem('emailForSignIn', email);
-        setMessage("קישור להגדרת סיסמה נשלח לאימייל של המנהל החדש.");
-        setEmail("");
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.error("Error sending sign-in link:", errorCode, errorMessage);
-        setMessage(`Error: ${errorMessage}`);
-      });
+    try {
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+      window.localStorage.setItem('emailForSignIn', email);
+
+      // Assign admin role in Firestore
+      const userRef = doc(db, 'users', email);
+      await setDoc(userRef, { role: 'admin' });
+
+      setMessage("קישור להגדרת סיסמה נשלח לאימייל של המנהל החדש.");
+      setEmail("");
+    } catch (error) {
+      const errorMessage = error.message;
+      console.error("Error sending sign-in link:", error);
+      setMessage(`Error: ${errorMessage}`);
+    }
   };
 
   return (

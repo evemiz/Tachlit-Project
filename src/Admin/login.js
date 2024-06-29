@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { auth } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig"; // Import db from firebaseConfig
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore"; // Import Firestore functions
 import { useNavigate } from 'react-router-dom';
-
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -10,21 +10,28 @@ function Login() {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        navigate('/AdminMain');
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.error("Error logging in user:", errorCode, errorMessage);
-        setMessage("Login failed. Please check your credentials and try again.");
-      });
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
+      // Fetch the user document from Firestore
+      const userDoc = await getDoc(doc(db, "users", email));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.role === "admin") {
+          navigate('/AdminMain');
+        } else {
+          setMessage("Unauthorized access. You do not have admin rights.");
+        }
+      } else {
+        setMessage("No user data found. Please contact support.");
+      }
+    } catch (error) {
+      console.error("Error logging in user:", error.code, error.message);
+      setMessage("Login failed. Please check your credentials and try again.");
+    }
   };
 
   return (
