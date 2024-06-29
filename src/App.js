@@ -19,7 +19,7 @@ import LoginVolunteer from './volunteer/VolunteerLogIn'
 import VolunteerMain from './volunteer/VolunteerMain';
 import SignUpVol from './Forms/Volunteers/SignUpNewVolunteer';
 import '@fontsource/rubik';
-
+import './App.css';
 
 
 const Home = () => (
