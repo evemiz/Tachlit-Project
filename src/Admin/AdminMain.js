@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import Modal from 'react-modal';
+import '../styles.css';
 
 Modal.setAppElement('#root');
 
@@ -72,16 +73,16 @@ function AdminMain() {
   };
 
   return (
-    <div className="App">
-      <h1>דף מנהל</h1>
-      <button>
-        <Link to="/Lists">Go to Lists</Link>
-      </button>
-      <button>
-        <Link to="/SignUp">Go to SignUpNewAdmin</Link>
-      </button>
-      <button onClick={handleLogout}>התנתקות</button>
-      <button onClick={openModal}>שינוי סיסמה</button>
+    <div className="AdminMAinPage">
+      <h1> ברוכים הבאים לדף מנהל</h1>
+      <adminMainButton>
+        <Link to="/Lists">צפיה ברשימות</Link>
+      </adminMainButton>
+      <adminMainButton>
+        <Link to="/SignUp">הוספת מנהל חדש</Link>
+      </adminMainButton>
+      <adminMainButton onClick={handleLogout}>התנתק</adminMainButton>
+      <adminMainButton onClick={openModal}>שינוי סיסמה</adminMainButton>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
