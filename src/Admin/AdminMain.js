@@ -41,6 +41,7 @@ function AdminMain() {
   };
 
   const handleChangePassword = (e) => {
+
     e.preventDefault();
     if (newPassword !== confirmNewPassword) {
       setMessage("הסיסמאות אינן תואמות.");
@@ -87,6 +88,7 @@ function AdminMain() {
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         contentLabel="Change Password Modal"
+        className={"Modal"}
       >
         <h2>שינוי סיסמה</h2>
         <form onSubmit={handleChangePassword}>

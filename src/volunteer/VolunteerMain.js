@@ -14,7 +14,7 @@ function VolunteerMain() {
 
 
 
-  
+
 
     const navigate = useNavigate();
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -23,7 +23,7 @@ function VolunteerMain() {
     const [newPassword, setNewPassword] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
     const [message, setMessage] = useState("");
-  
+
     const handleLogout = () => {
       signOut(auth)
         .then(() => {
@@ -34,11 +34,11 @@ function VolunteerMain() {
           console.error("Error logging out:", error);
         });
     };
-  
+
     const openModal = () => {
       setModalIsOpen(true);
     };
-  
+
     const closeModal = () => {
       setModalIsOpen(false);
       setEmail("");
@@ -47,16 +47,16 @@ function VolunteerMain() {
       setConfirmNewPassword("");
       setMessage("");
     };
-  
+
     const handleChangePassword = (e) => {
       e.preventDefault();
       if (newPassword !== confirmNewPassword) {
         setMessage("הסיסמאות אינן תואמות.");
         return;
       }
-  
+
       const user = auth.currentUser;
-  
+
       if (user && user.email === email) {
         const credential = EmailAuthProvider.credential(email, oldPassword);
         reauthenticateWithCredential(user, credential)
@@ -97,7 +97,7 @@ function VolunteerMain() {
 
       <volunteerMainButton onClick={handleLogout}>התנתק</volunteerMainButton>
       <volunteerMainButton onClick={openModal}>שינוי סיסמה</volunteerMainButton>
-      
+
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
@@ -138,7 +138,7 @@ function VolunteerMain() {
         {message && <p>{message}</p>}
         <button onClick={closeModal}>סגור</button>
       </Modal>
-      
+
     </div>
   );
 }
