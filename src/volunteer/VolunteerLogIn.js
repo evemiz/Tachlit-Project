@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { auth, db } from "../firebaseConfig";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore"; // Import Firestore functions
 import { useNavigate } from 'react-router-dom';
 
@@ -8,6 +8,7 @@ function LoginVolunteer() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -17,10 +18,10 @@ function LoginVolunteer() {
       const user = userCredential.user;
 
       // Retrieve user role from Firestore
-      const userDoc = await getDoc(doc(db, "users",email));
+      const userDoc = await getDoc(doc(db, "users", email));
       if (userDoc.exists()) {
         const userData = userDoc.data();
-         if (userData.role === "volunteer") {
+        if (userData.role === "volunteer") {
           navigate('/VolunteerMain');
         } else {
           setMessage("!הנך בכניסת מתנדב");
@@ -31,6 +32,20 @@ function LoginVolunteer() {
     } catch (error) {
       console.error("Error logging in user:", error.code, error.message);
       setMessage("Login failed. Please check your credentials and try again.");
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      setResetMessage("Please enter your email to reset password.");
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetMessage("Password reset email sent. Please check your inbox.");
+    } catch (error) {
+      console.error("Error sending password reset email:", error.code, error.message);
+      setResetMessage("Failed to send password reset email. Please try again.");
     }
   };
 
@@ -54,6 +69,8 @@ function LoginVolunteer() {
         <button type="submit">התחבר</button>
       </form>
       {message && <p>{message}</p>}
+      <button onClick={handleResetPassword}>שכחת סיסמה?</button>
+      {resetMessage && <p>{resetMessage}</p>}
     </div>
   );
 }

@@ -5,7 +5,7 @@
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   padding: 10px 20px;
   transition: transform 0.2s;
-  width: 90%;
+  width: auto;
   text-align: center;
   margin: 0 auto; /* Center the List component */
   margin-top: 20px;
@@ -123,13 +123,15 @@
 }
 
 .modal-button.confirm {
-  background-color: #4CAF50;
+  background-color: #009ba6;
   color: white;
 }
 
 .modal-button.cancel {
-  background-color: #f44336;
-  color: white;
+  border: 2px solid #009ba6;
+  color: #009ba6 !important;
+  background-color:white;
+
 }
 
 

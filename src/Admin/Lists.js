@@ -11,7 +11,6 @@ import FilterSidebar from './FilterSidebar'; // Import the new FilterSidebar com
 import Select from 'react-select'; // Import react-select for dropdowns
 import '@fontsource/rubik';
 
-
 const availableCollections = ['test', 'testRequests', 'NewVolunteers', 'Volunteers']; // Add your collection names here
 
 const getColumnDisplayName = (columnName) => {
@@ -142,7 +141,7 @@ function Lists() {
       const formattedRecord = {};
       for (const [key, value] of Object.entries(newRecord)) {
         if (columnDataTypes[key] === 'boolean') {
-          formattedRecord[key] = value === 'true';
+          formattedRecord[key] = value === true || value === 'true';
         } else if (columnDataTypes[key] === 'array') {
           formattedRecord[key] = value.map(item => item.value); // Ensure the value is an array of selected options
         } else if (columnDataTypes[key] === 'object') {
@@ -188,6 +187,10 @@ function Lists() {
     if (collectionName) {
       confirmAction(() => deleteDocument(collectionName, id), '?האם אתה בטוח שברצונך למחוק רשומה זו');
     }
+  };
+
+  const handleApproveNewVolunteer = (id) => {
+    confirmAction(() => handleApproveVolunteer(id), '?האם אתה בטוח שברצונך לאשר מתנדב חדש זה');
   };
 
   const handleEditRecord = (doc) => {
@@ -299,14 +302,14 @@ function Lists() {
                         type="radio"
                         name={column}
                         value="true"
-                        checked={newRecord[column] === 'true'}
+                        checked={newRecord[column] === true}
                         onChange={handleInputChange}
                       /> כן
                       <input
                         type="radio"
                         name={column}
                         value="false"
-                        checked={newRecord[column] === 'false'}
+                        checked={newRecord[column] === false}
                         onChange={handleInputChange}
                       /> לא
                     </>
@@ -345,7 +348,7 @@ function Lists() {
                 </div>
               ))}
               <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
-              {collectionName=='NewVolunteers'&&editMode && <button type="button" onClick={() => handleApproveVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
+              {collectionName === 'NewVolunteers' && editMode && <button type="button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
             </form>
           </div>
         )}
