@@ -18,6 +18,7 @@ const getColumnDisplayName = (columnName) => {
     status: 'סטטוס',
     emergency: 'חירום',
     vehicle: 'רכב',
+    matches: 'התאמות',
     // Add more mappings as necessary
   };
   return columnMapping[columnName] || columnName;

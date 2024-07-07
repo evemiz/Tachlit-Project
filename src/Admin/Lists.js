@@ -11,7 +11,7 @@ import FilterSidebar from './FilterSidebar'; // Import the new FilterSidebar com
 import Select from 'react-select'; // Import react-select for dropdowns
 import '@fontsource/rubik';
 
-const availableCollections = ['test', 'testRequests', 'NewVolunteers', 'Volunteers']; // Add your collection names here
+const availableCollections = ['test', 'AidRequests', 'NewVolunteers', 'Volunteers']; // Add your collection names here
 
 const getColumnDisplayName = (columnName) => {
   const columnMapping = {
@@ -30,13 +30,14 @@ const getColumnDisplayName = (columnName) => {
     status: 'סטטוס',
     emergency: 'חירום',
     vehicle: 'רכב',
+    matches: 'התאמות',
     // Add more mappings as necessary
   };
   return columnMapping[columnName] || columnName;
 };
 
 // Define the fixed column order
-const fixedColumnOrder = ['firstName', 'lastName', 'id', 'phoneNumber', 'langueges', 'city', 'days', 'volunteering', 'mail', 'date', 'time', 'comments', 'status', 'emergency', 'vehicle'];
+const fixedColumnOrder = ['firstName', 'lastName', 'id', 'phoneNumber', 'langueges', 'city', 'days', 'volunteering', 'mail', 'date', 'time', 'comments', 'status', 'emergency', 'vehicle', 'matches']; // Added 'matches'
 
 // Define predefined options for each filter (example)
 const filterOptions = {
@@ -62,7 +63,8 @@ const columnDataTypes = {
   status: 'string',
   vehicle: 'boolean',
   emergency: 'boolean',
-  id: 'string'
+  id: 'string',
+  matches: 'array' // Added 'matches'
 };
 
 Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
@@ -83,9 +85,27 @@ function Lists() {
   const [modalAction, setModalAction] = useState(() => {});
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [volunteers, setVolunteers] = useState([]);
 
-  const handleCollectionChange = (event) => {
-    setCollectionName(event.target.value);
+  useEffect(() => {
+    // Fetch all volunteers' data
+    const fetchVolunteers = async () => {
+      try {
+        const volunteersData = await readDocuments('Volunteers');
+        setVolunteers(volunteersData);
+      } catch (error) {
+        console.error('Error fetching volunteers:', error);
+      }
+    };
+    fetchVolunteers();
+  }, []);
+
+  useEffect(() => {
+    fetchDocuments();
+  }, [collectionName]);
+
+  const handleCollectionChange = (name) => {
+    setCollectionName(name);
     setFilters({});
     setDocuments([]); // Clear previous documents when collection changes
   };
@@ -207,6 +227,11 @@ function Lists() {
     setShowAddForm(true);
   };
 
+  const getVolunteerNameById = (id) => {
+    const volunteer = volunteers.find(vol => vol.id === id);
+    return volunteer ? `${volunteer.firstName} ${volunteer.lastName}` : id;
+  };
+
   const getColumns = () => {
     if (documents.length === 0) return [];
     const docKeys = Object.keys(documents[0]).filter(key => key);
@@ -259,19 +284,31 @@ function Lists() {
   return (
     <div dir="rtl" className='List'>
       <h1>צפייה ברשימות</h1>
-      <div>
-        <label>
-          :בחר רשימה
-          <select value={collectionName} onChange={handleCollectionChange}>
-            <option value=""> </option>
-            {availableCollections.map((collection) => (
-              <option key={collection} value={collection}>
-                {collection}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button className="lists-button" onClick={fetchDocuments} disabled={!collectionName}>אישור</button>
+      <div className="button-group">
+        <button
+          className="lists-button"
+          onClick={() => handleCollectionChange('test')}
+        >
+          Test List
+        </button>
+        <button
+          className="lists-button"
+          onClick={() => handleCollectionChange('AidRequests')}
+        >
+          בקשות סיוע
+        </button>
+        <button
+          className="lists-button"
+          onClick={() => handleCollectionChange('NewVolunteers')}
+        >
+          מתנדבים חדשים
+        </button>
+        <button
+          className="lists-button"
+          onClick={() => handleCollectionChange('Volunteers')}
+        >
+          מתנדבים
+        </button>
       </div>
       {collectionName && (
         <>
@@ -373,7 +410,11 @@ function Lists() {
                         {Array.isArray(doc[column])
                           ? doc[column].map((item, idx) => (
                               <span key={`${doc.id}-${column}-${idx}`}>
-                                {typeof item === 'object' && item !== null && 'label' in item ? item.label : item}
+                                {column === 'matches'
+                                  ? getVolunteerNameById(item)
+                                  : typeof item === 'object' && item !== null && 'label' in item
+                                  ? item.label
+                                  : item}
                                 {idx < doc[column].length - 1 ? ', ' : ''}
                               </span>
                             ))
