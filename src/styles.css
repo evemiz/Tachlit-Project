@@ -290,9 +290,52 @@ menuButton a:hover {
 }
 
 
+.navbarVol {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: black;
+}
+
+.navbarVol-logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-image {
+  width: 125px; 
+  height: 60px;
+  margin-right: 10px; 
+}
+
+.navbarVol-links {
+  display: flex;
+  gap: 10px;
+}
+
+.navbarVol-links a, .navbarVol-links button {
+  text-decoration: none;
+  color: #007bff;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.navbarVol-links button:hover, .navbarVol-links a:hover {
+  text-decoration: underline;
+}
 
 
+.flash {
+  animation: flash-animation 0.3s ease-in-out;
+}
 
-
+@keyframes flash-animation {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
 
 

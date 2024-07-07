@@ -1,98 +1,113 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from "react-router-dom";
-import { handleLogout, handleChangePassword } from '../Admin/AdminMain';
-import Modal from 'react-modal';
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
-import CloseRequest from '../Messages/CloseRequest';
-import { auth } from "../firebaseConfig"; // ייבוא auth מקובץ ההגדרות של Firebase
-
+import Modal from 'react-modal';
+import { auth, db } from "../firebaseConfig"; 
+import { query, where, collection, getDocs } from "firebase/firestore"; 
+import Navbar from './VolunteerNavigateBar';
+import VolunteerDetails from './VolunteerDetails';
 
 Modal.setAppElement('#root');
 
 function VolunteerMain() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const userId = location.state?.userId;
 
-    const navigate = useNavigate();
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [email, setEmail] = useState("");
-    const [oldPassword, setOldPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmNewPassword, setConfirmNewPassword] = useState("");
-    const [message, setMessage] = useState("");
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalIsOpen2, setModalIsOpen2] = useState(false);
+  const [email, setEmail] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [volRecord, setVolRecord] = useState(null); 
 
-    const handleLogout = () => {
-      signOut(auth)
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        console.log("User logged out");
+        navigate("/login");
+      })
+      .catch((error) => {
+        console.error("Error logging out:", error);
+      });
+  };
+
+  const openChangePasswordModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const openEditUser = async () => {
+    setModalIsOpen2(true);
+    await fetchVolRecord();
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+    setEmail("");
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmNewPassword("");
+    setMessage("");
+  };
+  
+  const closeModal2 = () => {
+    setModalIsOpen2(false);
+  };
+
+  const handleChangePassword = (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmNewPassword) {
+      setMessage("הסיסמאות אינן תואמות.");
+      return;
+    }
+
+    const user = auth.currentUser;
+
+    if (user && user.email === email) {
+      const credential = EmailAuthProvider.credential(email, oldPassword);
+      reauthenticateWithCredential(user, credential)
         .then(() => {
-          console.log("User logged out");
-          navigate("/login");
+          updatePassword(user, newPassword)
+            .then(() => {
+              setMessage("הסיסמה שונתה בהצלחה");
+              closeModal();
+            })
+            .catch((error) => {
+              console.error("Error updating password:", error);
+              setMessage("שגיאה בעדכון הסיסמה");
+            });
         })
         .catch((error) => {
-          console.error("Error logging out:", error);
+          console.error("Error reauthenticating user:", error);
+          setMessage("שגיאה באימות המשתמש. נא לבדוק את הסיסמה הישנה.");
         });
-    };
+    } else {
+      setMessage("האימייל שהוזן אינו תואם את האימייל של המשתמש המחובר");
+    }
+  };
 
-    const openModal = () => {
-      setModalIsOpen(true);
-    };
 
-    const closeModal = () => {
-      setModalIsOpen(false);
-      setEmail("");
-      setOldPassword("");
-      setNewPassword("");
-      setConfirmNewPassword("");
-      setMessage("");
-    };
-
-    const handleChangePassword = (e) => {
-      e.preventDefault();
-      if (newPassword !== confirmNewPassword) {
-        setMessage("הסיסמאות אינן תואמות.");
-        return;
-      }
-
-      const user = auth.currentUser;
-
-      if (user && user.email === email) {
-        const credential = EmailAuthProvider.credential(email, oldPassword);
-        reauthenticateWithCredential(user, credential)
-          .then(() => {
-            updatePassword(user, newPassword)
-              .then(() => {
-                setMessage("הסיסמה שונתה בהצלחה");
-                closeModal();
-              })
-              .catch((error) => {
-                console.error("Error updating password:", error);
-                setMessage("שגיאה בעדכון הסיסמה");
-              });
-          })
-          .catch((error) => {
-            console.error("Error reauthenticating user:", error);
-            setMessage("שגיאה באימות המשתמש. נא לבדוק את הסיסמה הישנה.");
-          });
+  const fetchVolRecord = async () => {
+    try {
+      const q = query(collection(db, "Volunteers"), where("mail", "==", userId));
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        const doc = querySnapshot.docs[0];
+        setVolRecord(doc.data());
       } else {
-        setMessage("האימייל שהוזן אינו תואם את האימייל של המשתמש המחובר");
+        setVolRecord(null);
+        console.log("No matching document found");
       }
-    };
-
-
+    } catch (error) {
+      console.error("Error fetching other record:", error);
+    }
+  };
 
   return (
     <div className='VolunteerMain'>
-      <h1> התנדבות בתכלית </h1>
-      <volunteerMainButton>
-        <Link to="/CloseRequest">סגירת בקשה</Link>
-      </volunteerMainButton>
-      <volunteerMainButton>
-        <Link to="/GetFeedback">הזנת משוב</Link>
-      </volunteerMainButton>
-      <volunteerMainButton>
-        <Link to="/ViewRequest">צפייה בבקשות סיוע</Link>
-      </volunteerMainButton>
-
-      <volunteerMainButton onClick={handleLogout}>התנתק</volunteerMainButton>
-      <volunteerMainButton onClick={openModal}>שינוי סיסמה</volunteerMainButton>
-
+      <Navbar handleLogout={handleLogout} openEditUser={openEditUser} openChangePasswordModal={openChangePasswordModal} />
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
@@ -134,6 +149,24 @@ function VolunteerMain() {
         <button onClick={closeModal}>סגור</button>
       </Modal>
 
+      <Modal
+        isOpen={modalIsOpen2}
+        onRequestClose={closeModal2}
+        contentLabel="Edit User Modal"
+      >
+        <h1>עריכת משתמש</h1>
+        {volRecord ? (
+          <VolunteerDetails volunteer={volRecord} /> 
+        ) : (
+          <p>...</p>
+        )}
+      </Modal>
+
+
+
+      <Link to="/CloseRequest">סגירת בקשה</Link>
+      <Link to="/GetFeedback">הזנת משוב</Link>
+      <Link to="/ViewRequest">צפייה בבקשות סיוע</Link>
     </div>
   );
 }

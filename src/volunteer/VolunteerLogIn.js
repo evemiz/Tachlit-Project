@@ -22,7 +22,7 @@ function LoginVolunteer() {
       if (userDoc.exists()) {
         const userData = userDoc.data();
         if (userData.role === "volunteer") {
-          navigate('/VolunteerMain');
+          navigate('/VolunteerMain', { state: { userId: user.email } });
         } else {
           setMessage("!הנך בכניסת מתנדב");
         }
