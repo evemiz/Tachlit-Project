@@ -1,7 +1,12 @@
-import { doc, addDoc, collection, deleteDoc, getDocs } from 'firebase/firestore';
+import { doc, addDoc, collection, deleteDoc, getDocs,setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig.js';
+import { doc as doc1, getDoc as getDoc1 } from 'firebase/firestore';
+import { sendSignInLinkToEmail } from 'firebase/auth';
+import { auth } from '../firebaseConfig.js'; // Adjust the import path as necessary
+
 
 export function validateData(data) {
+  return true;
   //...
 }
 
@@ -24,7 +29,17 @@ export const addDocument = async (collectionName, data) => {
         console.error('Invalid data');
     else{
         try {
-            const docRef = await addDoc(collection(db, collectionName), data);
+            const docId = data.id;
+            if (!docId) {
+                console.error('Document ID is missing in the data');
+                return null;
+            }
+
+            // Create a document reference with the custom ID
+            const docRef = doc(collection(db, collectionName), docId);
+
+            // Use setDoc to create the document with the specified ID and data
+            await setDoc(docRef, data);
             console.log("Document written with ID: ", docRef.id);
             return docRef;
           } catch (error) {
@@ -47,7 +62,62 @@ export const deleteDocument = async (collectionName, id) => {
 };
 
 
-// Function to update a document in a collection
-export const updateDocument = async (collection, docId, data) => {
-    //...
+
+export const updateDocument = async (collectionName, docId, data) => {
+  if (!validateData(data)) {
+    console.error('Invalid data');
+  } else {
+    try {
+      const docRef = doc(db, collectionName, docId);
+      await setDoc(docRef, data, { merge: true });
+      console.log("Document updated with ID: ", docId);
+      return docRef;
+    } catch (error) {
+      console.error("Error updating document: ", error);
+    }
+  }
 };
+
+
+
+// Function to move a document from one collection to another
+export const MoveDoc = async (docId) => {
+  try {
+    const docRef = doc1(db, 'NewVolunteers', docId);
+    const docSnap = await getDoc1(docRef);
+
+    if (docSnap.exists()) {
+      const docData = docSnap.data();
+      
+      // Add the document to the Volunteers collection
+      await addDocument('Volunteers', { ...docData, id: docId });
+      
+      // Delete the document from the NewVolunteers collection
+      await deleteDocument('NewVolunteers', docId);
+      
+      console.log("Document moved from NewVolunteers to Volunteers with ID: ", docId);
+    } else {
+      console.error("No such document!");
+    }
+  } catch (error) {
+    console.error("Error moving document: ", error);
+  }
+};
+
+// Function to send approval email
+export const sendApprovalEmail = async (email, volunteerId) => {
+  const actionCodeSettings = {
+    url: `https://your-app-url.com/VolunteerRegister/${volunteerId}`,
+    handleCodeInApp: true,
+  };
+
+  try {
+    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+    window.localStorage.setItem('emailForSignIn', email);
+    console.log("קישור להגדרת סיסמה נשלח לאימייל של המתנדב החדש.");
+  } catch (error) {
+    console.error("Error sending sign-in link:", error.code, error.message);
+    throw error;
+  }
+};
+ 

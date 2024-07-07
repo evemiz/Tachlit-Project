@@ -4,10 +4,13 @@ import volunteerings from '../Volunteerings';
 import langues from '../Languges';
 import { React, useState } from "react";
 import Select from 'react-select';
-import {validateData, addDocument, addFieldToDocument} from "./RequestFunctions.js";
+import Modal from 'react-modal';
+import { validateData, addDocument, addFieldToDocument } from "./RequestFunctions.js";
 import days from '../Days.js';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
+
+Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
 
 function RequestForm() {
   const [firstName, setFirstName] = useState("");
@@ -21,6 +24,8 @@ function RequestForm() {
   const [time, setTime] = useState("");
   const [comments, setComments] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("");
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,17 +45,17 @@ function RequestForm() {
       volunteerFeedback: "",
       seekerFeedback: "",
     };
-  
+
     if (validateData(formData)) {
       try {
         const docRef = await addDocument('AidRequests', formData);
-  
+
         const volunteersCollection = collection(db, 'Volunteers');
-  
+
         // First query: Filter by city
         let qCity = query(volunteersCollection, where('city', '==', citySelectedOption.label));
         const queryCitySnapshot = await getDocs(qCity);
-  
+
         // Filter city results further by language
         let filteredDocs = queryCitySnapshot.docs;
         if (langSelectedOptions.label) {
@@ -59,7 +64,7 @@ function RequestForm() {
             return data.langueges && data.langueges.includes(langSelectedOptions.label);
           });
         }
-  
+
         // Filter city and language results further by volunteering
         if (volSelectedOptions.label) {
           filteredDocs = filteredDocs.filter(doc => {
@@ -75,19 +80,33 @@ function RequestForm() {
             return data.days && data.days.includes(dayOfWeek);
           });
         }
-  
+
         // Extract IDs of matching volunteers
         const volunteerIds = filteredDocs.map(doc => doc.id);
         console.log('Volunteer IDs:', volunteerIds);
-  
+
         // Add matching volunteer IDs to the aid request document
         await addFieldToDocument('AidRequests', docRef.id, 'matches', volunteerIds);
+
+        // Reset the form
+        setFirstName("");
+        setLastName("");
+        setId("");
+        setContact("");
+        setCitySelectedOption("");
+        setVolSelectedOptions("");
+        setLangSelectedOptions("");
+        setDate("");
+        setTime("");
+        setComments("");
+        setDayOfWeek("");
+        setSuccessMessage("הבקשה נשלחה בהצלחה!"); // Set success message
+        setIsSuccessModalOpen(true); // Open success modal
       } catch (error) {
         console.error('Error during handleSubmit:', error);
       }
     }
   };
-  
 
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
@@ -100,11 +119,15 @@ function RequestForm() {
     return days[dayIndex];
   };
 
+  const handleSuccessModalClose = () => {
+    setIsSuccessModalOpen(false);
+  };
+
   return (
     <div className="App">
       <h1>טופס בקשת סיוע חדשה</h1>
       <fieldset>
-        <form action="#" method="get">
+        <form action="#" method="get" onSubmit={handleSubmit}>
           <label htmlFor="firstname">שם פרטי</label>
           <input
             type="text"
@@ -210,12 +233,24 @@ function RequestForm() {
           <button
             type="submit"
             value="Submit"
-            onClick={(e) => handleSubmit(e)}
           >
             הגש בקשה
           </button>
         </form>
       </fieldset>
+      <Modal
+        isOpen={isSuccessModalOpen}
+        onRequestClose={handleSuccessModalClose}
+        contentLabel="Success"
+        className="Modal"
+        overlayClassName="Overlay"
+      >
+        <h2>פעולה הצליחה</h2>
+        <p>{successMessage}</p>
+        <div className="modal-buttons">
+          <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { auth, db } from "../firebaseConfig"; // Import db from firebaseConfig
+import { auth, db } from "../firebaseConfig";
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore"; // Import Firestore functions
 import { useNavigate } from 'react-router-dom';
 
-function Login() {
+function LoginVolunteer() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -17,21 +17,21 @@ function Login() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Fetch the user document from Firestore
+      // Retrieve user role from Firestore
       const userDoc = await getDoc(doc(db, "users", email));
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        if (userData.role === "admin") {
-          navigate('/AdminMain');
+        if (userData.role === "volunteer") {
+          navigate('/VolunteerMain');
         } else {
-          setMessage("הנך בכניסת מנהל ");
+          setMessage("!הנך בכניסת מתנדב");
         }
       } else {
-        setMessage("No user data found. Please contact support.");
+        setMessage("לא נמצא משתמש");
       }
     } catch (error) {
       console.error("Error logging in user:", error.code, error.message);
-      setMessage("שם משתמש או סיסמה שגויים ");
+      setMessage("Login failed. Please check your credentials and try again.");
     }
   };
 
@@ -75,4 +75,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default LoginVolunteer;

@@ -4,9 +4,11 @@ import volunteerings from '../Volunteerings';
 import { React, useState } from "react";
 import Select from 'react-select';
 import days from '../Days';
-import langueges from '../Languges'
-import {validateData, addDocument} from "./VolunteerFunctions.js"
+import langueges from '../Languges';
+import Modal from 'react-modal';
+import { validateData, addDocument } from "./VolunteerFunctions.js";
 
+Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
 
 function VolunteerForm() {
   const [firstName, setFirstName] = useState("");
@@ -20,6 +22,8 @@ function VolunteerForm() {
   const [langSelectedOptions, setLangSelectedOptions] = useState([]);
   const [available, setAvailable] = useState(Boolean);
   const [vehicle, setVehicle] = useState(Boolean);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -34,21 +38,38 @@ function VolunteerForm() {
       langueges: langSelectedOptions.map(option => option.value),
       days: daySelectedOptions.map(option => option.value),
       emergency: available,
-      volunteering : volSelectedOptions.map(option => option.value), 
+      volunteering: volSelectedOptions.map(option => option.value),
       vehicle: vehicle,
     };
 
-    if(validateData(formData)){
-      addDocument("NewVolunteers", formData);
+    if (validateData(formData)) {
+      addDocument("NewVolunteers", formData, 'id');
+      // Reset the form
+      setFirstName("");
+      setLastName("");
+      setId("");
+      setContact("");
+      setMail("");
+      setCitySelectedOption("");
+      setVolSelectedOptions([]);
+      setDaySelectedOptions([]);
+      setLangSelectedOptions([]);
+      setAvailable(Boolean);
+      setVehicle(Boolean);
+      setSuccessMessage("הטופס נשלח בהצלחה!"); // Set success message
+      setIsSuccessModalOpen(true); // Open success modal
     }
+  };
 
+  const handleSuccessModalClose = () => {
+    setIsSuccessModalOpen(false);
   };
 
   return (
     <div className="App">
       <h1>טופס רישום מתנדב חדש</h1>
       <fieldset>
-        <form action="#" method="get">
+        <form action="#" method="get" onSubmit={handleSubmit}>
           <label htmlFor="firstname">שם פרטי</label>
           <input
             type="text"
@@ -70,7 +91,7 @@ function VolunteerForm() {
             required
           />
 
-        <label htmlFor="id">מספר תעדות זהות</label>
+          <label htmlFor="id">מספר תעדות זהות</label>
           <input
             type="text"
             name="id"
@@ -81,37 +102,33 @@ function VolunteerForm() {
           />
 
           <label htmlFor="tel">מספר טלפון</label>
-                    <input
-                        type="tel"
-                        name="contact"
-                        id="contact"
-                        value={contact}
-                        onChange={(e) =>
-                            setContact(e.target.value)
-                        }
-                        required
-                    />
+          <input
+            type="tel"
+            name="contact"
+            id="contact"
+            value={contact}
+            onChange={(e) => setContact(e.target.value)}
+            required
+          />
 
-            <label htmlFor="mail">כתובת מייל</label>
-                    <input
-                        type="tel"
-                        name="mail"
-                        id="mail"
-                        value={mail}
-                        onChange={(e) =>
-                            setMail(e.target.value)
-                        }
-                        required
-                    />
+          <label htmlFor="mail">כתובת מייל</label>
+          <input
+            type="email"
+            name="mail"
+            id="mail"
+            value={mail}
+            onChange={(e) => setMail(e.target.value)}
+            required
+          />
 
           <label>עיר מגורים</label>
           <Select
             name="select"
-            options={citiesInIsrael.map(city => ({ value: city, label: city}))}
+            options={citiesInIsrael.map(city => ({ value: city, label: city }))}
             value={citySelectedOption}
             onChange={setCitySelectedOption}
             placeholder="בחר עיר מגורים"
-          />            
+          />
 
           <label>תחומי התנדבות</label>
           <Select
@@ -155,7 +172,7 @@ function VolunteerForm() {
             name="available"
             value="yes"
             id="yes"
-            checked={available}
+            checked={available === true}
             onChange={(e) => setAvailable(true)}
           />
           כן
@@ -164,7 +181,7 @@ function VolunteerForm() {
             name="available"
             value="no"
             id="no"
-            checked={!available}
+            checked={available === false}
             onChange={(e) => setAvailable(false)}
           />
           לא
@@ -175,7 +192,7 @@ function VolunteerForm() {
             name="vehicle"
             value="yes"
             id="vehicleYes"
-            checked={vehicle}
+            checked={vehicle === true}
             onChange={(e) => setVehicle(true)}
           />
           כן
@@ -184,7 +201,7 @@ function VolunteerForm() {
             name="vehicle"
             value="no"
             id="vehicleNo"
-            checked={!vehicle}
+            checked={vehicle === false}
             onChange={(e) => setVehicle(false)}
           />
           לא
@@ -194,12 +211,24 @@ function VolunteerForm() {
           <button
             type="submit"
             value="Submit"
-            onClick={(e) => handleSubmit(e)}
           >
             שלח
           </button>
         </form>
       </fieldset>
+      <Modal
+        isOpen={isSuccessModalOpen}
+        onRequestClose={handleSuccessModalClose}
+        contentLabel="Success"
+        className="Modal"
+        overlayClassName="Overlay"
+      >
+        <h2>פעולה הצליחה</h2>
+        <p>{successMessage}</p>
+        <div className="modal-buttons">
+          <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
+        </div>
+      </Modal>
     </div>
   );
 }
