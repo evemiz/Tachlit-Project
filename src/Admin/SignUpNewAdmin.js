@@ -92,7 +92,7 @@ function SignUp() {
       const userRef = doc(db, 'users', email);
       await setDoc(userRef, { role: 'admin' });
 
-      setMessage("קישור להגדרת סיסמה נשלח לאימייל של המנהל החדש.");
+      setMessage(".קישור להגדרת סיסמה נשלח לאימייל של המנהל החדש");
       setEmail("");
     } catch (error) {
       const errorMessage = error.message;

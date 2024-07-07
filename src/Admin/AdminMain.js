@@ -44,7 +44,7 @@ function AdminMain() {
 
     e.preventDefault();
     if (newPassword !== confirmNewPassword) {
-      setMessage("הסיסמאות אינן תואמות.");
+      setMessage(".הסיסמאות אינן תואמות");
       return;
     }
 
@@ -66,7 +66,7 @@ function AdminMain() {
         })
         .catch((error) => {
           console.error("Error reauthenticating user:", error);
-          setMessage("שגיאה באימות המשתמש. נא לבדוק את הסיסמה הישנה.");
+          setMessage(".שגיאה באימות המשתמש. נא לבדוק את הסיסמה הישנה");
         });
     } else {
       setMessage("האימייל שהוזן אינו תואם את האימייל של המשתמש המחובר");

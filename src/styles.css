@@ -127,7 +127,7 @@ menuButton {
   font-weight: 700;
   transition: background-color 0.3s;
   width: auto;
-  
+
 
 }
 
@@ -285,8 +285,8 @@ menuButton a:hover {
   display: flex;
   justify-content: center;
   height: 100%; /* מוודא שהקישור יתפוס את כל גובה הכפתור */
-  
-  
+
+
 }
 
 

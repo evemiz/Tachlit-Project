@@ -190,7 +190,7 @@ function Lists() {
   };
 
   const handleApproveNewVolunteer = (id) => {
-    confirmAction(() => handleApproveVolunteer(id), '?האם אתה בטוח שברצונך לאשר מתנדב חדש זה');
+    confirmAction(() => handleApproveVolunteer(id), '? האם אתה בטוח שברצונך לאשר מתנדב חדש זה');
   };
 
   const handleEditRecord = (doc) => {
