@@ -1,5 +1,5 @@
 import { db } from '../../firebaseConfig.js';
-import { doc, addDoc, collection, deleteDoc, getDocs, updateDoc } from 'firebase/firestore';
+import { doc, addDoc, collection, deleteDoc, getDocs, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
 
 export function validateData(data) {
   const { firstName, lastName, phoneNumber, city, langueges, volunteering, date, time } = data;
@@ -65,6 +65,34 @@ export const addFieldToDocument = async (collectionName, documentId, fieldName, 
   } catch (error) {
       console.error("Error adding field to document: ", error);
       return false;
+  }
+};
+
+export const addMatchToDocument = async (collectionName, documentId, fieldValue) => {
+  try {
+    const docRef = doc(db, collectionName, documentId);
+
+    // Get the document to check if the 'matches' field exists
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const docData = docSnap.data();
+      if (docData.matches) {
+        // If the 'matches' field exists, add the value to the array
+        await updateDoc(docRef, {
+          matches: arrayUnion(fieldValue)
+        });
+      } else {
+        // If the 'matches' field does not exist, create it and set the value
+        await updateDoc(docRef, {
+          matches: [fieldValue]
+        });
+      }
+    } 
+    return true;
+  } catch (error) {
+    console.error("Error adding field to document: ", error);
+    return false;
   }
 };
 

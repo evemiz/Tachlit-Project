@@ -5,7 +5,7 @@ import langues from '../Languges';
 import { React, useState } from "react";
 import Select from 'react-select';
 import Modal from 'react-modal';
-import { validateData, addDocument, addFieldToDocument } from "./RequestFunctions.js";
+import { validateData, addDocument, addFieldToDocument, addMatchToDocument } from "./RequestFunctions.js";
 import days from '../Days.js';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
@@ -49,7 +49,6 @@ function RequestForm() {
     if (validateData(formData)) {
       try {
         const docRef = await addDocument('AidRequests', formData);
-
         const volunteersCollection = collection(db, 'Volunteers');
 
         // First query: Filter by city
@@ -88,6 +87,17 @@ function RequestForm() {
         // Add matching volunteer IDs to the aid request document
         await addFieldToDocument('AidRequests', docRef.id, 'matches', volunteerIds);
 
+        if (volunteerIds.length > 0) {
+          // Function to add a field to a specific document
+            try {
+              for (const id of volunteerIds) {
+                await addMatchToDocument('Volunteers', id, docRef.id);
+              }
+            } catch (error) {
+              console.error(`Error updating volunteer documents: ${error}`);
+            }
+        }
+  
         // Reset the form
         setFirstName("");
         setLastName("");

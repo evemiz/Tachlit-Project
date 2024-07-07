@@ -11,11 +11,6 @@ Modal.setAppElement('#root');
 
 function VolunteerMain() {
 
-
-
-
-
-
     const navigate = useNavigate();
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [email, setEmail] = useState("");
