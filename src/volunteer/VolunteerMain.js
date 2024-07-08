@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
 import Modal from 'react-modal';
 import { auth, db } from "../firebaseConfig"; 
-import { query, where, collection, getDocs, getDoc } from "firebase/firestore"; 
+import { query, where, collection, getDocs, getDoc, doc, setDoc, updateDoc, arrayRemove } from "firebase/firestore"; 
 import Navbar from './VolunteerNavigateBar';
 import citiesInIsrael from '../Forms/Cities.js';
 import volunteerings from '../Forms/Volunteerings.js';
 import Select from 'react-select';
 import days from '../Forms/Days.js';
 import langueges from '../Forms/Languges.js';
-import { doc, setDoc, updateDoc, arrayRemove } from 'firebase/firestore';
 
 Modal.setAppElement('#root');
 
@@ -39,6 +38,12 @@ function VolunteerMain() {
   const [matches, setMatches] = useState([]);
   const [matchDetails, setMatchDetails] = useState([]);
 
+  const [currents, setCurrents] = useState([]);
+  const [currentsDetails, setCurrentsDetails] = useState([]);
+
+  const [close, setClose] = useState([]);
+  const [closeDetails, setCloseDetails] = useState([]);
+
   useEffect(() => {
     fetchVolRecord();
   }, []);
@@ -48,6 +53,18 @@ function VolunteerMain() {
       fetchMatchDetails();
     }
   }, [matches]);
+
+  useEffect(() => {
+    if (currents.length > 0) {
+      fetchCurrentsDetails();
+    }
+  }, [currents]);
+
+  useEffect(() => {
+    if (close.length > 0) {
+      fetchCloseDetails();
+    }
+  }, [close]);
 
   const handleLogout = () => {
     signOut(auth)
@@ -126,6 +143,8 @@ function VolunteerMain() {
         setAvailable(data.emergency || false);
         setVehicle(data.vehicle || false);
         setMatches(data.matches || []);
+        setCurrents(data.inProcessRequests || []);
+        setClose(data.closeRequests || []);
       } else {
         console.log("No matching document found");
       }
@@ -166,6 +185,56 @@ function VolunteerMain() {
   };
 
 
+  const fetchCurrentsDetails = async () => {
+    try {
+      // Fetch the details
+      const currentsDetailsPromises = currents.map(async (currentId) => {
+        const currentDocRef = doc(db, "AidRequests", currentId);
+        const currentDocSnap = await getDoc(currentDocRef);
+        return currentDocSnap.exists() ? { id: currentId, ...currentDocSnap.data() } : null;
+      });
+  
+      const currentDetailsResults = await Promise.all(currentsDetailsPromises);
+      const validCurrents = currentDetailsResults.filter(detail => detail && detail.status === "in process");
+      const invalidCurrents = currentDetailsResults
+        .filter(detail => detail && detail.status !== "in process")
+        .map(detail => detail.id);
+  
+      // Remove invalid matches from the matches array in Firestore
+      if (invalidCurrents.length > 0) {
+        const userDocRef = doc(db, "Volunteers", documentId);
+        await updateDoc(userDocRef, {
+          inProcessRequests: arrayRemove(...invalidCurrents)
+        });
+      }
+
+      // Update the local state
+      setCurrents(validCurrents.map(detail => detail.id));
+      setCurrentsDetails(validCurrents);
+    } catch (error) {
+      console.error("Error fetching currents details:", error);
+    }
+  };
+
+  const fetchCloseDetails = async () => {
+    try {
+      // Fetch the details
+      const closeDetailsPromises = close.map(async (closeId) => {
+        const closeDocRef = doc(db, "AidRequests", closeId);
+        const closeDocSnap = await getDoc(closeDocRef);
+        return closeDocSnap.exists() ? { id: closeId, ...closeDocSnap.data() } : null;
+      });
+  
+      const closeDetailsResults = await Promise.all(closeDetailsPromises);
+
+      // Update the local state
+      setClose(closeDetailsResults.map(detail => detail.id));
+      setCloseDetails(closeDetailsResults);
+    } catch (error) {
+      console.error("Error fetching closw details:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -183,8 +252,6 @@ function VolunteerMain() {
     try {
       const docRef = doc(db, "Volunteers", documentId);
       await setDoc(docRef, formData, { merge: true });
-      
-
       setIsSuccessModalOpen(true);
       setSuccessMessage("עדכון בוצע בהצלחה");
 
@@ -216,6 +283,24 @@ function VolunteerMain() {
     else {
       console.error("status != open");
     }
+};
+
+const handleCloseRequest = async (status, id) => {
+  if (status === "in process") {
+      try {
+          const docRef = doc(db, "AidRequests", id);
+          await setDoc(docRef, { status: "close" }, { merge: true });
+
+          const docRefVol = doc(db, "Volunteers", documentId);
+          await updateDoc(docRefVol, { closeRequests: [id] }, { merge: true });
+
+      } catch (error) {
+          console.error("Error updating :", error);
+      }
+  }
+  else {
+    console.error("status != open");
+  }
 };
 
   return (
@@ -413,6 +498,42 @@ function VolunteerMain() {
           ))
         ) : (
           <p>לא נמצאו התאמות.</p>
+        )}
+      </div>
+
+      <div className="App">
+        <h2>בקשות בטיפולך</h2>
+        {currentsDetails.length > 0 ? (
+          currentsDetails.map((cur) => (
+            <div key={cur.id} className="current-container">
+              <div className="Request">
+                <h3>{cur.firstName} {cur.lastName}</h3>
+                <p>{`${cur.firstName + " " + cur.lastName} מבקש/ת את עזרתך ב${cur.volunteering} `}</p>
+                <p>{`בתאריך: ${formatDate(cur.date)} בשעה: ${cur.time}`}</p>
+                <button onClick={() => handleCloseRequest(cur.status, cur.id)}>סגירת הבקשה</button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>אין בקשות בטיפול</p>
+        )}
+      </div>
+
+      <div className="App">
+        <h2>בקשות סגורות</h2>
+        {closeDetails.length > 0 ? (
+          closeDetails.map((cur) => (
+            <div key={cur.id} className="close-container">
+              <div className="Request">
+                <h3>{cur.firstName} {cur.lastName}</h3>
+                <p>{`${cur.firstName + " " + cur.lastName} מבקש/ת את עזרתך ב${cur.volunteering} `}</p>
+                <p>{`בתאריך: ${formatDate(cur.date)} בשעה: ${cur.time}`}</p>
+                <button onClick={() => handleCloseRequest(cur.status, cur.id)}>סגירת הבקשה</button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>אין בקשות בטיפול</p>
         )}
       </div>
 
