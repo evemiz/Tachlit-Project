@@ -3,14 +3,14 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
 import Modal from 'react-modal';
 import { auth, db } from "../firebaseConfig"; 
-import { query, where, collection, getDocs } from "firebase/firestore"; 
+import { query, where, collection, getDocs, getDoc } from "firebase/firestore"; 
 import Navbar from './VolunteerNavigateBar';
 import citiesInIsrael from '../Forms/Cities.js';
 import volunteerings from '../Forms/Volunteerings.js';
 import Select from 'react-select';
 import days from '../Forms/Days.js';
 import langueges from '../Forms/Languges.js';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, arrayRemove } from 'firebase/firestore';
 
 Modal.setAppElement('#root');
 
@@ -36,10 +36,18 @@ function VolunteerMain() {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [documentId, setDocumentId] = useState("");
+  const [matches, setMatches] = useState([]);
+  const [matchDetails, setMatchDetails] = useState([]);
 
   useEffect(() => {
     fetchVolRecord();
   }, []);
+
+  useEffect(() => {
+    if (matches.length > 0) {
+      fetchMatchDetails();
+    }
+  }, [matches]);
 
   const handleLogout = () => {
     signOut(auth)
@@ -117,6 +125,7 @@ function VolunteerMain() {
         setLangSelectedOptions(data.langueges ? data.langueges.map(lang => ({ value: lang, label: lang })) : []);
         setAvailable(data.emergency || false);
         setVehicle(data.vehicle || false);
+        setMatches(data.matches || []);
       } else {
         console.log("No matching document found");
       }
@@ -124,6 +133,38 @@ function VolunteerMain() {
       console.error("Error fetching other record:", error);
     }
   };
+
+  const fetchMatchDetails = async () => {
+    try {
+      // Fetch the details of all matches
+      const matchDetailsPromises = matches.map(async (matchId) => {
+        const matchDocRef = doc(db, "AidRequests", matchId);
+        const matchDocSnap = await getDoc(matchDocRef);
+        return matchDocSnap.exists() ? { id: matchId, ...matchDocSnap.data() } : null;
+      });
+  
+      const matchDetailsResults = await Promise.all(matchDetailsPromises);
+      const validMatches = matchDetailsResults.filter(detail => detail && detail.status === "open");
+      const invalidMatches = matchDetailsResults
+        .filter(detail => detail && detail.status !== "open")
+        .map(detail => detail.id);
+  
+      // Remove invalid matches from the matches array in Firestore
+      if (invalidMatches.length > 0) {
+        const userDocRef = doc(db, "Volunteers", documentId);
+        await updateDoc(userDocRef, {
+          matches: arrayRemove(...invalidMatches)
+        });
+      }
+  
+      // Update the local state
+      setMatches(validMatches.map(detail => detail.id));
+      setMatchDetails(validMatches);
+    } catch (error) {
+      console.error("Error fetching match details:", error);
+    }
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -142,6 +183,7 @@ function VolunteerMain() {
     try {
       const docRef = doc(db, "Volunteers", documentId);
       await setDoc(docRef, formData, { merge: true });
+      
 
       setIsSuccessModalOpen(true);
       setSuccessMessage("עדכון בוצע בהצלחה");
@@ -150,6 +192,31 @@ function VolunteerMain() {
       console.error("Error updating volunteer:", error);
     }
   };
+
+  const formatDate = (dateString) => {
+    const [year, month, day] = dateString.split('-');
+    return `${day}-${month}-${year}`;
+  };
+
+  const handleApproveRequest = async (status, id) => {
+    if (status === "open") {
+        try {
+            const docRef = doc(db, "AidRequests", id);
+            await setDoc(docRef, { status: "in process" }, { merge: true });
+            await setDoc(docRef, { volunteerMatch: documentId }, { merge: true });
+            await updateDoc(docRef, {matches: null});
+
+            const docRefVol = doc(db, "Volunteers", documentId);
+            await updateDoc(docRefVol, { inProcessRequests: [id] }, { merge: true });
+
+        } catch (error) {
+            console.error("Error updating :", error);
+        }
+    }
+    else {
+      console.error("status != open");
+    }
+};
 
   return (
     <div className='VolunteerMain'>
@@ -330,6 +397,24 @@ function VolunteerMain() {
           </button>
         </div>
       </Modal>
+
+      <div className="App">
+        <h2>התאמות שלך</h2>
+        {matchDetails.length > 0 ? (
+          matchDetails.map((match) => (
+            <div key={match.id} className="match-container">
+              <div className="Request">
+                <h3>{match.firstName} {match.lastName}</h3>
+                <p>{`${match.firstName + " " + match.lastName} מבקש/ת את עזרתך ב${match.volunteering} `}</p>
+                <p>{`בתאריך: ${formatDate(match.date)} בשעה: ${match.time}`}</p>
+                <button onClick={() => handleApproveRequest(match.status, match.id)}>אישור בקשה</button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>לא נמצאו התאמות.</p>
+        )}
+      </div>
 
     </div>
   );
