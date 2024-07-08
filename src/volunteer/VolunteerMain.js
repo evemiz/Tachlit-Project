@@ -331,9 +331,6 @@ function VolunteerMain() {
         </div>
       </Modal>
 
-      <Link to="/CloseRequest">סגירת בקשה</Link>
-      <Link to="/GetFeedback">הזנת משוב</Link>
-      <Link to="/ViewRequest">צפייה בבקשות סיוע</Link>
     </div>
   );
 }

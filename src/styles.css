@@ -6,11 +6,10 @@
 
 body {
   font-family: 'Rubik';
-  background-color: #f4f4f4;
-  padding: 2%;
   direction: rtl;
-  background-image: url('/public/b.png');
-  background-size: cover;
+  background: linear-gradient(to bottom, #000000 ,#9b9393); 
+  height: 100vh; /* Make sure it covers the full height */
+  margin: 0;
 }
 
 .container {
@@ -294,7 +293,7 @@ menuButton a:hover {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background-color: black;
+  background: linear-gradient(to top, #141414 ,#535252); 
 }
 
 .navbarVol-logo {
