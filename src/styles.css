@@ -398,7 +398,7 @@ menuButton a:hover {
   color: #666;
 }
 
-.match-container, .current-container, .close-container {
+.match-container, .myRequests-container {
   margin-bottom: 15px;
   padding: 10px;
   border: 1px solid #ddd;
@@ -406,13 +406,13 @@ menuButton a:hover {
   background-color: #fff;
 }
 
-.match-container h3, .current-container h3, .close-container h3 {
+.match-container h3, .myRequests-container h3{
   margin-bottom: 5px;
   color: #333;
   font-size: 30px;
 }
 
-.match-container p, .current-container p, .close-container p {
+.match-container p, .myRequests-container p {
   margin-bottom: 5px;
   color: #666;
   font-size: 25px;

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
 import Modal from 'react-modal';
 import { auth, db } from "../firebaseConfig"; 
-import { query, where, collection, getDocs, getDoc, doc, setDoc, updateDoc, arrayRemove } from "firebase/firestore"; 
+import { arrayUnion, query, where, collection, getDocs, getDoc, doc, setDoc, updateDoc, arrayRemove } from "firebase/firestore"; 
 import Navbar from './VolunteerNavigateBar';
 import citiesInIsrael from '../Forms/Cities.js';
 import volunteerings from '../Forms/Volunteerings.js';
@@ -38,11 +38,8 @@ function VolunteerMain() {
   const [matches, setMatches] = useState([]);
   const [matchDetails, setMatchDetails] = useState([]);
 
-  const [currents, setCurrents] = useState([]);
-  const [currentsDetails, setCurrentsDetails] = useState([]);
-
-  const [close, setClose] = useState([]);
-  const [closeDetails, setCloseDetails] = useState([]);
+  const [myRequests, setMyRequests] = useState([]);
+  const [myRequestsDetails, setMyRequestsDetails] = useState([]);
 
   useEffect(() => {
     fetchVolRecord();
@@ -55,16 +52,10 @@ function VolunteerMain() {
   }, [matches]);
 
   useEffect(() => {
-    if (currents.length > 0) {
-      fetchCurrentsDetails();
+    if (myRequests.length > 0) {
+      fetchMyRequestsDetails();
     }
-  }, [currents]);
-
-  useEffect(() => {
-    if (close.length > 0) {
-      fetchCloseDetails();
-    }
-  }, [close]);
+  }, [myRequests]);
 
   const handleLogout = () => {
     signOut(auth)
@@ -143,8 +134,7 @@ function VolunteerMain() {
         setAvailable(data.emergency || false);
         setVehicle(data.vehicle || false);
         setMatches(data.matches || []);
-        setCurrents(data.inProcessRequests || []);
-        setClose(data.closeRequests || []);
+        setMyRequests(data.myRequests || []);
       } else {
         console.log("No matching document found");
       }
@@ -183,55 +173,20 @@ function VolunteerMain() {
       console.error("Error fetching match details:", error);
     }
   };
-
-
-  const fetchCurrentsDetails = async () => {
+  
+  const fetchMyRequestsDetails = async () => {
     try {
-      // Fetch the details
-      const currentsDetailsPromises = currents.map(async (currentId) => {
-        const currentDocRef = doc(db, "AidRequests", currentId);
-        const currentDocSnap = await getDoc(currentDocRef);
-        return currentDocSnap.exists() ? { id: currentId, ...currentDocSnap.data() } : null;
+      const myRequestsDetailsPromises = myRequests.map(async (myRequestsId) => {
+        const myRequestsDocRef = doc(db, "AidRequests", myRequestsId);
+        const myRequestsDocSnap = await getDoc(myRequestsDocRef);
+        return myRequestsDocSnap.exists() ? { id: myRequestsId, ...myRequestsDocSnap.data() } : null;
       });
   
-      const currentDetailsResults = await Promise.all(currentsDetailsPromises);
-      const validCurrents = currentDetailsResults.filter(detail => detail && detail.status === "in process");
-      const invalidCurrents = currentDetailsResults
-        .filter(detail => detail && detail.status !== "in process")
-        .map(detail => detail.id);
+      const myRequestsDetailsResults = await Promise.all(myRequestsDetailsPromises);
   
-      // Remove invalid matches from the matches array in Firestore
-      if (invalidCurrents.length > 0) {
-        const userDocRef = doc(db, "Volunteers", documentId);
-        await updateDoc(userDocRef, {
-          inProcessRequests: arrayRemove(...invalidCurrents)
-        });
-      }
-
-      // Update the local state
-      setCurrents(validCurrents.map(detail => detail.id));
-      setCurrentsDetails(validCurrents);
+      setMyRequestsDetails(myRequestsDetailsResults);
     } catch (error) {
-      console.error("Error fetching currents details:", error);
-    }
-  };
-
-  const fetchCloseDetails = async () => {
-    try {
-      // Fetch the details
-      const closeDetailsPromises = close.map(async (closeId) => {
-        const closeDocRef = doc(db, "AidRequests", closeId);
-        const closeDocSnap = await getDoc(closeDocRef);
-        return closeDocSnap.exists() ? { id: closeId, ...closeDocSnap.data() } : null;
-      });
-  
-      const closeDetailsResults = await Promise.all(closeDetailsPromises);
-
-      // Update the local state
-      setClose(closeDetailsResults.map(detail => detail.id));
-      setCloseDetails(closeDetailsResults);
-    } catch (error) {
-      console.error("Error fetching closw details:", error);
+      console.error("Error fetching close details:", error);
     }
   };
 
@@ -274,9 +229,10 @@ function VolunteerMain() {
             await updateDoc(docRef, {matches: null});
 
             const docRefVol = doc(db, "Volunteers", documentId);
-            await updateDoc(docRefVol, { inProcessRequests: [id] }, { merge: true });
-
-        } catch (error) {
+            await updateDoc(docRefVol, { myRequests: arrayUnion(id) }, { merge: true }); 
+            window.location.reload();     
+          } 
+            catch (error) {
             console.error("Error updating :", error);
         }
     }
@@ -285,23 +241,21 @@ function VolunteerMain() {
     }
 };
 
-const handleCloseRequest = async (status, id) => {
-  if (status === "in process") {
-      try {
-          const docRef = doc(db, "AidRequests", id);
-          await setDoc(docRef, { status: "close" }, { merge: true });
-
-          const docRefVol = doc(db, "Volunteers", documentId);
-          await updateDoc(docRefVol, { closeRequests: [id] }, { merge: true });
-
-      } catch (error) {
-          console.error("Error updating :", error);
-      }
-  }
-  else {
-    console.error("status != open");
+const closeRequest = async (id) => {
+  try {
+    const docRef = doc(db, 'AidRequests', id);
+    await setDoc(docRef, { status: 'close' }, { merge: true });
+    window.location.reload();
+  } catch (error) {
+    console.error('Error closing request:', error);
   }
 };
+
+const sortedRequests = React.useMemo(() => {
+  const inProcessRequests = myRequestsDetails.filter(cur => cur.status === 'in process');
+  const closedRequests = myRequestsDetails.filter(cur => cur.status === 'close');
+  return [...inProcessRequests, ...closedRequests];
+}, [myRequestsDetails]);
 
   return (
     <div className='VolunteerMain'>
@@ -502,38 +456,31 @@ const handleCloseRequest = async (status, id) => {
       </div>
 
       <div className="box">
-        <h2>בקשות בטיפולך</h2>
-        {currentsDetails.length > 0 ? (
-          currentsDetails.map((cur) => (
-            <div key={cur.id} className="current-container">
-              <div className="Request">
-                <p>{`${cur.firstName + " " + cur.lastName} מבקש/ת את עזרתך ב${cur.volunteering} `}</p>
-                <p>{`בתאריך: ${formatDate(cur.date)} בשעה: ${cur.time}`}</p>
-                <button onClick={() => handleCloseRequest(cur.status, cur.id)}>סגירת הבקשה</button>
-              </div>
+      <h2>בקשות בטיפולך</h2>
+      {sortedRequests.length > 0 ? (
+        sortedRequests.map((cur) => (
+          <div key={cur.id} className="myRequests-container">
+            <div className="Request">
+              <p>{`סיוע ל${cur.firstName + " " + cur.lastName} ב${cur.volunteering}`}</p>
+              <p>{`בתאריך: ${formatDate(cur.date)} בשעה: ${cur.time}`}</p>
+              <p>
+                סטטוס: 
+                {cur.status === 'in process' ? (
+                  <span style={{ color: '#009ba6' }}> בתהליך</span>
+                ) : (
+                  ' טופל'
+                )}
+              </p>
+              {cur.status === 'in process' && (
+                <button onClick={() => closeRequest(cur.id)}>סגור בקשה</button>
+              )}
             </div>
-          ))
-        ) : (
-          <p>אין בקשות בטיפול</p>
-        )}
-      </div>
-
-      <div className="box">
-        <h2>בקשות סגורות</h2>
-        {closeDetails.length > 0 ? (
-          closeDetails.map((close) => (
-            <div key={close.id} className="close-container">
-              <div className="Request">
-                <p>{`${close.firstName + " " + close.lastName} מבקש/ת את עזרתך ב${close.volunteering} `}</p>
-                <p>{`בתאריך: ${formatDate(close.date)} בשעה: ${close.time}`}</p>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>אין בקשות בטיפול</p>
-        )}
-      </div>
-
+          </div>
+        ))
+      ) : (
+        <p>אין בקשות בטיפול</p>
+      )}
+    </div>
     </div>
   );
 }
