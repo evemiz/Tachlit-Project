@@ -456,7 +456,7 @@ const sortedRequests = React.useMemo(() => {
       </div>
 
       <div className="box">
-      <h2>בקשות בטיפולך</h2>
+      <h2>הבקשות שלי</h2>
       {sortedRequests.length > 0 ? (
         sortedRequests.map((cur) => (
           <div key={cur.id} className="myRequests-container">

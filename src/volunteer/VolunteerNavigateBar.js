@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from "react-router-dom";
-import logo from '../images/logo.png'
+import { useLocation } from "react-router-dom";
+import logo from '../images/logo.png';
 
 function Navbar({ handleLogout, openEditUser }) {
     const location = useLocation();
@@ -9,21 +9,27 @@ function Navbar({ handleLogout, openEditUser }) {
     const handleLogoClick = () => {
       if (location.pathname === "/VolunteerMain") {
         setFlash(true);
-        setTimeout(() => setFlash(false), 300); 
+        setTimeout(() => setFlash(false), 300);
+        
+        // Force page reload
+        window.location.reload();
       }
     };
 
   return (
     <nav className="navbarVol">
-
-    <div className={`navbar-logo ${flash ? 'flash' : ''}`}>
-        <Link to="/VolunteerMain" onClick={handleLogoClick}>
-          <img src={logo} alt="Logo" className="logo-image" />
-        </Link>
-    </div>
+      <div className={`navbar-logo ${flash ? 'flash' : ''}`}>
+        <img
+          src={logo}
+          alt="Logo"
+          className="logo-image"
+          onClick={handleLogoClick}
+          style={{ cursor: 'pointer' }}
+        />
+      </div>
 
       <div className="navbar-links">
-      <button onClick={openEditUser}>ערוך פרופיל</button>
+        <button onClick={openEditUser}>ערוך פרופיל</button>
         <button onClick={handleLogout}>התנתק</button>
       </div>
     </nav>
