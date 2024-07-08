@@ -370,7 +370,15 @@ menuButton a:hover {
   border-radius: 4px;
 }
 
+.terms-container {
+  display: flex;
+  align-items: center;
+  margin-top: 10px; 
+}
 
+.terms-container input[type="checkbox"] {
+  margin-right: 10px; 
+}
 
 
 /* styles.css */
@@ -414,4 +422,9 @@ menuButton a:hover {
   margin: 50px;
   color: #009ba6;
   font-size: 40px;
+}
+
+h2 {
+  margin-top: 30px;
+  font-size: 20px;
 }

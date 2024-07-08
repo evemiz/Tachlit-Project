@@ -24,6 +24,7 @@ function VolunteerForm() {
   const [vehicle, setVehicle] = useState(Boolean);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -207,6 +208,20 @@ function VolunteerForm() {
           לא
 
           <br></br>
+
+          <h2>תקנון למתנדב חדש</h2>
+          <p>יש לשמור על אנונימיות של מבקש הסיוע ולנהוג</p>
+          <p>בסובלנות ובחמלה כלפי מבקש הסיוע.</p>
+          <div className="terms-container">
+            <input
+              type="checkbox"
+              id="terms"
+              checked={isTermsAccepted}
+              onChange={() => setIsTermsAccepted(!isTermsAccepted)}
+              required      
+            />
+            <label htmlFor="terms">אני מאשר את תנאי השימוש</label>
+          </div>
 
           <button
             type="submit"

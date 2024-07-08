@@ -1,17 +1,17 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDsSDzid-Kt_HmqMZTokvBbOYjPyNvTMRc",
-    authDomain: "tachlit-association.firebaseapp.com",
-    projectId: "tachlit-association",
-    storageBucket: "tachlit-association.appspot.com",
-    messagingSenderId: "329042195364",
-    appId: "1:329042195364:web:62380f403e4f9d78fa8731",
-    measurementId: "G-9SK8TXRSKN"
-  };
+  apiKey: "AIzaSyDsSDzid-Kt_HmqMZTokvBbOYjPyNvTMRc",
+  authDomain: "tachlit-association.firebaseapp.com",
+  projectId: "tachlit-association",
+  storageBucket: "tachlit-association.appspot.com",
+  messagingSenderId: "329042195364",
+  appId: "1:329042195364:web:4860e7a8ab388209fa8731",
+  measurementId: "G-WWCSGWFE78"
+};
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

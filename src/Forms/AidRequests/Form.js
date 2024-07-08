@@ -26,6 +26,7 @@ function RequestForm() {
   const [dayOfWeek, setDayOfWeek] = useState("");
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -239,6 +240,21 @@ function RequestForm() {
           />
 
           <br />
+          <h2>תקנון הגשת בקשת סיוע</h2>
+          <p>יש לשמור על פרטיות המתנדב ולא להקשות מעבר.</p>
+          <p>אין לקחת מספרים ופרטים ולהתנהל מולם מלבד פלטפורמה זו,</p>
+          <p>אלא אם כן, המתנדב אישר זו גם אצלנו.</p>
+          <div className="terms-container">
+            <input
+              type="checkbox"
+              id="terms"
+              checked={isTermsAccepted}
+              onChange={() => setIsTermsAccepted(!isTermsAccepted)}
+              required      
+            />
+            <label htmlFor="terms">אני מאשר את תנאי השימוש</label>
+          </div>
+
 
           <button
             type="submit"
