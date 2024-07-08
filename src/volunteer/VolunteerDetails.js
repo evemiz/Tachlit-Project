@@ -36,38 +36,45 @@ const VolunteerDetails = ({ volunteer }) => {
     const [successMessage, setSuccessMessage] = useState("");
   
     const handleSubmit = async (e) => {
-      e.preventDefault();
-  
-      const formData = {
-        firstName: firstName,
-        lastName: lastName,
-        id: volunteer.id,
-        phoneNumber: volunteer.phoneNumber,
-        mail: volunteer.mail,
-        city: citySelectedOption ? citySelectedOption.label : "",
-        langueges: langSelectedOptions.map(option => option.value),
-        days: daySelectedOptions.map(option => option.value),
-        emergency: available,
-        volunteering: volSelectedOptions.map(option => option.value),
-        vehicle: vehicle,
-      };
-  
-      if (validateData(formData)) {
-        try {
+        e.preventDefault();
+      
+        const formData = {
+          firstName: firstName,
+          lastName: lastName,
+          id: volunteer.id,
+          phoneNumber: volunteer.phoneNumber,
+          mail: volunteer.mail,
+          city: citySelectedOption ? citySelectedOption.label : "",
+          langueges: langSelectedOptions.map(option => option.value),
+          days: daySelectedOptions.map(option => option.value),
+          emergency: available,
+          volunteering: volSelectedOptions.map(option => option.value),
+          vehicle: vehicle,
+        };
+      
+        if (validateData(formData)) {
+          try {
             const docRef = doc(db, "Volunteers", volunteer.id);
-            await setDoc(docRef, { firstName: firstName }, { merge: true });
-            await setDoc(docRef, { lastName: lastName }, { merge: true });
-            await setDoc(docRef, { city: citySelectedOption ? citySelectedOption.label : "" }, { merge: true });
-            await setDoc(docRef, { langueges: langSelectedOptions.map(option => option.value) }, { merge: true });
-            await setDoc(docRef, { days: daySelectedOptions.map(option => option.value) }, { merge: true });
-            await setDoc(docRef, { emergency: available }, { merge: true });
-            await setDoc(docRef, { volunteering: volSelectedOptions.map(option => option.value) }, { merge: true });
-            await setDoc(docRef, { vehicle: vehicle }, { merge: true });
-        } catch (error) {
-            console.error("Error updating status:", error);
+            await setDoc(docRef, {
+              firstName: firstName,
+              lastName: lastName,
+              city: citySelectedOption ? citySelectedOption.label : "",
+              langueges: langSelectedOptions.map(option => option.value),
+              days: daySelectedOptions.map(option => option.value),
+              emergency: available,
+              volunteering: volSelectedOptions.map(option => option.value),
+              vehicle: vehicle,
+            }, { merge: true });
+      
+            // Close success modal and show success message
+            setIsSuccessModalOpen(true);
+            setSuccessMessage("עדכון בוצע בהצלחה");
+      
+          } catch (error) {
+            console.error("Error updating volunteer:", error);
+          }
         }
-      }
-    };
+      };
   
     const handleSuccessModalClose = () => {
       setIsSuccessModalOpen(false);
@@ -212,4 +219,3 @@ const VolunteerDetails = ({ volunteer }) => {
   };
   
   export default VolunteerDetails;
-  

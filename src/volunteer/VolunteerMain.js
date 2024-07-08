@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
 import Modal from 'react-modal';
 import { auth, db } from "../firebaseConfig"; 
 import { query, where, collection, getDocs } from "firebase/firestore"; 
 import Navbar from './VolunteerNavigateBar';
-import VolunteerDetails from './VolunteerDetails';
+import citiesInIsrael from '../Forms/Cities.js';
+import volunteerings from '../Forms/Volunteerings.js';
+import Select from 'react-select';
+import days from '../Forms/Days.js';
+import langueges from '../Forms/Languges.js';
+import { doc, setDoc } from 'firebase/firestore';
 
 Modal.setAppElement('#root');
 
@@ -22,6 +27,21 @@ function VolunteerMain() {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [message, setMessage] = useState("");
   const [volRecord, setVolRecord] = useState(null); 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [citySelectedOption, setCitySelectedOption] = useState(null);
+  const [volSelectedOptions, setVolSelectedOptions] = useState([]);
+  const [daySelectedOptions, setDaySelectedOptions] = useState([]);
+  const [langSelectedOptions, setLangSelectedOptions] = useState([]);
+  const [available, setAvailable] = useState(false);
+  const [vehicle, setVehicle] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [documentId, setDocumentId] = useState("");
+
+  useEffect(() => {
+    fetchVolRecord();
+  }, []);
 
   const handleLogout = () => {
     signOut(auth)
@@ -40,7 +60,6 @@ function VolunteerMain() {
 
   const openEditUser = async () => {
     setModalIsOpen2(true);
-    await fetchVolRecord();
   };
 
   const closeModal = () => {
@@ -88,14 +107,23 @@ function VolunteerMain() {
     }
   };
 
-
   const fetchVolRecord = async () => {
     try {
       const q = query(collection(db, "Volunteers"), where("mail", "==", userId));
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
         const doc = querySnapshot.docs[0];
-        setVolRecord(doc.data());
+        const data = doc.data();
+        setDocumentId(doc.id);
+        setVolRecord(data);
+        setFirstName(data.firstName || "");
+        setLastName(data.lastName || "");
+        setCitySelectedOption(data.city ? { value: data.city, label: data.city } : null);
+        setVolSelectedOptions(data.volunteering ? data.volunteering.map(vol => ({ value: vol, label: vol })) : []);
+        setDaySelectedOptions(data.days ? data.days.map(day => ({ value: day, label: day })) : []);
+        setLangSelectedOptions(data.langueges ? data.langueges.map(lang => ({ value: lang, label: lang })) : []);
+        setAvailable(data.emergency || false);
+        setVehicle(data.vehicle || false);
       } else {
         setVolRecord(null);
         console.log("No matching document found");
@@ -103,6 +131,36 @@ function VolunteerMain() {
     } catch (error) {
       console.error("Error fetching other record:", error);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = {
+      firstName: firstName,
+      lastName: lastName,
+      city: citySelectedOption ? citySelectedOption.label : "",
+      langueges: langSelectedOptions.map(option => option.value),
+      days: daySelectedOptions.map(option => option.value),
+      emergency: available,
+      volunteering: volSelectedOptions.map(option => option.value),
+      vehicle: vehicle,
+    };
+
+    try {
+      const docRef = doc(db, "Volunteers", documentId);
+      await setDoc(docRef, formData, { merge: true });
+
+      setIsSuccessModalOpen(true);
+      setSuccessMessage("עדכון בוצע בהצלחה");
+
+    } catch (error) {
+      console.error("Error updating volunteer:", error);
+    }
+  };
+
+  const handleSuccessModalClose = () => {
+    setIsSuccessModalOpen(false);
   };
 
   return (
@@ -155,14 +213,141 @@ function VolunteerMain() {
         contentLabel="Edit User Modal"
       >
         <h1>עריכת משתמש</h1>
-        {volRecord ? (
-          <VolunteerDetails volunteer={volRecord} /> 
-        ) : (
-          <p>...</p>
-        )}
+        <div className='App'>
+        <fieldset>
+            <label htmlFor="firstname">שם פרטי</label>
+            <input
+              placeholder={volRecord ? volRecord.firstName : ""}
+              type="text"
+              name="firstname"
+              id="firstname"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              dir="rtl"
+              required
+            />
+            <label htmlFor="lastname">שם משפחה</label>
+            <input
+              placeholder={volRecord ? volRecord.lastName : ""}
+              type="text"
+              name="lastname"
+              id="lastname"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              dir="rtl"
+              required
+            />
+
+            <label>עיר מגורים</label>
+            <Select
+              name="select"
+              options={citiesInIsrael.map(city => ({ value: city, label: city }))}
+              value={citySelectedOption}
+              onChange={setCitySelectedOption}
+              placeholder="בחר עיר מגורים"
+            />
+
+            <label>תחומי התנדבות</label>
+            <Select
+              isMulti
+              name="volunteerings"
+              options={volunteerings.map(volunteer => ({ value: volunteer, label: volunteer }))}
+              className="basic-multi-select"
+              classNamePrefix="select"
+              value={volSelectedOptions}
+              onChange={setVolSelectedOptions}
+              placeholder="בחר תחומי התנדבות"
+            />
+
+            <label>ימי זמינות</label>
+            <Select
+              isMulti
+              name="days"
+              options={days.map(day => ({ value: day, label: day }))}
+              className="basic-multi-select"
+              classNamePrefix="select"
+              value={daySelectedOptions}
+              onChange={setDaySelectedOptions}
+              placeholder="בחר ימי זמינות"
+            />
+
+            <label>שפות</label>
+            <Select
+              isMulti
+              name="langueges"
+              options={langueges.map(lang => ({ value: lang, label: lang }))}
+              className="basic-multi-select"
+              classNamePrefix="select"
+              value={langSelectedOptions}
+              onChange={setLangSelectedOptions}
+              placeholder="בחר שפות"
+            />
+
+            <label htmlFor="available">זמינות לחירום</label>
+            <input
+              type="radio"
+              name="available"
+              value="yes"
+              id="yes"
+              checked={available === true}
+              onChange={(e) => setAvailable(true)}
+            />
+            כן
+            <input
+              type="radio"
+              name="available"
+              value="no"
+              id="no"
+              checked={available === false}
+              onChange={(e) => setAvailable(false)}
+            />
+            לא
+
+            <label htmlFor="vehicle">רכב</label>
+            <input
+              type="radio"
+              name="vehicle"
+              value="yes"
+              id="vehicleYes"
+              checked={vehicle === true}
+              onChange={(e) => setVehicle(true)}
+            />
+            כן
+            <input
+              type="radio"
+              name="vehicle"
+              value="no"
+              id="vehicleNo"
+              checked={vehicle === false}
+              onChange={(e) => setVehicle(false)}
+            />
+            לא
+
+            <br />
+
+            <button type="submit" value="Submit" onClick={handleSubmit}> 
+              אישור עריכה
+            </button>
+        </fieldset>
+        </div>
+        <button onClick={closeModal2}>סגור</button>
       </Modal>
 
-
+      <Modal
+        isOpen={isSuccessModalOpen}
+        onRequestClose={handleSuccessModalClose}
+        contentLabel="Success"
+        className="Modal"
+        overlayClassName="Overlay"
+      >
+        <h2>פעולה הצליחה</h2>
+        <p>{successMessage}</p>
+        <div className="modal-buttons">
+          <button className="modal-button confirm" onClick={handleSuccessModalClose}>
+            סגור
+          </button>
+        </div>
+      </Modal>
 
       <Link to="/CloseRequest">סגירת בקשה</Link>
       <Link to="/GetFeedback">הזנת משוב</Link>
