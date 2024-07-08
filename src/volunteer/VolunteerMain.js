@@ -20,13 +20,11 @@ function VolunteerMain() {
   const userId = location.state?.userId;
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [modalIsOpen2, setModalIsOpen2] = useState(false);
   const [email, setEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [volRecord, setVolRecord] = useState(null); 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [citySelectedOption, setCitySelectedOption] = useState(null);
@@ -54,25 +52,17 @@ function VolunteerMain() {
       });
   };
 
-  const openChangePasswordModal = () => {
+  const openEditUser = async () => {
     setModalIsOpen(true);
   };
-
-  const openEditUser = async () => {
-    setModalIsOpen2(true);
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-    setEmail("");
-    setOldPassword("");
-    setNewPassword("");
-    setConfirmNewPassword("");
-    setMessage("");
-  };
   
-  const closeModal2 = () => {
-    setModalIsOpen2(false);
+  const closeModal = () => {
+    fetchVolRecord();
+    setModalIsOpen(false);
+  };
+
+  const handleSuccessModalClose = () => {
+    setIsSuccessModalOpen(false);
   };
 
   const handleChangePassword = (e) => {
@@ -81,6 +71,7 @@ function VolunteerMain() {
       setMessage("הסיסמאות אינן תואמות.");
       return;
     }
+    
 
     const user = auth.currentUser;
 
@@ -91,7 +82,10 @@ function VolunteerMain() {
           updatePassword(user, newPassword)
             .then(() => {
               setMessage("הסיסמה שונתה בהצלחה");
-              closeModal();
+              setEmail("");
+              setOldPassword("");
+              setNewPassword("");
+              setConfirmNewPassword("");
             })
             .catch((error) => {
               console.error("Error updating password:", error);
@@ -115,7 +109,6 @@ function VolunteerMain() {
         const doc = querySnapshot.docs[0];
         const data = doc.data();
         setDocumentId(doc.id);
-        setVolRecord(data);
         setFirstName(data.firstName || "");
         setLastName(data.lastName || "");
         setCitySelectedOption(data.city ? { value: data.city, label: data.city } : null);
@@ -125,7 +118,6 @@ function VolunteerMain() {
         setAvailable(data.emergency || false);
         setVehicle(data.vehicle || false);
       } else {
-        setVolRecord(null);
         console.log("No matching document found");
       }
     } catch (error) {
@@ -159,57 +151,12 @@ function VolunteerMain() {
     }
   };
 
-  const handleSuccessModalClose = () => {
-    setIsSuccessModalOpen(false);
-  };
-
   return (
     <div className='VolunteerMain'>
-      <Navbar handleLogout={handleLogout} openEditUser={openEditUser} openChangePasswordModal={openChangePasswordModal} />
+      <Navbar handleLogout={handleLogout} openEditUser={openEditUser}/>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
-        contentLabel="Change Password Modal"
-      >
-        <h2>שינוי סיסמה</h2>
-        <form onSubmit={handleChangePassword}>
-          <input
-            type="email"
-            placeholder="אימייל"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            dir="rtl"
-          />
-          <input
-            type="password"
-            placeholder="סיסמה ישנה"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            dir="rtl"
-          />
-          <input
-            type="password"
-            placeholder="סיסמה חדשה"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            dir="rtl"
-          />
-          <input
-            type="password"
-            placeholder="הקש שוב את סיסמתך"
-            value={confirmNewPassword}
-            onChange={(e) => setConfirmNewPassword(e.target.value)}
-            dir="rtl"
-          />
-          <button type="submit">שנה סיסמה</button>
-        </form>
-        {message && <p>{message}</p>}
-        <button onClick={closeModal}>סגור</button>
-      </Modal>
-
-      <Modal
-        isOpen={modalIsOpen2}
-        onRequestClose={closeModal2}
         contentLabel="Edit User Modal"
       >
         <h1>עריכת משתמש</h1>
@@ -217,7 +164,6 @@ function VolunteerMain() {
         <fieldset>
             <label htmlFor="firstname">שם פרטי</label>
             <input
-              placeholder={volRecord ? volRecord.firstName : ""}
               type="text"
               name="firstname"
               id="firstname"
@@ -228,7 +174,6 @@ function VolunteerMain() {
             />
             <label htmlFor="lastname">שם משפחה</label>
             <input
-              placeholder={volRecord ? volRecord.lastName : ""}
               type="text"
               name="lastname"
               id="lastname"
@@ -325,12 +270,49 @@ function VolunteerMain() {
 
             <br />
 
-            <button type="submit" value="Submit" onClick={handleSubmit}> 
+        <div className='passwordVolUpdate'>
+
+        <h1>שינוי סיסמה</h1>
+        <form onSubmit={handleChangePassword}>
+          <input
+            type="email"
+            placeholder="אימייל"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            dir="rtl"
+          />
+          <input
+            type="password"
+            placeholder="סיסמה ישנה"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            dir="rtl"
+          />
+          <input
+            type="password"
+            placeholder="סיסמה חדשה"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            dir="rtl"
+          />
+          <input
+            type="password"
+            placeholder="הקש שוב את סיסמתך"
+            value={confirmNewPassword}
+            onChange={(e) => setConfirmNewPassword(e.target.value)}
+            dir="rtl"
+          />
+          <button type="submit">שנה סיסמה</button>
+        </form>
+        {message && <p>{message}</p>}
+
+        </div>
+        <button type="submit" value="Submit" onClick={handleSubmit}> 
               אישור עריכה
             </button>
         </fieldset>
         </div>
-        <button onClick={closeModal2}>סגור</button>
+        <button onClick={closeModal}>סגור</button>
       </Modal>
 
       <Modal
