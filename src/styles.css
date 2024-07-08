@@ -7,7 +7,7 @@
 body {
   font-family: 'Rubik';
   direction: rtl;
-  background: linear-gradient(to bottom, #000000 ,#9b9393); 
+  background: #666; 
   height: 100vh; /* Make sure it covers the full height */
   margin: 0;
 }
@@ -293,7 +293,7 @@ menuButton a:hover {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background: linear-gradient(to top, #141414 ,#535252); 
+  background: linear-gradient(to left, #141414 ,#535252); 
 }
 
 .navbarVol-logo {
@@ -373,3 +373,45 @@ menuButton a:hover {
 
 
 
+/* styles.css */
+
+.box {
+  border: 1px solid #141313;
+  border-radius: 50px;
+  padding: 20px;
+  background-color: #e8e8e8;
+  width: 80%;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.box p {
+  color: #666;
+}
+
+.match-container, .current-container, .close-container {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.match-container h3, .current-container h3, .close-container h3 {
+  margin-bottom: 5px;
+  color: #333;
+  font-size: 30px;
+}
+
+.match-container p, .current-container p, .close-container p {
+  margin-bottom: 5px;
+  color: #666;
+  font-size: 25px;
+}
+
+.box h2 {
+  margin: 50px;
+  color: #009ba6;
+  font-size: 40px;
+}

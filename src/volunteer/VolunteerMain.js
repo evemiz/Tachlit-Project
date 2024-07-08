@@ -482,16 +482,16 @@ const handleCloseRequest = async (status, id) => {
           </button>
         </div>
       </Modal>
-
-      <div className="App">
-        <h2>התאמות שלך</h2>
+      
+      <div className="box">
+        <h2>בקשות סיוע רלוונטיות עבורך</h2>
         {matchDetails.length > 0 ? (
           matchDetails.map((match) => (
             <div key={match.id} className="match-container">
               <div className="Request">
-                <h3>{match.firstName} {match.lastName}</h3>
                 <p>{`${match.firstName + " " + match.lastName} מבקש/ת את עזרתך ב${match.volunteering} `}</p>
-                <p>{`בתאריך: ${formatDate(match.date)} בשעה: ${match.time}`}</p>
+                <p>{`ביום: ${match.day} ${formatDate(match.date)} בשעה: ${match.time}`}</p>
+                <p>{match.comments && <p>הערות: {match.comments}</p>}</p>
                 <button onClick={() => handleApproveRequest(match.status, match.id)}>אישור בקשה</button>
               </div>
             </div>
@@ -501,13 +501,12 @@ const handleCloseRequest = async (status, id) => {
         )}
       </div>
 
-      <div className="App">
+      <div className="box">
         <h2>בקשות בטיפולך</h2>
         {currentsDetails.length > 0 ? (
           currentsDetails.map((cur) => (
             <div key={cur.id} className="current-container">
               <div className="Request">
-                <h3>{cur.firstName} {cur.lastName}</h3>
                 <p>{`${cur.firstName + " " + cur.lastName} מבקש/ת את עזרתך ב${cur.volunteering} `}</p>
                 <p>{`בתאריך: ${formatDate(cur.date)} בשעה: ${cur.time}`}</p>
                 <button onClick={() => handleCloseRequest(cur.status, cur.id)}>סגירת הבקשה</button>
@@ -519,16 +518,14 @@ const handleCloseRequest = async (status, id) => {
         )}
       </div>
 
-      <div className="App">
+      <div className="box">
         <h2>בקשות סגורות</h2>
         {closeDetails.length > 0 ? (
-          closeDetails.map((cur) => (
-            <div key={cur.id} className="close-container">
+          closeDetails.map((close) => (
+            <div key={close.id} className="close-container">
               <div className="Request">
-                <h3>{cur.firstName} {cur.lastName}</h3>
-                <p>{`${cur.firstName + " " + cur.lastName} מבקש/ת את עזרתך ב${cur.volunteering} `}</p>
-                <p>{`בתאריך: ${formatDate(cur.date)} בשעה: ${cur.time}`}</p>
-                <button onClick={() => handleCloseRequest(cur.status, cur.id)}>סגירת הבקשה</button>
+                <p>{`${close.firstName + " " + close.lastName} מבקש/ת את עזרתך ב${close.volunteering} `}</p>
+                <p>{`בתאריך: ${formatDate(close.date)} בשעה: ${close.time}`}</p>
               </div>
             </div>
           ))
