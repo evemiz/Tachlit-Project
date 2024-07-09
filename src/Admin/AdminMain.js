@@ -1,9 +1,13 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
+import { db } from "../firebaseConfig";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import Modal from 'react-modal';
 import '../styles.css';
+import Lists from './Lists'; // ייבוא הרכיב להצגת הרשימות
+import { useNavigate } from "react-router-dom";
+import Navbar from "./AdminNavigateBar";
 
 Modal.setAppElement('#root');
 
@@ -15,6 +19,41 @@ function AdminMain() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [volunteersThisMonth, setVolunteersThisMonth] = useState(0);
+  const [totalVolunteers, setTotalVolunteers] = useState(0);
+  const [closedRequestsThisMonth, setClosedRequestsThisMonth] = useState(0);
+  const [openRequests, setOpenRequests] = useState(0);
+
+  // useEffect(() => {
+  //   fetchDashboardData();
+  // }, []);
+
+  // const fetchDashboardData = async () => {
+  //   const now = new Date();
+  //   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  //   // מתנדבים שנוספו החודש
+  //   const newVolunteersRef = collection(db, 'NewVolunteers');
+  //   const newVolunteersQuery = query(newVolunteersRef, where('date', '>=', startOfMonth));
+  //   const newVolunteersSnapshot = await getDocs(newVolunteersQuery);
+  //   setVolunteersThisMonth(newVolunteersSnapshot.size);
+
+  //   // סך כל המתנדבים
+  //   const totalVolunteersRef = collection(db, 'Volunteers');
+  //   const totalVolunteersSnapshot = await getDocs(totalVolunteersRef);
+  //   setTotalVolunteers(totalVolunteersSnapshot.size);
+
+  //   // בקשות שנסגרו החודש
+  //   const closedRequestsRef = collection(db, 'AidRequests');
+  //   const closedRequestsQuery = query(closedRequestsRef, where('status', '==', 'close'), where('date', '>=', startOfMonth));
+  //   const closedRequestsSnapshot = await getDocs(closedRequestsQuery);
+  //   setClosedRequestsThisMonth(closedRequestsSnapshot.size);
+
+  //   // בקשות פתוחות
+  //   const openRequestsQuery = query(closedRequestsRef, where('status', '==', 'open'));
+  //   const openRequestsSnapshot = await getDocs(openRequestsQuery);
+  //   setOpenRequests(openRequestsSnapshot.size);
+  // };
 
   const handleLogout = () => {
     signOut(auth)
@@ -41,7 +80,6 @@ function AdminMain() {
   };
 
   const handleChangePassword = (e) => {
-
     e.preventDefault();
     if (newPassword !== confirmNewPassword) {
       setMessage(".הסיסמאות אינן תואמות");
@@ -74,16 +112,32 @@ function AdminMain() {
   };
 
   return (
-    <div className="AdminMAinPage">
+    <div className="AdminMainPage">
+      <Navbar handleLogout={handleLogout} openPasswordReset={openModal}/>
       <h1> ברוכים הבאים לדף מנהל</h1>
-      <adminMainButton>
-        <Link to="/Lists">צפיה ברשימות</Link>
-      </adminMainButton>
-      <adminMainButton>
-        <Link to="/SignUp">הוספת מנהל חדש</Link>
-      </adminMainButton>
-      <adminMainButton onClick={handleLogout}>התנתק</adminMainButton>
-      <adminMainButton onClick={openModal}>שינוי סיסמה</adminMainButton>
+      <div className="topBar"></div>
+
+      {/* <div className="dashboard">
+        <div className="dashboard-item">
+          <h3>מתנדבים ממתינים לאישור</h3>
+          <p>{volunteersThisMonth}</p>
+        </div>
+        <div className="dashboard-item">
+          <h3>סך כל המתנדבים</h3>
+          <p>{totalVolunteers}</p>
+        </div>
+        <div className="dashboard-item">
+          <h3>בקשות שנסגרו </h3>
+          <p>{closedRequestsThisMonth}</p>
+        </div>
+        <div className="dashboard-item">
+          <h3>בקשות פתוחות</h3>
+          <p>{openRequests}</p>
+        </div>
+      </div> */}
+
+      <Lists /> {/* הצגת רכיב הרשימות ישירות בדף */}
+
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
@@ -125,6 +179,9 @@ function AdminMain() {
         {message && <p>{message}</p>}
         <button onClick={closeModal}>סגור</button>
       </Modal>
+      <div className='pageEnd'>
+        <h2> חזרה לעמוד הבית</h2>
+    </div>
     </div>
   );
 }

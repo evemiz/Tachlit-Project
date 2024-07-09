@@ -354,6 +354,7 @@ h2 {
 }
 
 .pageEnd {
+  margin-top: auto;
   display: flex;
   justify-content: center; /* Center items horizontally */
   align-items: center; /* Center items vertically */
@@ -368,3 +369,7 @@ h2 {
   max-height: fit-content;
   margin: auto;
 }
+
+
+
+
