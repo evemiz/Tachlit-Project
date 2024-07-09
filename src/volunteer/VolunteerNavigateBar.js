@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useLocation } from "react-router-dom";
 import logo from '../images/logo.png';
 
-function Navbar({ handleLogout, openEditUser }) {
+function Navbar({ handleLogout, openEditUser, openPasswordReset }) {
     const location = useLocation();
     const [flash, setFlash] = useState(false);
   
@@ -30,6 +30,7 @@ function Navbar({ handleLogout, openEditUser }) {
 
       <div className="navbar-links">
         <button onClick={openEditUser}>ערוך פרופיל</button>
+        <button onClick={openPasswordReset}>שנה סיסמא</button>
         <button onClick={handleLogout}>התנתק</button>
       </div>
     </nav>
