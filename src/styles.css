@@ -112,34 +112,6 @@ button a:hover {
   text-decoration: none; /* להסרת קו תחתון גם כאשר מרחפים מעל הקישור */
 }
 
-menuButton {
-  background-color: #000000;
-  color: white !important;
-  border: none;
-  cursor: pointer;
-  font-size: 17px;
-  padding-right: 30px;
-  padding-left: 30px;
-  font-weight: 700;
-  transition: background-color 0.3s;
-  width: auto;
-
-
-}
-
-menuButton:hover {
-  background-color: #009ba6;
-}
-
-menuButton a {
-  color: white !important;
-  text-decoration: none; /* להסרת קו תחתון */
-}
-
-menuButton a:hover {
-  color: white !important;
-  text-decoration: none; /* להסרת קו תחתון גם כאשר מרחפים מעל הקישור */
-}
 
 .Button_list {
   background-color: white;
@@ -388,7 +360,6 @@ h2 {
   padding: 10px;
   background: linear-gradient(to left, #141414, #535252);
   color: #f9f9f9;
-
 }
 
 
@@ -397,4 +368,3 @@ h2 {
   max-height: fit-content;
   margin: auto;
 }
-

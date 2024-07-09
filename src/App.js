@@ -21,31 +21,47 @@ import SignUpVol from './Forms/Volunteers/SignUpNewVolunteer';
 import '@fontsource/rubik';
 import './App.css'; // ייבוא של קובץ ה-CSS
 import './styles.css';
+import logo from './images/logo.png';
+import image1 from './images/image1.jpg'
 
 const Home = () => (
   <div>
-    <h1>דף הבית</h1>
-    <p>ברוכים הבאים לאתר שלנו!</p>
+    <img
+          src={image1}
+          alt="image1"
+          className="image1"
+          style={{ cursor: 'pointer' }}
+        />
   </div>
 );
 
 const Navigation = () => (
-  <nav>
-    <menuButton>
+  <nav className='navbarVol'>
+          <div className={'navbar-logo'}>
+        <img
+          src={logo}
+          alt="Logo"
+          className="logo-image"
+          style={{ cursor: 'pointer' }}
+        />
+      </div>
+      <div className="navbar-links">
+      <button>      
       <Link to="/VolunteerForm">טופס התנדבות</Link>
-    </menuButton>
+    </button>
 
-    <menuButton>
+    <button>
       <Link to="/RequestForm">טופס בקשת סיוע</Link>
-    </menuButton>
+    </button>
 
-    <menuButton>
+    <button>
       <Link to="/Login">התחבר כמנהל</Link>
-    </menuButton>
+    </button>
 
-    <menuButton>
+    <button>
       <Link to="/LoginVolunteer">התחבר כמתנדב</Link>
-    </menuButton>
+    </button>
+      </div>
   </nav>
 );
 
