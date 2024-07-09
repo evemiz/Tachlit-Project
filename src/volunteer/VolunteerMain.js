@@ -21,6 +21,7 @@ function VolunteerMain() {
   const userId = location.state?.userId;
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalPasswordIsOpen, setModalPasswordIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -73,15 +74,15 @@ function VolunteerMain() {
   const openEditUser = async () => {
     setModalIsOpen(true);
   };
-  
-  const closeModal = () => {
-    fetchVolRecord();
-    setModalIsOpen(false);
-  };
 
-  const handleSuccessModalClose = () => {
-    setIsSuccessModalOpen(false);
-  };
+  const closeModal = async () => {
+    setModalIsOpen(false);
+    setModalPasswordIsOpen(false);
+  }
+
+  const openPasswordReset = async () => {
+    setModalPasswordIsOpen(true);
+  }
 
   const handleChangePassword = (e) => {
     e.preventDefault();
@@ -104,6 +105,7 @@ function VolunteerMain() {
               setOldPassword("");
               setNewPassword("");
               setConfirmNewPassword("");
+              setModalPasswordIsOpen(false);
             })
             .catch((error) => {
               console.error("Error updating password:", error);
@@ -209,9 +211,8 @@ function VolunteerMain() {
     try {
       const docRef = doc(db, "Volunteers", documentId);
       await setDoc(docRef, formData, { merge: true });
-      setIsSuccessModalOpen(true);
-      setSuccessMessage("עדכון בוצע בהצלחה");
-
+      setModalIsOpen(false);
+      window.location.reload();
     } catch (error) {
       console.error("Error updating volunteer:", error);
     }
@@ -268,14 +269,15 @@ const openWhatsAppChat = () => {
 
   return (
     <div className='VolunteerMain'>
-      <Navbar handleLogout={handleLogout} openEditUser={openEditUser}/>
+      <Navbar handleLogout={handleLogout} openEditUser={openEditUser} openPasswordReset={openPasswordReset}/>
+      <div className='modal-container'>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         contentLabel="Edit User Modal"
       >
+        <div className='volunteerApp'>
         <h1>עריכת משתמש</h1>
-        <div className='App'>
         <fieldset>
             <label htmlFor="firstname">שם פרטי</label>
             <input
@@ -384,9 +386,22 @@ const openWhatsAppChat = () => {
             לא
 
             <br />
+        <button type="submit" value="Submit" onClick={handleSubmit}> 
+              אישור עריכה
+            </button>
+        </fieldset>
+        </div>
+      </Modal>
+      </div>
+      
+      <div className='modal-container'>
+      <Modal
+        isOpen={modalPasswordIsOpen}
+        onRequestClose={closeModal}
+        contentLabel="Edit User Modal"
+      >
 
         <div className='passwordVolUpdate'>
-
         <h1>שינוי סיסמה</h1>
         <form onSubmit={handleChangePassword}>
           <input
@@ -420,24 +435,10 @@ const openWhatsAppChat = () => {
           <button type="submit">שנה סיסמה</button>
         </form>
         {message && <p>{message}</p>}
-
         </div>
-        <button type="submit" value="Submit" onClick={handleSubmit}> 
-              אישור עריכה
-            </button>
-        </fieldset>
-        </div>
-        <button style={{ width: '80%' }} onClick={closeModal}>סגור</button>
       </Modal>
-
-      <Modal
-        isOpen={isSuccessModalOpen}
-        onRequestClose={handleSuccessModalClose}
-        contentLabel="Success"
-        className="Modal"
-        overlayClassName="Overlay"
-      >
-      </Modal>
+      
+      </div>
       
       <div className="box">
         <h2>בקשות סיוע רלוונטיות עבורך</h2>
