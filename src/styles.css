@@ -1,5 +1,3 @@
-
-
 * {
   box-sizing: border-box;
 }
@@ -202,47 +200,6 @@ menuButton a:hover {
   padding: 5px 0;
 }
 
-/*מתנדב*/
-.VolunteerMain {
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  position: absolute; /* מוודא שה-div יתפוס את כל המסך */
-  top: 0;
-  left: 0;
-}
-
-.VolunteerMain h1 {
-  font-size: 3.5em; /* גודל גופן מותאם אישית */
-  font-weight: bold; /* אופציונלי: שינוי עובי הגופן */
-  text-align: center; /* אופציונלי: מיקום הכותרת במרכז */
-  margin-top: 5%; /* אופציונלי: הוספת ריווח מלמעלה */
-}
-
-.VolunteerMain volunteerMainButton {
-  display: inline-block;
-  width: 12%; /* הגדרת רוחב הכפתור */
-  height: 5%; /* הגדרת גובה הכפתור */
-  background-color: #009ba6; /* הגדרת צבע הרקע */
-  color: white; /* צבע הטקסט */
-  font-size: 150%; /* גודל הגופן */
-  border: none; /* הסרת מסגרת הכפתור */
-  border-radius: 10px; /* פינות מעוגלות, אופציונלי */
-  margin: 4%; /* רווח בין הכפתורים */
-  margin-top: 30%;
-  cursor: pointer; /* שינוי צורת הסמן */
-  text-align: center; /* מיקום הטקסט במרכז הכפתור */
-}
-
-.VolunteerMain volunteerMainButton a {
-  color: white; /* צבע הקישור */
-  text-decoration: none; /* הסרת הקו התחתון של הקישור */
-  display: flex;
-  justify-content: center;
-  height: 100%; /* מוודא שהקישור יתפוס את כל גובה הכפתור */
-}
-
 /*מנהל*/
 .AdminMAinPage {
   width: 100vw;
@@ -384,7 +341,6 @@ menuButton a:hover {
 /* styles.css */
 
 .box {
-  border: 1px solid #141313;
   border-radius: 50px;
   padding: 20px;
   background-color: #e8e8e8;
@@ -401,7 +357,7 @@ menuButton a:hover {
 .match-container, .myRequests-container {
   margin-bottom: 15px;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 2px solid #009ba6;
   border-radius: 5px;
   background-color: #fff;
 }

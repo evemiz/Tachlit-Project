@@ -427,7 +427,7 @@ const openWhatsAppChat = () => {
             </button>
         </fieldset>
         </div>
-        <button onClick={closeModal}>סגור</button>
+        <button style={{ width: '80%' }} onClick={closeModal}>סגור</button>
       </Modal>
 
       <Modal
@@ -437,13 +437,6 @@ const openWhatsAppChat = () => {
         className="Modal"
         overlayClassName="Overlay"
       >
-        <h2>פעולה הצליחה</h2>
-        <p>{successMessage}</p>
-        <div className="modal-buttons">
-          <button className="modal-button confirm" onClick={handleSuccessModalClose}>
-            סגור
-          </button>
-        </div>
       </Modal>
       
       <div className="box">
