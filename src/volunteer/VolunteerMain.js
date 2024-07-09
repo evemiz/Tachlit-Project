@@ -10,6 +10,8 @@ import volunteerings from '../Forms/Volunteerings.js';
 import Select from 'react-select';
 import days from '../Forms/Days.js';
 import langueges from '../Forms/Languges.js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
 
 Modal.setAppElement('#root');
 
@@ -257,6 +259,13 @@ const sortedRequests = React.useMemo(() => {
   return [...inProcessRequests, ...closedRequests];
 }, [myRequestsDetails]);
 
+const openWhatsAppChat = () => {
+  // Replace with the WhatsApp chat link (replace placeholders with actual phone number and message)
+  const phoneNumber = "+972545559682";
+  const whatsappUrl = `https://wa.me/${phoneNumber}`;
+  window.open(whatsappUrl, "_blank");
+};
+
   return (
     <div className='VolunteerMain'>
       <Navbar handleLogout={handleLogout} openEditUser={openEditUser}/>
@@ -481,6 +490,15 @@ const sortedRequests = React.useMemo(() => {
         <p>אין בקשות בטיפול</p>
       )}
     </div>
+
+    <div className='pageEnd'>
+        <h2>צור איתנו קשר בווצאפ</h2>
+        <button className="whatsapp-button" onClick={openWhatsAppChat}>
+            <FontAwesomeIcon icon={faWhatsapp} size="2x" />
+        </button>
+    </div>
+
+
     </div>
   );
 }

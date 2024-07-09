@@ -428,3 +428,11 @@ h2 {
   margin-top: 30px;
   font-size: 20px;
 }
+
+.pageEnd {
+  display: flex;
+  justify-content: center; /* Center items horizontally */
+  align-items: center; /* Center items vertically */
+  padding: 10px;
+  background: linear-gradient(to left, #141414, #535252);
+}
