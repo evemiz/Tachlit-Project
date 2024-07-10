@@ -42,7 +42,6 @@ body {
   input {
     display: block;
     width: 100%;
-    /* margin-bottom: 15px; */
     padding: 8px;
     box-sizing: border-box;
     border: 1px solid #009ba6;
@@ -78,7 +77,7 @@ body {
     font-weight: bold;
   }
 
-  button {
+  /* button {
     padding: 15px;
     border-radius: 50px;
     margin: 15px;
@@ -93,7 +92,7 @@ body {
   }
   button:hover {
     background-color: #555;
-}
+} */
   textarea {
     resize: none;
     width: 98%;
@@ -103,7 +102,6 @@ body {
   }
 
 
-  /* Phone input styling */
   .phone-input-container {
     margin-bottom: 20px;
   }
@@ -117,7 +115,7 @@ body {
   }
 
   .whatsapp-button {
-    background-color: #25D366; /* WhatsApp green */
+    background-color: #25D366; 
     color: #fff;
     border: none;
     padding: 10px;
@@ -126,5 +124,5 @@ body {
 }
 
 .whatsapp-button:hover {
-    background-color: #128C7E; /* Darker shade of WhatsApp green on hover */
+    background-color: #128C7E; 
 }

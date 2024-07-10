@@ -5,19 +5,19 @@
 body {
   font-family: 'Rubik';
   direction: rtl;
-  background: #666; 
-  height: 100vh; /* Make sure it covers the full height */
+  background: #ffffff; 
+  height: 100vh; 
   margin: 0;
 }
 
-.container {
+/* .container {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
+} */
 
 h1 {
   text-align: center;
@@ -39,7 +39,7 @@ input[type="text"],
 input[type="tel"],
 .dropdown-btn,
 .checkbox-list,
-button {
+/* button {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
@@ -47,7 +47,7 @@ button {
   font-size: 14px;
   margin-bottom: 10px;
 
-}
+} */
 
 .form-group {
   margin-bottom: 20px;
@@ -81,13 +81,13 @@ button {
 }
 
 textarea {
-  height: 10%; /* גובה קבוע לתיבת הטקסט */
+  height: 10%; 
   width: 100%;
 }
 
 
 
-button {
+/* button {
   background-color: #009ba6;
   color: white !important;
   border: none;
@@ -104,27 +104,27 @@ button:hover {
 
 button a {
   color: white !important;
-  text-decoration: none; /* להסרת קו תחתון */
+  text-decoration: none; 
 }
 
 button a:hover {
   color: white !important;
-  text-decoration: none; /* להסרת קו תחתון גם כאשר מרחפים מעל הקישור */
-}
+  text-decoration: none; 
+} */
 
 
 .Button_list {
   background-color: white;
   color: black;
-  border: 1px solid #ccc; /* Add border */
-  padding: 8px 16px; /* Add padding for better appearance */
-  cursor: pointer; /* Change cursor to pointer to indicate interactivity */
+  border: 1px solid #ccc; 
+  padding: 8px 16px; 
+  cursor: pointer; 
   border-radius: 50px !important;
 
 }
 
 .Button_list.active {
-  background-color: #f9f9f9; /* Change background color when button is active */
+  background-color: #f9f9f9; 
 }
 
 
@@ -160,64 +160,63 @@ button a:hover {
 .dropdown-content {
   display: block;
   position: absolute;
-  background-color: white; /* Set background color to opaque white */
+  background-color: white; 
   min-width: 160px;
-  overflow-y: auto; /* Enable vertical scrollbar */
-  max-height: 200px; /* Set max height */
-  border-radius: 4px; /* Add some border radius for a cleaner look */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+  overflow-y: auto; 
+  max-height: 200px; 
+  border-radius: 4px; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
 }
 
 .city-list {
   padding: 5px 0;
 }
 
-/*מנהל*/
-.AdminMAinPage {
+/* .AdminMAinPage {
   width: 100vw;
   height: 100vh;
   margin: 0;
   padding: 0;
-  position: absolute; /* מוודא שה-div יתפוס את כל המסך */
+  position: absolute; 
   top: 0;
   left: 0;
 }
 
 .AdminMAinPage h1 {
-  font-size: 3.5em; /* גודל גופן מותאם אישית */
-  font-weight: bold; /* אופציונלי: שינוי עובי הגופן */
-  text-align: center; /* אופציונלי: מיקום הכותרת במרכז */
-  margin-top: 5%; /* אופציונלי: הוספת ריווח מלמעלה */
+  font-size: 3.5em; 
+  font-weight: bold; 
+  text-align: center; 
+  margin-top: 5%; 
 }
 
 .AdminMAinPage adminMainButton {
   display: inline-block;
-  width: 12%; /* הגדרת רוחב הכפתור */
-  height: 5%; /* הגדרת גובה הכפתור */
-  background-color: #009ba6; /* הגדרת צבע הרקע */
-  color: white; /* צבע הטקסט */
-  font-size: 150%; /* גודל הגופן */
-  border: none; /* הסרת מסגרת הכפתור */
-  border-radius: 10px; /* פינות מעוגלות, אופציונלי */
-  margin: 4%; /* רווח בין הכפתורים */
+  width: 12%; 
+  height: 5%; 
+  background-color: #009ba6; 
+  color: white; 
+  font-size: 150%; 
+  border: none; 
+  border-radius: 10px; 
+  margin: 4%; 
   margin-top: 30%;
-  cursor: pointer; /* שינוי צורת הסמן */
-  text-align: center; /* מיקום הטקסט במרכז הכפתור */
+  cursor: pointer; 
+  text-align: center; 
 
-}
+} */
 
-.AdminMAinPage adminMainButton a {
-  color: white; /* צבע הקישור */
-  text-decoration: none; /* הסרת הקו התחתון של הקישור */
+/* .AdminMAinPage adminMainButton a {
+  color: white; 
+  text-decoration: none; 
   display: flex;
   justify-content: center;
-  height: 100%; /* מוודא שהקישור יתפוס את כל גובה הכפתור */
+  height: 100%; 
 
 
-}
+} */
 
 
-.navbarVol {
+/* .navbarVol {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -263,10 +262,9 @@ button a:hover {
   0% { opacity: 1; }
   50% { opacity: 0; }
   100% { opacity: 1; }
-}
+} */
 
 
-/* styles.css */
 
 .passwordVolUpdate {
   margin-top: 10px;
@@ -306,7 +304,6 @@ button a:hover {
 }
 
 
-/* styles.css */
 
 .box {
   border-radius: 50px;
@@ -356,8 +353,8 @@ h2 {
 .pageEnd {
   margin-top: auto;
   display: flex;
-  justify-content: center; /* Center items horizontally */
-  align-items: center; /* Center items vertically */
+  justify-content: center; 
+  align-items: center; 
   padding: 10px;
   background: linear-gradient(to left, #141414, #535252);
   color: #f9f9f9;

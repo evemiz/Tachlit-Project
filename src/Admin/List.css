@@ -7,7 +7,7 @@
   transition: transform 0.2s;
   width: auto;
   text-align: center;
-  margin: 0 auto; /* Center the List component */
+  margin: 0 auto; 
   margin-top: 20px;
   display: flex;
   flex-direction: column;
@@ -21,14 +21,14 @@
 
 .table-container {
   width: 100%;
-  overflow-x: auto; /* Allows horizontal scrolling if table overflows */
+  overflow-x: auto; 
   font-family: 'Rubik';
   align-items: center;
 }
 
 .table {
   border-collapse: collapse;
-  width: 100%; /* Ensure table takes the full width of the container */
+  width: 100%; 
   align-items: center;
   font-family: 'Rubik';
 
@@ -38,7 +38,7 @@
 .table td {
   border: 1px solid #009ba6;
   padding: 8px;
-  white-space: nowrap; /* Prevent content from wrapping */
+  white-space: nowrap; 
   font-family: 'Rubik';
 
 }
@@ -58,11 +58,11 @@
   color: #ffffff;
   background-color: #009ba6;
   border: 2px solid #009ba6;
-  padding: 10px 20px; /* Adjust the padding as needed */
-  font-size: 16px; /* Adjust the font size as needed */
+  padding: 10px 20px; 
+  font-size: 16px; 
   text-decoration: none;
   display: inline-block;
-  border-radius: 5px; /* Adjust the border-radius if needed */
+  border-radius: 5px; 
   transition: background-color 0.3s ease, color 0.3s ease;
   width: auto;
   border-radius: 50px !important;
@@ -78,7 +78,6 @@
 }
 
 
-/* List.css */
 .Modal {
   position: fixed;
   top: 50%;
