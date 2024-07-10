@@ -96,7 +96,7 @@ function VolunteerForm() {
   };
 
   return (
-    <div className="App">
+    <div className="Form">
       <h1>טופס מתנדב חדש</h1>
       <fieldset>
         <form action="#" method="get" onSubmit={handleSubmit}>
@@ -147,7 +147,7 @@ function VolunteerForm() {
             <label style={{ color: 'red', fontSize: '12px' }}>הקלד מספר טלפון חוקי</label>
           )}
 
-        <label htmlFor="mail">מייל</label>
+        <label htmlFor="mail">כתבות דוא״ל</label>
           <input
             name="mail"
             type='text'
@@ -157,7 +157,7 @@ function VolunteerForm() {
             required
           />
           {!emailValid && (
-            <label style={{ color: 'red', fontSize: '12px' }}>הקלד מייל חוקי</label>
+            <label style={{ color: 'red', fontSize: '12px' }}>הקלד דוא״ל חוקי</label>
           )}
 
           <label>עיר מגורים</label>

@@ -157,7 +157,7 @@ function RequestForm() {
   };
 
   return (
-    <div className="App">
+    <div className="Form">
       <h1>טופס בקשת סיוע חדשה</h1>
       <fieldset>
         <form action="#" method="get" onSubmit={handleSubmit}>

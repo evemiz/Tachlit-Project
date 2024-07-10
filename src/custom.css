@@ -133,3 +133,113 @@ h1, h2 {
   flex-grow: 1;
   width: 100%;
 }
+
+
+/*Forms*/
+
+.Form {
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  padding: 10px 20px;
+  transition: transform 0.2s;
+  width: 500px;
+  text-align: center;
+  margin: auto;
+  margin-top: 32px;
+  font-family: 'Rubik';
+  height: auto;
+}
+
+.Form h1 {
+  font-size: x-large;
+  text-align: center;
+  color: #009ba6;
+}
+
+/*Login*/
+.vol-login .container {
+  background-color: #f0f0f0; /* Light gray background */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.vol-login .container .row {
+  gap: 40px; /* Increase space between items */
+}
+
+.vol-login h2 {
+  color: #009ba6;
+  font-weight: bold;
+  font-size: xx-large;
+}
+
+.vol-login .form-label {
+  font-weight: bold;
+}
+
+.vol-login .form-control {
+  margin-bottom: 15px;
+}
+
+.vol-login .btn-custom {
+  background-color: #009ba6;
+  color: #fff;
+}
+
+.vol-login .container .forget-password-btn {
+  margin-top: 20px;
+  background-color:transparent;
+  color: #007c87;
+  border: none;
+}
+
+.vol-login .container .forget-password-btn:hover {
+  background-color: transparent;
+  color: #01626b;
+  transform: scale(1.05);
+}
+
+.vol-login .alert-custom {
+  background-color: #f8d7da;
+  color: #721c24;
+  margin-top: 15px;
+}
+
+.vol-login .image-container {
+  position: relative;
+}
+
+.vol-login .image-container:hover .overlay {
+  opacity: 1;
+}
+
+.vol-login .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.vol-login .overlay-text {
+  color: #fff;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.vol-login .heart-image {
+  border-radius: 8px;
+  width: 100%; 
+  max-width: 500px; /* Optional: set a max-width for better control */
+  height: auto; /* Maintain aspect ratio */
+  display: block;
+  margin: 0 auto; /* Center the image */
+}
