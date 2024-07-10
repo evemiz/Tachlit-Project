@@ -1,32 +1,6 @@
 import { doc, addDoc, collection, deleteDoc, getDocs, getDoc ,setDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig.js';
 
-export function validateData(data) {
-  const { firstName, lastName, phoneNumber, city, langueges, days, volunteering } = data;
-
-  // Check required fields
-  if (!firstName || !lastName || !phoneNumber || !city) {
-    return false;
-  }
-
-  // Check if at least one language is selected
-  if (!langueges.some(lang => lang)) {
-    return false;
-  }
-
-  // Check if at least one day is selected
-  if (!days.some(day => day)) {
-    return false;
-  }
-
-  // Check if volunteering options are selected
-  if (!volunteering.some(option => option)) {
-    return false;
-  }
-
-  return true;
-}
-
 // Function to add or update a document with a specific ID
 export const setDocumentWithId = async (collectionName, docId, data) => {
   try {
@@ -68,9 +42,6 @@ export const readDocument = async (collectionName, documentId) => {
 
 // Function to add a document to a collection with a custom ID (if provided)
 export const addDocument = async (collectionName, data) => {
-    if(!validateData(data))
-        console.error('Invalid data');
-    else{
         try {
           const docId = data.id;
           if (!docId) {
@@ -88,7 +59,6 @@ export const addDocument = async (collectionName, data) => {
           } catch (error) {
             console.error("Error adding document: ", error);
           }
-    }
 };
 
 
@@ -130,14 +100,10 @@ export const getDocumentById = async (collectionName, docId) => {
 // TODO: make it work
 // Function to update a document in a collection
 export const updateDocument = async (collection, docId, data) => {
-    if(!validateData(data))
-        console.error('Invalid data');
-    else{
         try {
             await db.collection(collection).doc(docId).update(data);
             console.log("Document updated with ID: ", docId);
           } catch (error) {
             console.error("Error updating document: ", error);
           }
-    }
 };

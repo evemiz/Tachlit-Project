@@ -5,7 +5,7 @@ import langues from '../Languges';
 import { React, useState } from "react";
 import Select from 'react-select';
 import Modal from 'react-modal';
-import { validateData, addDocument, addFieldToDocument, addMatchToDocument } from "./RequestFunctions.js";
+import { addDocument, addFieldToDocument, addMatchToDocument } from "./RequestFunctions.js";
 import days from '../Days.js';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
@@ -16,7 +16,9 @@ function RequestForm() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [id, setId] = useState("");
+  const [idValid, setIdValid] = useState(true);
   const [contact, setContact] = useState("");
+  const [contactValid, setContactValid] = useState(true);
   const [citySelectedOption, setCitySelectedOption] = useState("");
   const [volSelectedOptions, setVolSelectedOptions] = useState("");
   const [langSelectedOptions, setLangSelectedOptions] = useState("");
@@ -30,94 +32,114 @@ function RequestForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = {
-      firstName: firstName,
-      lastName: lastName,
-      ID: id,
-      phoneNumber: contact,
-      city: citySelectedOption ? citySelectedOption.label : "",
-      langueges: langSelectedOptions ? langSelectedOptions.label : "",
-      volunteering: volSelectedOptions ? volSelectedOptions.label : "",
-      date: date,
-      day: dayOfWeek,
-      time: time,
-      comments: comments,
-      status: "open",
-      volunteerFeedback: "",
-      seekerFeedback: "",
-    };
+    let isValid = true;
 
-    if (validateData(formData)) {
-      try {
-        const docRef = await addDocument('AidRequests', formData);
-        const volunteersCollection = collection(db, 'Volunteers');
-
-        // First query: Filter by city
-        let qCity = query(volunteersCollection, where('city', '==', citySelectedOption.label));
-        const queryCitySnapshot = await getDocs(qCity);
-
-        // Filter city results further by language
-        let filteredDocs = queryCitySnapshot.docs;
-        if (langSelectedOptions.label) {
-          filteredDocs = filteredDocs.filter(doc => {
-            const data = doc.data();
-            return data.langueges && data.langueges.includes(langSelectedOptions.label);
-          });
-        }
-
-        // Filter city and language results further by volunteering
-        if (volSelectedOptions.label) {
-          filteredDocs = filteredDocs.filter(doc => {
-            const data = doc.data();
-            return data.volunteering && data.volunteering.includes(volSelectedOptions.label);
-          });
-        }
-
-        // Filter city, language and volunteering results further by day
-        if (volSelectedOptions.label) {
-          filteredDocs = filteredDocs.filter(doc => {
-            const data = doc.data();
-            return data.days && data.days.includes(dayOfWeek);
-          });
-        }
-
-        // Extract IDs of matching volunteers
-        const volunteerIds = filteredDocs.map(doc => doc.id);
-        console.log('Volunteer IDs:', volunteerIds);
-
-        // Add matching volunteer IDs to the aid request document
-        await addFieldToDocument('AidRequests', docRef.id, 'matches', volunteerIds);
-
-        if (volunteerIds.length > 0) {
-          // Function to add a field to a specific document
-            try {
-              for (const id of volunteerIds) {
-                await addMatchToDocument('Volunteers', id, docRef.id);
-              }
-            } catch (error) {
-              console.error(`Error updating volunteer documents: ${error}`);
-            }
-        }
-  
-        // Reset the form
-        setFirstName("");
-        setLastName("");
-        setId("");
-        setContact("");
-        setCitySelectedOption("");
-        setVolSelectedOptions("");
-        setLangSelectedOptions("");
-        setDate("");
-        setTime("");
-        setComments("");
-        setDayOfWeek("");
-        setSuccessMessage("הבקשה נשלחה בהצלחה!"); // Set success message
-        setIsSuccessModalOpen(true); // Open success modal
-      } catch (error) {
-        console.error('Error during handleSubmit:', error);
-      }
+    const phoneRegex = /^05\d{8}$/; 
+    if (!phoneRegex.test(contact)){
+      setContactValid(false);
+      isValid = false;
+    } else {
+      setContactValid(true);
     }
-  };
+
+    const idRegex = /^\d{9}$/; 
+    if (!idRegex.test(id)){
+      setIdValid(false);
+      isValid = false;
+    } else {
+      setIdValid(true);
+    }
+
+    if (isValid) {
+      const formData = {
+        firstName: firstName,
+        lastName: lastName,
+        ID: id,
+        phoneNumber: contact,
+        city: citySelectedOption ? citySelectedOption.label : "",
+        langueges: langSelectedOptions ? langSelectedOptions.label : "",
+        volunteering: volSelectedOptions ? volSelectedOptions.label : "",
+        date: date,
+        day: dayOfWeek,
+        time: time,
+        comments: comments,
+        status: "open",
+        volunteerFeedback: "",
+        seekerFeedback: "",
+      };
+      
+      if (contactValid && idValid) {
+        try {
+          const docRef = await addDocument('AidRequests', formData);
+          const volunteersCollection = collection(db, 'Volunteers');
+  
+          // First query: Filter by city
+          let qCity = query(volunteersCollection, where('city', '==', citySelectedOption.label));
+          const queryCitySnapshot = await getDocs(qCity);
+  
+          // Filter city results further by language
+          let filteredDocs = queryCitySnapshot.docs;
+          if (langSelectedOptions.label) {
+            filteredDocs = filteredDocs.filter(doc => {
+              const data = doc.data();
+              return data.langueges && data.langueges.includes(langSelectedOptions.label);
+            });
+          }
+  
+          // Filter city and language results further by volunteering
+          if (volSelectedOptions.label) {
+            filteredDocs = filteredDocs.filter(doc => {
+              const data = doc.data();
+              return data.volunteering && data.volunteering.includes(volSelectedOptions.label);
+            });
+          }
+  
+          // Filter city, language and volunteering results further by day
+          if (volSelectedOptions.label) {
+            filteredDocs = filteredDocs.filter(doc => {
+              const data = doc.data();
+              return data.days && data.days.includes(dayOfWeek);
+            });
+          }
+  
+          // Extract IDs of matching volunteers
+          const volunteerIds = filteredDocs.map(doc => doc.id);
+          console.log('Volunteer IDs:', volunteerIds);
+  
+          // Add matching volunteer IDs to the aid request document
+          await addFieldToDocument('AidRequests', docRef.id, 'matches', volunteerIds);
+  
+          if (volunteerIds.length > 0) {
+            // Function to add a field to a specific document
+              try {
+                for (const id of volunteerIds) {
+                  await addMatchToDocument('Volunteers', id, docRef.id);
+                }
+              } catch (error) {
+                console.error(`Error updating volunteer documents: ${error}`);
+              }
+          }
+    
+          // Reset the form
+          setFirstName("");
+          setLastName("");
+          setId("");
+          setContact("");
+          setCitySelectedOption("");
+          setVolSelectedOptions("");
+          setLangSelectedOptions("");
+          setDate("");
+          setTime("");
+          setComments("");
+          setDayOfWeek("");
+          setSuccessMessage("הבקשה נשלחה בהצלחה!"); // Set success message
+          setIsSuccessModalOpen(true); // Open success modal
+        } catch (error) {
+          console.error('Error during handleSubmit:', error);
+        }
+    }
+  }
+};
 
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
@@ -169,6 +191,9 @@ function RequestForm() {
             onChange={(e) => setId(e.target.value)}
             required
           />
+        {!idValid && (
+            <label style={{ color: 'red', fontSize: '12px' }}>הקלד תעודת זהות חוקית</label>
+        )}
 
           <label htmlFor="tel">מספר טלפון</label>
           <input
@@ -179,6 +204,9 @@ function RequestForm() {
             onChange={(e) => setContact(e.target.value)}
             required
           />
+        {!contactValid && (
+          <label style={{ color: 'red', fontSize: '12px' }}>הקלד מספר טלפון חוקי</label>
+        )}
 
           <label>עיר מגורים</label>
           <Select
@@ -188,6 +216,7 @@ function RequestForm() {
             value={citySelectedOption}
             onChange={setCitySelectedOption}
             placeholder="בחר עיר מגורים"
+            required
           />
 
           <label>שפה מועדפת</label>
@@ -198,6 +227,7 @@ function RequestForm() {
             value={langSelectedOptions}
             onChange={setLangSelectedOptions}
             placeholder="בחר שפה "
+            required
           />
 
           <label>אופן הסיוע</label>
@@ -208,6 +238,7 @@ function RequestForm() {
             value={volSelectedOptions}
             onChange={setVolSelectedOptions}
             placeholder="בחר תחום לסיוע"
+            required
           />
 
           <label>תאריך</label>

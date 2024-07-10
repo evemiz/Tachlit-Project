@@ -4,9 +4,9 @@ import volunteerings from '../Volunteerings';
 import { React, useState } from "react";
 import Select from 'react-select';
 import days from '../Days';
-import langueges from '../Languges';
+import langues from '../Languges';
 import Modal from 'react-modal';
-import { validateData, addDocument } from "./VolunteerFunctions.js";
+import {addDocument } from "./VolunteerFunctions.js";
 
 Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
 
@@ -15,7 +15,7 @@ function VolunteerForm() {
   const [lastName, setLastName] = useState("");
   const [id, setId] = useState("");
   const [contact, setContact] = useState("");
-  const [mail, setMail] = useState("");
+  const [email, setEmail] = useState("");
   const [citySelectedOption, setCitySelectedOption] = useState("");
   const [volSelectedOptions, setVolSelectedOptions] = useState([]);
   const [daySelectedOptions, setDaySelectedOptions] = useState([]);
@@ -25,32 +25,61 @@ function VolunteerForm() {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+  const [idValid, setIdValid] = useState(true);
+  const [contactValid, setContactValid] = useState(true);
+  const [emailValid, setEmailValid] = useState(true);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    let isValid = true;
 
-    const formData = {
-      firstName: firstName,
-      lastName: lastName,
-      id: id,
-      phoneNumber: contact,
-      mail: mail,
-      city: citySelectedOption ? citySelectedOption.label : "",
-      langueges: langSelectedOptions.map(option => option.value),
-      days: daySelectedOptions.map(option => option.value),
-      emergency: available,
-      volunteering: volSelectedOptions.map(option => option.value),
-      vehicle: vehicle,
-    };
+    const phoneRegex = /^05\d{8}$/; 
+    if (!phoneRegex.test(contact)){
+      setContactValid(false);
+      isValid = false;
+    } else {
+      setContactValid(true);
+    }
 
-    if (validateData(formData)) {
-      addDocument("NewVolunteers", formData, 'id');
+    const idRegex = /^\d{9}$/; 
+    if (!idRegex.test(id)){
+      setIdValid(false);
+      isValid = false;
+    } else {
+      setIdValid(true);
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailValid(false);
+      isValid = false;
+    } else {
+      setEmailValid(true);
+    }
+
+    if (isValid) {
+      const formData = {
+        firstName: firstName,
+        lastName: lastName,
+        id: id,
+        phoneNumber: contact,
+        mail: email,
+        city: citySelectedOption ? citySelectedOption.label : "",
+        languages: langSelectedOptions.map(option => option.value),
+        days: daySelectedOptions.map(option => option.value),
+        emergency: available,
+        volunteering: volSelectedOptions.map(option => option.value),
+        vehicle: vehicle,
+      };
+
+      await addDocument("NewVolunteers", formData, 'id');
+
       // Reset the form
       setFirstName("");
       setLastName("");
       setId("");
       setContact("");
-      setMail("");
+      setEmail("");
       setCitySelectedOption("");
       setVolSelectedOptions([]);
       setDaySelectedOptions([]);
@@ -68,7 +97,7 @@ function VolunteerForm() {
 
   return (
     <div className="App">
-      <h1>טופס רישום מתנדב חדש</h1>
+      <h1>טופס מתנדב חדש</h1>
       <fieldset>
         <form action="#" method="get" onSubmit={handleSubmit}>
           <label htmlFor="firstname">שם פרטי</label>
@@ -101,6 +130,9 @@ function VolunteerForm() {
             onChange={(e) => setId(e.target.value)}
             required
           />
+          {!idValid && (
+            <label style={{ color: 'red', fontSize: '12px' }}>הקלד תעודת זהות חוקית</label>
+          )}
 
           <label htmlFor="tel">מספר טלפון</label>
           <input
@@ -111,16 +143,22 @@ function VolunteerForm() {
             onChange={(e) => setContact(e.target.value)}
             required
           />
+          {!contactValid && (
+            <label style={{ color: 'red', fontSize: '12px' }}>הקלד מספר טלפון חוקי</label>
+          )}
 
-          <label htmlFor="mail">כתובת מייל</label>
+        <label htmlFor="mail">מייל</label>
           <input
-            type="email"
             name="mail"
+            type='text'
             id="mail"
-            value={mail}
-            onChange={(e) => setMail(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
+          {!emailValid && (
+            <label style={{ color: 'red', fontSize: '12px' }}>הקלד מייל חוקי</label>
+          )}
 
           <label>עיר מגורים</label>
           <Select
@@ -129,6 +167,7 @@ function VolunteerForm() {
             value={citySelectedOption}
             onChange={setCitySelectedOption}
             placeholder="בחר עיר מגורים"
+            required
           />
 
           <label>תחומי התנדבות</label>
@@ -141,6 +180,7 @@ function VolunteerForm() {
             value={volSelectedOptions}
             onChange={setVolSelectedOptions}
             placeholder="בחר תחומי התנדבות"
+            required
           />
 
           <label>ימי זמינות</label>
@@ -153,18 +193,20 @@ function VolunteerForm() {
             value={daySelectedOptions}
             onChange={setDaySelectedOptions}
             placeholder="בחר ימי זמינות"
+            required
           />
 
           <label>שפות</label>
           <Select
             isMulti
-            name="langueges"
-            options={langueges.map(lang => ({ value: lang, label: lang }))}
+            name="languages"
+            options={langues.map(lang => ({ value: lang, label: lang }))}
             className="basic-multi-select"
             classNamePrefix="select"
             value={langSelectedOptions}
             onChange={setLangSelectedOptions}
             placeholder="בחר שפות"
+            required
           />
 
           <label htmlFor="available">זמינות לחירום</label>
@@ -227,7 +269,7 @@ function VolunteerForm() {
             type="submit"
             value="Submit"
           >
-            שלח
+            הגש בקשה
           </button>
         </form>
       </fieldset>
