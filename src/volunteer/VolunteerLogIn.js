@@ -49,7 +49,7 @@ function LoginVolunteer() {
   };
 
   return (
-    <div className="vol-login">
+    <div className="login">
       <div className="container mt-5">
       <div className="row justify-content-center align-items-center">
         <div className="col-md-6 col-lg-4">

@@ -158,63 +158,63 @@ h1, h2 {
 }
 
 /*Login*/
-.vol-login .container {
+.login .container {
   background-color: #f0f0f0; /* Light gray background */
   padding: 20px;
   border-radius: 8px;
 }
 
-.vol-login .container .row {
+.login .container .row {
   gap: 40px; /* Increase space between items */
 }
 
-.vol-login h2 {
+.login h2 {
   color: #009ba6;
   font-weight: bold;
   font-size: xx-large;
 }
 
-.vol-login .form-label {
+.login .form-label {
   font-weight: bold;
 }
 
-.vol-login .form-control {
+.login .form-control {
   margin-bottom: 15px;
 }
 
-.vol-login .btn-custom {
+.login .btn-custom {
   background-color: #009ba6;
   color: #fff;
 }
 
-.vol-login .container .forget-password-btn {
+.login .container .forget-password-btn {
   margin-top: 20px;
   background-color:transparent;
   color: #007c87;
   border: none;
 }
 
-.vol-login .container .forget-password-btn:hover {
+.login .container .forget-password-btn:hover {
   background-color: transparent;
   color: #01626b;
   transform: scale(1.05);
 }
 
-.vol-login .alert-custom {
+.login .alert-custom {
   background-color: #f8d7da;
   color: #721c24;
   margin-top: 15px;
 }
 
-.vol-login .image-container {
+.login .image-container {
   position: relative;
 }
 
-.vol-login .image-container:hover .overlay {
+.login .image-container:hover .overlay {
   opacity: 1;
 }
 
-.vol-login .overlay {
+.login .overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -229,13 +229,13 @@ h1, h2 {
   transition: opacity 0.3s ease;
 }
 
-.vol-login .overlay-text {
+.login .overlay-text {
   color: #fff;
   font-size: 1.5rem;
   text-align: center;
 }
 
-.vol-login .heart-image {
+.login .heart-image {
   border-radius: 8px;
   width: 100%; 
   max-width: 500px; /* Optional: set a max-width for better control */
