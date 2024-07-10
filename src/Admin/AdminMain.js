@@ -434,182 +434,129 @@ function AdminMain() {
     }
   };
 
-  return (
-    <div className="AdminMainPage">
-      <div className="navbar-custom">
-        <div className="navbar-logo">
-          <a href="/AdminMain">
-            <img src="/tachlitLOGO.png" alt="Logo" className="navbar-logo" />
-          </a>
-        </div>
-        <div className="navbar-buttons">
-          <button onClick={openModal} className="btn btn-custom">שנה סיסמא</button>
-          <button onClick={handleLogout} className="btn btn-custom">התנתק</button>
-          {isSuperAdmin && (
-            <button onClick={openSignUpModal} className="btn btn-custom">הוספת מנהל חדש</button>
-          )}
-        </div>
-      </div>
-      <div className="container">
-        <h1 className="text-center my-4">ברוכים הבאים לדף מנהל</h1>
-        <div className="topBar"></div>
+return (
+    <div className='VolunteerMain'>
+      <Navbar handleLogout={handleLogout} openEditUser={openEditUser} openPasswordReset={openPasswordReset}/>
+      <div className='modal-container'>
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        contentLabel="Edit User Modal"
+      >
+        <div className='volunteerApp'>
+        <h1>עריכת משתמש</h1>
+        <fieldset>
+            <label htmlFor="firstname">שם פרטי</label>
+            <input
+              type="text"
+              name="firstname"
+              id="firstname"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              dir="rtl"
+              required
+            />
+            <label htmlFor="lastname">שם משפחה</label>
+            <input
+              type="text"
+              name="lastname"
+              id="lastname"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              dir="rtl"
+              required
+            />
 
-        {selectedList ? (
-          <ListDisplay collectionName={selectedList.collectionName} status={selectedList.status} />
-        ) : (
-          <div className="dashboard">
-            <div className="dashboard-item" onClick={() => handleCollectionChange('NewVolunteers')}>
-              <h3>מתנדבים ממתינים לאישור</h3>
-              <p>{volunteersThisMonth}</p>
-            </div>
-            <div className="dashboard-item" onClick={() => handleCollectionChange('Volunteers')}>
-              <h3>סך כל המתנדבים</h3>
-              <p>{totalVolunteers}</p>
-            </div>
-            <div className="dashboard-item" onClick={() => handleCollectionChangeRequests('AidRequests', 'close')}>
-              <h3>בקשות שנסגרו</h3>
-              <p>{closedRequestsThisMonth}</p>
-            </div>
-            <div className="dashboard-item" onClick={() => handleCollectionChangeRequests('AidRequests', 'open')}>
-              <h3>בקשות פתוחות</h3>
-              <p>{openRequests}</p>
-            </div>
-            <div className="dashboard-item" onClick={() => handleCollectionChangeRequests('AidRequests', 'in process')}>
-              <h3>בקשות בטיפול</h3>
-              <p>{inProcessRequests}</p>
-            </div>
-          </div>
-        )}
+            <label>עיר מגורים</label>
+            <Select
+              name="select"
+              options={citiesInIsrael.map(city => ({ value: city, label: city }))}
+              value={citySelectedOption}
+              onChange={setCitySelectedOption}
+              placeholder="בחר עיר מגורים"
+            />
 
-        {collectionName && (
-          <div className="admin-lists-buttons-container">
-            <button className="lists-button" onClick={() => setShowFilters(!showFilters)}>
-              {showFilters ? 'הסתר סינון' : 'סנן'}
+            <label>תחומי התנדבות</label>
+            <Select
+              isMulti
+              name="volunteerings"
+              options={volunteerings.map(volunteer => ({ value: volunteer, label: volunteer }))}
+              className="basic-multi-select"
+              classNamePrefix="select"
+              value={volSelectedOptions}
+              onChange={setVolSelectedOptions}
+              placeholder="בחר תחומי התנדבות"
+            />
+
+            <label>ימי זמינות</label>
+            <Select
+              isMulti
+              name="days"
+              options={days.map(day => ({ value: day, label: day }))}
+              className="basic-multi-select"
+              classNamePrefix="select"
+              value={daySelectedOptions}
+              onChange={setDaySelectedOptions}
+              placeholder="בחר ימי זמינות"
+            />
+
+            <label>שפות</label>
+            <Select
+              isMulti
+              name="langueges"
+              options={langueges.map(lang => ({ value: lang, label: lang }))}
+              className="basic-multi-select"
+              classNamePrefix="select"
+              value={langSelectedOptions}
+              onChange={setLangSelectedOptions}
+              placeholder="בחר שפות"
+            />
+
+            <label htmlFor="available">זמינות לחירום</label>
+            <input
+              type="radio"
+              name="available"
+              value="yes"
+              id="yes"
+              checked={available === true}
+              onChange={(e) => setAvailable(true)}
+            />
+            כן
+            <input
+              type="radio"
+              name="available"
+              value="no"
+              id="no"
+              checked={available === false}
+              onChange={(e) => setAvailable(false)}
+            />
+            לא
+
+            <label htmlFor="vehicle">רכב</label>
+            <input
+              type="radio"
+              name="vehicle"
+              value="yes"
+              id="vehicleYes"
+              checked={vehicle === true}
+              onChange={(e) => setVehicle(true)}
+            />
+            כן
+            <input
+              type="radio"
+              name="vehicle"
+              value="no"
+              id="vehicleNo"
+              checked={vehicle === false}
+              onChange={(e) => setVehicle(false)}
+            />
+            לא
+
+            <br />
+        <button type="submit" value="Submit" onClick={handleSubmit}> 
+              אישור עריכה
             </button>
-            <button className="lists-button" onClick={() => setShowAddForm(!showAddForm)}>
-              {showAddForm ? 'הסתר טופס' : 'הוספת רשומה'}
-            </button>
-          </div>
-        )}
-        <div className={`content ${showFilters ? 'sidebar-open' : ''}`}>
-          <FilterSidebar
-            filters={filters}
-            handleFilterChange={handleFilterChange}
-            filterOptions={filterOptions}
-            showFilters={showFilters}
-          />
-          {showAddForm && (
-            <div className="add-form">
-              <form onSubmit={handleAddRecord}>
-                {columns.map((column) => (
-                  <div key={column}>
-                    <label>{getColumnDisplayName(column)}:</label>
-                    {columnDataTypes[column] === 'boolean' ? (
-                      <>
-                        <input
-                          type="radio"
-                          name={column}
-                          value="true"
-                          checked={newRecord[column] === true}
-                          onChange={handleInputChange}
-                        /> כן
-                        <input
-                          type="radio"
-                          name={column}
-                          value="false"
-                          checked={newRecord[column] === false}
-                          onChange={handleInputChange}
-                        /> לא
-                      </>
-                    ) : columnDataTypes[column] === 'array' ? (
-                      <Select
-                        name={column}
-                        options={filterOptions[column].map(item => ({ value: item, label: item }))}
-                        isMulti
-                        value={newRecord[column] || []}
-                        onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                        placeholder={`Select ${getColumnDisplayName(column)}`}
-                      />
-                    ) : columnDataTypes[column] === 'object' ? (
-                      <Select
-                        name={column}
-                        options={filterOptions[column].map(item => ({ value: item, label: item }))}
-                        value={newRecord[column] || null}
-                        onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                        placeholder={`Select ${getColumnDisplayName(column)}`}
-                      />
-                    ) : columnDataTypes[column] === 'date' ? (
-                      <input
-                        type="date"
-                        name={column}
-                        value={newRecord[column] || ''}
-                        onChange={handleInputChange}
-                      />
-                    ) : (
-                      <input
-                        type="text"
-                        name={column}
-                        value={newRecord[column] || ''}
-                        onChange={handleInputChange}
-                      />
-                    )}
-                  </div>
-                ))}
-                <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
-                {collectionName === 'NewVolunteers' && editMode && <button type="button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
-              </form>
-            </div>
-          )}
-          {loading && <p>Loading...</p>}
-          {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-          {filteredDocuments.length > 0 ? (
-            <div className="table-container">
-              <table className="table">
-                <thead>
-                  <tr>
-                    {columns.map((key) => (
-                      <th key={key}>{getColumnDisplayName(key)}</th>
-                    ))}
-                    <th>פעולות</th> {/* Add column for actions */}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredDocuments.map((doc, index) => (
-                    <tr key={doc.id || index}> {/* Ensure each row has a unique key */}
-                      {columns.map((column) => (
-                        <td key={`${doc.id}-${column}`}>
-                          {Array.isArray(doc[column])
-                            ? doc[column].map((item, idx) => (
-                                <span key={`${doc.id}-${column}-${idx}`}>
-                                  {column === 'matches'
-                                    ? getVolunteerNameById(item)
-                                    : typeof item === 'object' && item !== null && 'label' in item
-                                    ? item.label
-                                    : item}
-                                  {idx < doc[column].length - 1 ? ', ' : ''}
-                                </span>
-                              ))
-                            : typeof doc[column] === 'boolean'
-                            ? doc[column] ? '✓' : '✗'
-                            : typeof doc[column] === 'object' && doc[column] !== null && 'label' in doc[column]
-                            ? doc[column].label
-                            : typeof doc[column] === 'object'
-                            ? JSON.stringify(doc[column])
-                            : doc[column]}
-                        </td>
-                      ))}
-                      <td>
-                        <button className="buttons-inside-table" onClick={() => handleEditRecord(doc)}>ערוך</button>
-                        <button className="buttons-inside-table" onClick={() => handleDeleteRecord(doc.id)}>מחק</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            !loading && <p>No documents found</p>
-          )}
+        </fieldset>
         </div>
         <Modal
           isOpen={isModalOpen}
