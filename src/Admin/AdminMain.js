@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { db } from "../firebaseConfig";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import Modal from 'react-modal';
 import '../custom.css';
 import '../navbar.css'; // ייבוא CSS מותאם אישית
@@ -19,7 +19,6 @@ import volunteering from '../Forms/Volunteerings.js'; // Adjust the import path 
 import FilterSidebar from './FilterSidebar'; // Import the new FilterSidebar component
 import Select from 'react-select'; // Import react-select for dropdowns
 import '@fontsource/rubik';
-
 
 const getColumnDisplayName = (columnName) => {
   const columnMapping = {
@@ -75,7 +74,6 @@ const columnDataTypes = {
   matches: 'array' // Added 'matches'
 };
 
-
 Modal.setAppElement('#root');
 
 function AdminMain() {
@@ -110,6 +108,21 @@ function AdminMain() {
   const [successMessage, setSuccessMessage] = useState('');
   const [volunteers, setVolunteers] = useState([]);
   const [status, setStatus] = useState("");
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  useEffect(() => {
+    // Fetch the current user's data to check if they are a superAdmin
+    const fetchCurrentUser = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.email));
+        if (userDoc.exists()) {
+          setIsSuperAdmin(userDoc.data().superAdmin === true);
+        }
+      }
+    };
+    fetchCurrentUser();
+  }, []);
 
   useEffect(() => {
     // Fetch all volunteers' data
@@ -432,7 +445,9 @@ function AdminMain() {
         <div className="navbar-buttons">
           <button onClick={openModal} className="btn btn-custom">שנה סיסמא</button>
           <button onClick={handleLogout} className="btn btn-custom">התנתק</button>
-          <button onClick={openSignUpModal} className="btn btn-custom">הוספת מנהל חדש</button>
+          {isSuperAdmin && (
+            <button onClick={openSignUpModal} className="btn btn-custom">הוספת מנהל חדש</button>
+          )}
         </div>
       </div>
       <div className="container">
@@ -466,175 +481,163 @@ function AdminMain() {
           </div>
         )}
 
-      {collectionName && (
-        <div className="admin-lists-buttons-container">
-          <button className="lists-button" onClick={() => setShowFilters(!showFilters)}>
-            {showFilters ? 'הסתר סינון' : 'סנן'}
-          </button>
-          <button className="lists-button" onClick={() => setShowAddForm(!showAddForm)}>
-            {showAddForm ? 'הסתר טופס' : 'הוספת רשומה'}
-          </button>
-        </div>
-      )}
-      <div className={`content ${showFilters ? 'sidebar-open' : ''}`}>
-        <FilterSidebar
-          filters={filters}
-          handleFilterChange={handleFilterChange}
-          filterOptions={filterOptions}
-          showFilters={showFilters}
-        />
-        {showAddForm && (
-          <div className="add-form">
-            <form onSubmit={handleAddRecord}>
-              {columns.map((column) => (
-                <div key={column}>
-                  <label>{getColumnDisplayName(column)}:</label>
-                  {columnDataTypes[column] === 'boolean' ? (
-                    <>
-                      <input
-                        type="radio"
-                        name={column}
-                        value="true"
-                        checked={newRecord[column] === true}
-                        onChange={handleInputChange}
-                      /> כן
-                      <input
-                        type="radio"
-                        name={column}
-                        value="false"
-                        checked={newRecord[column] === false}
-                        onChange={handleInputChange}
-                      /> לא
-                    </>
-                  ) : columnDataTypes[column] === 'array' ? (
-                    <Select
-                      name={column}
-                      options={filterOptions[column].map(item => ({ value: item, label: item }))}
-                      isMulti
-                      value={newRecord[column] || []}
-                      onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                      placeholder={`Select ${getColumnDisplayName(column)}`}
-                    />
-                  ) : columnDataTypes[column] === 'object' ? (
-                    <Select
-                      name={column}
-                      options={filterOptions[column].map(item => ({ value: item, label: item }))}
-                      value={newRecord[column] || null}
-                      onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                      placeholder={`Select ${getColumnDisplayName(column)}`}
-                    />
-                  ) : columnDataTypes[column] === 'date' ? (
-                    <input
-                      type="date"
-                      name={column}
-                      value={newRecord[column] || ''}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    <input
-                      type="text"
-                      name={column}
-                      value={newRecord[column] || ''}
-                      onChange={handleInputChange}
-                    />
-                  )}
-                </div>
-              ))}
-              <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
-              {collectionName === 'NewVolunteers' && editMode && <button type="button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
-            </form>
+        {collectionName && (
+          <div className="admin-lists-buttons-container">
+            <button className="lists-button" onClick={() => setShowFilters(!showFilters)}>
+              {showFilters ? 'הסתר סינון' : 'סנן'}
+            </button>
+            <button className="lists-button" onClick={() => setShowAddForm(!showAddForm)}>
+              {showAddForm ? 'הסתר טופס' : 'הוספת רשומה'}
+            </button>
           </div>
         )}
-        {loading && <p>Loading...</p>}
-        {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-        {filteredDocuments.length > 0 ? (
-          <div className="table-container">
-            <table className="table">
-              <thead>
-                <tr>
-                  {columns.map((key) => (
-                    <th key={key}>{getColumnDisplayName(key)}</th>
-                  ))}
-                  <th>פעולות</th> {/* Add column for actions */}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredDocuments.map((doc, index) => (
-                  <tr key={doc.id || index}> {/* Ensure each row has a unique key */}
-                    {columns.map((column) => (
-                      <td key={`${doc.id}-${column}`}>
-                        {Array.isArray(doc[column])
-                          ? doc[column].map((item, idx) => (
-                              <span key={`${doc.id}-${column}-${idx}`}>
-                                {column === 'matches'
-                                  ? getVolunteerNameById(item)
-                                  : typeof item === 'object' && item !== null && 'label' in item
-                                  ? item.label
-                                  : item}
-                                {idx < doc[column].length - 1 ? ', ' : ''}
-                              </span>
-                            ))
-                          : typeof doc[column] === 'boolean'
-                          ? doc[column] ? '✓' : '✗'
-                          : typeof doc[column] === 'object' && doc[column] !== null && 'label' in doc[column]
-                          ? doc[column].label
-                          : typeof doc[column] === 'object'
-                          ? JSON.stringify(doc[column])
-                          : doc[column]}
-                      </td>
-                    ))}
-                    <td>
-                      <button className="buttons-inside-table" onClick={() => handleEditRecord(doc)}>ערוך</button>
-                      <button className="buttons-inside-table" onClick={() => handleDeleteRecord(doc.id)}>מחק</button>
-                    </td>
-                  </tr>
+        <div className={`content ${showFilters ? 'sidebar-open' : ''}`}>
+          <FilterSidebar
+            filters={filters}
+            handleFilterChange={handleFilterChange}
+            filterOptions={filterOptions}
+            showFilters={showFilters}
+          />
+          {showAddForm && (
+            <div className="add-form">
+              <form onSubmit={handleAddRecord}>
+                {columns.map((column) => (
+                  <div key={column}>
+                    <label>{getColumnDisplayName(column)}:</label>
+                    {columnDataTypes[column] === 'boolean' ? (
+                      <>
+                        <input
+                          type="radio"
+                          name={column}
+                          value="true"
+                          checked={newRecord[column] === true}
+                          onChange={handleInputChange}
+                        /> כן
+                        <input
+                          type="radio"
+                          name={column}
+                          value="false"
+                          checked={newRecord[column] === false}
+                          onChange={handleInputChange}
+                        /> לא
+                      </>
+                    ) : columnDataTypes[column] === 'array' ? (
+                      <Select
+                        name={column}
+                        options={filterOptions[column].map(item => ({ value: item, label: item }))}
+                        isMulti
+                        value={newRecord[column] || []}
+                        onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
+                        placeholder={`Select ${getColumnDisplayName(column)}`}
+                      />
+                    ) : columnDataTypes[column] === 'object' ? (
+                      <Select
+                        name={column}
+                        options={filterOptions[column].map(item => ({ value: item, label: item }))}
+                        value={newRecord[column] || null}
+                        onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
+                        placeholder={`Select ${getColumnDisplayName(column)}`}
+                      />
+                    ) : columnDataTypes[column] === 'date' ? (
+                      <input
+                        type="date"
+                        name={column}
+                        value={newRecord[column] || ''}
+                        onChange={handleInputChange}
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        name={column}
+                        value={newRecord[column] || ''}
+                        onChange={handleInputChange}
+                      />
+                    )}
+                  </div>
                 ))}
-              </tbody>
-            </table>
+                <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
+                {collectionName === 'NewVolunteers' && editMode && <button type="button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
+              </form>
+            </div>
+          )}
+          {loading && <p>Loading...</p>}
+          {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+          {filteredDocuments.length > 0 ? (
+            <div className="table-container">
+              <table className="table">
+                <thead>
+                  <tr>
+                    {columns.map((key) => (
+                      <th key={key}>{getColumnDisplayName(key)}</th>
+                    ))}
+                    <th>פעולות</th> {/* Add column for actions */}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredDocuments.map((doc, index) => (
+                    <tr key={doc.id || index}> {/* Ensure each row has a unique key */}
+                      {columns.map((column) => (
+                        <td key={`${doc.id}-${column}`}>
+                          {Array.isArray(doc[column])
+                            ? doc[column].map((item, idx) => (
+                                <span key={`${doc.id}-${column}-${idx}`}>
+                                  {column === 'matches'
+                                    ? getVolunteerNameById(item)
+                                    : typeof item === 'object' && item !== null && 'label' in item
+                                    ? item.label
+                                    : item}
+                                  {idx < doc[column].length - 1 ? ', ' : ''}
+                                </span>
+                              ))
+                            : typeof doc[column] === 'boolean'
+                            ? doc[column] ? '✓' : '✗'
+                            : typeof doc[column] === 'object' && doc[column] !== null && 'label' in doc[column]
+                            ? doc[column].label
+                            : typeof doc[column] === 'object'
+                            ? JSON.stringify(doc[column])
+                            : doc[column]}
+                        </td>
+                      ))}
+                      <td>
+                        <button className="buttons-inside-table" onClick={() => handleEditRecord(doc)}>ערוך</button>
+                        <button className="buttons-inside-table" onClick={() => handleDeleteRecord(doc.id)}>מחק</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            !loading && <p>No documents found</p>
+          )}
+        </div>
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={handleModalCancel}
+          contentLabel="Confirmation"
+          className="Modal"
+          overlayClassName="Overlay"
+        >
+          <h2>Confirm Action</h2>
+          <p>{modalMessage}</p>
+          <div className="modal-buttons">
+            <button className="modal-button confirm" onClick={handleModalConfirm}>אשר</button>
+            <button className="modal-button cancel" onClick={handleModalCancel}>בטל</button>
           </div>
-        ) : (
-          !loading && <p>No documents found</p>
-        )}
-      </div>
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={handleModalCancel}
-        contentLabel="Confirmation"
-        className="Modal"
-        overlayClassName="Overlay"
-      >
-        <h2>Confirm Action</h2>
-        <p>{modalMessage}</p>
-        <div className="modal-buttons">
-          <button className="modal-button confirm" onClick={handleModalConfirm}>אשר</button>
-          <button className="modal-button cancel" onClick={handleModalCancel}>בטל</button>
-        </div>
-      </Modal>
-      <Modal
-        isOpen={isSuccessModalOpen}
-        onRequestClose={handleSuccessModalClose}
-        contentLabel="Success"
-        className="Modal"
-        overlayClassName="Overlay"
-      >
-        <h2>פעולה הצליחה</h2>
-        <p>{successMessage}</p>
-        <div className="modal-buttons">
-          <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
-        </div>
-      </Modal>
-
-
-
-
-
-
-
-
-
-
-
-
+        </Modal>
+        <Modal
+          isOpen={isSuccessModalOpen}
+          onRequestClose={handleSuccessModalClose}
+          contentLabel="Success"
+          className="Modal"
+          overlayClassName="Overlay"
+        >
+          <h2>פעולה הצליחה</h2>
+          <p>{successMessage}</p>
+          <div className="modal-buttons">
+            <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
+          </div>
+        </Modal>
 
         <Modal
           isOpen={modalIsOpen}
@@ -681,7 +684,7 @@ function AdminMain() {
           {message && <p className="alert alert-custom">{message}</p>}
           <button onClick={closeModal} className="btn btn-secondary w-100">סגור</button>
         </Modal>
-        
+
         <Modal
           isOpen={signUpModalIsOpen}
           onRequestClose={closeSignUpModal}
