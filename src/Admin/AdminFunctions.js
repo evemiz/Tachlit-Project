@@ -1,4 +1,4 @@
-import { doc, addDoc, collection, deleteDoc, getDocs,setDoc } from 'firebase/firestore';
+import { doc, addDoc, collection, deleteDoc, getDocs,setDoc, query, where, } from 'firebase/firestore';
 import { db } from '../firebaseConfig.js';
 import { doc as doc1, getDoc as getDoc1 } from 'firebase/firestore';
 import { sendSignInLinkToEmail } from 'firebase/auth';
@@ -13,9 +13,15 @@ export function validateData(data) {
 
 
 // Function to read documents from a collection
-export const readDocuments = async (collectionName) => {
+export const readDocuments = async (collectionName, status) => {
   try {
-    const querySnapshot = await getDocs(collection(db, collectionName));
+    let collectionRef = collection(db, collectionName);
+    
+    if (status !== "") {
+      collectionRef = query(collectionRef, where("status", "==", status));
+    }
+
+    const querySnapshot = await getDocs(collectionRef);
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error("Error getting documents: ", error);

@@ -14,9 +14,6 @@
   align-items: center;
   font-family: 'Rubik';
   color: #555;
-
-
-
 }
 
 .table-container {
@@ -62,14 +59,9 @@
   font-size: 16px; 
   text-decoration: none;
   display: inline-block;
-  border-radius: 5px; 
   transition: background-color 0.3s ease, color 0.3s ease;
-  width: auto;
-  border-radius: 50px !important;
+  width: 200px;
   font-weight: bold;
-
-
-
 }
 
 .list-button:hover {
@@ -133,5 +125,20 @@
 
 }
 
+.buttons-inside-table {
+  padding: 4px;
+  margin: 5px;
+  border: 2px solid #6c6c6c;
+  color: #6c6c6c;
+  cursor: pointer;
+  background-color: transparent;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  font-size: 14px;
+  font-weight: bold;
+}
 
-
+.buttons-inside-table:hover {
+  background-color: #6c6c6c;
+  color: white;
+}
