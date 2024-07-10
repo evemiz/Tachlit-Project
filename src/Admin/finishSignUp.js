@@ -36,6 +36,13 @@ function FinishSignUp() {
 
   const handleFinishSignUp = (e) => {
     e.preventDefault();
+
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+    if(!passwordRegex.test(password)){
+      setMessage("הסיסמה חייבת להיות באורך של לפחות 8 תווים ולכלול אותיות ומספרים.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setMessage("הסיסמאות אינן תואמות.");
       return;

@@ -35,14 +35,13 @@ function VolunteerMain() {
   const [langSelectedOptions, setLangSelectedOptions] = useState([]);
   const [available, setAvailable] = useState(false);
   const [vehicle, setVehicle] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
   const [documentId, setDocumentId] = useState("");
   const [matches, setMatches] = useState([]);
   const [matchDetails, setMatchDetails] = useState([]);
 
   const [myRequests, setMyRequests] = useState([]);
   const [myRequestsDetails, setMyRequestsDetails] = useState([]);
+  const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false);
 
   useEffect(() => {
     fetchVolRecord();
@@ -86,6 +85,13 @@ function VolunteerMain() {
 
   const handleChangePassword = (e) => {
     e.preventDefault();
+
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+    if(!passwordRegex.test(newPassword)){
+      setMessage("הסיסמה חייבת להיות באורך של לפחות 8 תווים ולכלול אותיות ומספרים.");
+      return;
+    }
+
     if (newPassword !== confirmNewPassword) {
       setMessage("הסיסמאות אינן תואמות.");
       return;
@@ -106,6 +112,7 @@ function VolunteerMain() {
               setNewPassword("");
               setConfirmNewPassword("");
               setModalPasswordIsOpen(false);
+              setPasswordChangeSuccess(true);
             })
             .catch((error) => {
               console.error("Error updating password:", error);
@@ -437,6 +444,15 @@ const openWhatsAppChat = () => {
         {message && <p>{message}</p>}
         </div>
       </Modal>
+
+      <Modal
+          isOpen={passwordChangeSuccess}
+          onRequestClose={() => setPasswordChangeSuccess(false)}
+          contentLabel="Password Change Success Modal"
+        >
+          <h1>שינוי הסיסמה הושלם בהצלחה</h1>
+          <button onClick={() => setPasswordChangeSuccess(false)}>סגור</button>
+        </Modal>
       
       </div>
       
