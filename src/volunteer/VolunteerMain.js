@@ -43,6 +43,9 @@ function VolunteerMain() {
   const [myRequestsDetails, setMyRequestsDetails] = useState([]);
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false);
 
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
   useEffect(() => {
     fetchVolRecord();
   }, []);
@@ -68,6 +71,9 @@ function VolunteerMain() {
       .catch((error) => {
         console.error("Error logging out:", error);
       });
+  };
+  const handleSuccessModalClose = () => {
+    setIsSuccessModalOpen(false);
   };
 
   const openEditUser = async () => {
@@ -219,7 +225,7 @@ function VolunteerMain() {
       const docRef = doc(db, "Volunteers", documentId);
       await setDoc(docRef, formData, { merge: true });
       setModalIsOpen(false);
-      window.location.reload();
+      setIsSuccessModalOpen(true);
     } catch (error) {
       console.error("Error updating volunteer:", error);
     }
@@ -262,8 +268,8 @@ const closeRequest = async (id) => {
 };
 
 const sortedRequests = React.useMemo(() => {
-  const inProcessRequests = myRequestsDetails.filter(cur => cur.status === 'in process');
-  const closedRequests = myRequestsDetails.filter(cur => cur.status === 'close');
+  const inProcessRequests = myRequestsDetails.filter(cur => cur && cur.status === 'in process');
+  const closedRequests = myRequestsDetails.filter(cur => cur && cur.status === 'close');
   return [...inProcessRequests, ...closedRequests];
 }, [myRequestsDetails]);
 
@@ -314,6 +320,9 @@ const openWhatsAppChat = () => {
               value={citySelectedOption}
               onChange={setCitySelectedOption}
               placeholder="בחר עיר מגורים"
+              className="basic-multi-select"
+              classNamePrefix="select"
+              required
             />
 
             <label>תחומי התנדבות</label>
@@ -326,6 +335,7 @@ const openWhatsAppChat = () => {
               value={volSelectedOptions}
               onChange={setVolSelectedOptions}
               placeholder="בחר תחומי התנדבות"
+              required
             />
 
             <label>ימי זמינות</label>
@@ -338,6 +348,7 @@ const openWhatsAppChat = () => {
               value={daySelectedOptions}
               onChange={setDaySelectedOptions}
               placeholder="בחר ימי זמינות"
+              required
             />
 
             <label>שפות</label>
@@ -350,6 +361,7 @@ const openWhatsAppChat = () => {
               value={langSelectedOptions}
               onChange={setLangSelectedOptions}
               placeholder="בחר שפות"
+              required
             />
 
             <label htmlFor="available">זמינות לחירום</label>
@@ -397,6 +409,19 @@ const openWhatsAppChat = () => {
               אישור עריכה
             </button>
         </fieldset>
+        </div>
+      </Modal>
+      <Modal
+        isOpen={isSuccessModalOpen}
+        onRequestClose={handleSuccessModalClose}
+        contentLabel="Success"
+        className="Modal"
+        overlayClassName="Overlay"
+      >
+        <h2>פעולה הצליחה</h2>
+        <p>{successMessage}</p>
+        <div className="modal-buttons">
+          <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
         </div>
       </Modal>
       </div>
@@ -502,7 +527,7 @@ const openWhatsAppChat = () => {
     </div>
 
     <div className='pageEnd'>
-        <h2>צור איתנו קשר בווצאפ</h2>
+        <h2>צור איתנו קשר ב - whatsapp </h2>
         <button className="whatsapp-button" onClick={openWhatsAppChat}>
             <FontAwesomeIcon icon={faWhatsapp} size="2x" />
         </button>

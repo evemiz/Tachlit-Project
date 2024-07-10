@@ -43,7 +43,7 @@ export const readDocument = async (collectionName, documentId) => {
 // Function to add a document to a collection with a custom ID (if provided)
 export const addDocument = async (collectionName, data) => {
         try {
-          const docId = data.id;
+          const docId = data.ID;
           if (!docId) {
               console.error('Document ID is missing in the data');
               return null;

@@ -5,7 +5,7 @@
 body {
   font-family: 'Rubik';
   direction: rtl;
-  background: #ffffff; 
+  background: linear-gradient(to right, #c8c8c8, #8fb5b9);
   height: 100vh; 
   margin: 0;
 }
@@ -216,7 +216,7 @@ button a:hover {
 } */
 
 
-/* .navbarVol {
+.navbarVol {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -262,7 +262,7 @@ button a:hover {
   0% { opacity: 1; }
   50% { opacity: 0; }
   100% { opacity: 1; }
-} */
+}
 
 
 
@@ -313,6 +313,7 @@ button a:hover {
   margin: 0 auto;
   margin-bottom: 20px;
   margin-top: 20px;
+  text-align: center;
 }
 
 .box p {
@@ -367,5 +368,27 @@ h2 {
   margin: auto;
 }
 
+.box button {
+  background-color: #009ba6;
+  color: white !important;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  width: auto;
+  border-radius: 50px !important;
+}
 
+.box button:hover {
+  background-color: #086d74;
+}
 
+.box a {
+  color: white !important;
+  text-decoration: none; 
+}
+
+.box a:hover {
+  color: white !important;
+  text-decoration: none; 
+} 
