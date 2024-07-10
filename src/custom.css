@@ -1,0 +1,125 @@
+/* Custom styles for buttons */
+.btn-custom {
+  background-color: #009ba6;
+  border-color: #009ba6;
+  color: white;
+}
+
+.btn-custom:hover {
+  background-color: #007c87;
+  border-color: #007c87;
+}
+
+/* Custom styles for alerts */
+.alert-custom {
+  background-color: #009ba6;
+  color: white;
+}
+
+/* Body background color */
+body {
+  background-color: #f8f9fa;
+}
+
+/* Admin main page styles */
+.AdminMainPage {
+  padding: 20px;
+}
+
+/* Top bar styles */
+.topBar {
+  background-color: #009ba6;
+  height: 4px;
+  margin-bottom: 20px;
+}
+
+/* Dashboard styles */
+.dashboard {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.dashboard-item {
+  background-color: #d3cccc;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 5px;
+  width: 200px;
+  text-align: center;
+  margin: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal styles */
+.Modal {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 500px;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+/* Page end styles */
+.pageEnd {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.pageEnd h2 {
+  color: #009ba6;
+}
+
+/* Headings styles */
+h1, h2 {
+  color: #009ba6;
+}
+
+/* Navbar styles */
+.navbar-custom {
+  background-color: #000000;
+  border-bottom: 2px solid #009ba6;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.navbar-logo {
+  max-height: 50px;
+}
+
+.navbar-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.navbar-buttons .btn {
+  background-color: #009ba6;
+  border: none;
+  color: white;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.navbar-buttons .btn:hover {
+  background-color: #007c87;
+  color: white;
+}
+
+/* Container margin for fixed navbar */
+.container {
+  margin-top: 100px;
+}
