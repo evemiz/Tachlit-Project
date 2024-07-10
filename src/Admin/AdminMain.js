@@ -435,7 +435,7 @@ function AdminMain() {
           <button onClick={openSignUpModal} className="btn btn-custom">הוספת מנהל חדש</button>
         </div>
       </div>
-      <div className="container">
+      <div className="admin-container">
         <h1 className="text-center my-4">ברוכים הבאים לדף מנהל</h1>
         <div className="topBar"></div>
 
@@ -443,30 +443,60 @@ function AdminMain() {
           <ListDisplay collectionName={selectedList.collectionName} status={selectedList.status} />
         ) : (
           <div className="dashboard">
-            <div className="dashboard-item" onClick={() => handleCollectionChange('NewVolunteers')}>
+            <div className="dashboard-item" 
+            onClick={() => handleCollectionChange('NewVolunteers')}
+            style={{
+              backgroundColor: collectionName === 'NewVolunteers' ? '#acacacba' : '#d3d3d3ba',
+              color: collectionName === 'NewVolunteers' ? '#3a3a3a' : 'black',
+            }}          
+            >
               <h3>מתנדבים ממתינים לאישור</h3>
               <p>{volunteersThisMonth}</p>
             </div>
-            <div className="dashboard-item" onClick={() => handleCollectionChange('Volunteers')}>
+            <div className="dashboard-item" 
+            onClick={() => handleCollectionChange('Volunteers')}
+            style={{
+              backgroundColor: collectionName === 'Volunteers' ? '#acacacba' : '#d3d3d3ba',
+              color: collectionName === 'Volunteers' ? '#3a3a3a' : 'black',
+            }}   
+            >
               <h3>סך כל המתנדבים</h3>
               <p>{totalVolunteers}</p>
             </div>
-            <div className="dashboard-item" onClick={() => handleCollectionChangeRequests('AidRequests', 'close')}>
+            <div className="dashboard-item" 
+            onClick={() => handleCollectionChangeRequests('AidRequests', 'close')}
+            style={{
+              backgroundColor: collectionName === 'AidRequests' && status === 'close' ? '#acacacba' : '#d3d3d3ba',
+              color: collectionName === 'AidRequests'  && status === 'close' ? '#3a3a3a' : 'black',
+            }}  
+            >
               <h3>בקשות שנסגרו</h3>
               <p>{closedRequestsThisMonth}</p>
             </div>
-            <div className="dashboard-item" onClick={() => handleCollectionChangeRequests('AidRequests', 'open')}>
+            <div className="dashboard-item" 
+            onClick={() => handleCollectionChangeRequests('AidRequests', 'open')}
+            style={{
+              backgroundColor: collectionName === 'AidRequests' && status === 'open' ? '#acacacba' : '#d3d3d3ba',
+              color: collectionName === 'AidRequests'  && status === 'open' ? '#3a3a3a' : 'black',
+            }}  
+            >
               <h3>בקשות פתוחות</h3>
               <p>{openRequests}</p>
             </div>
-            <div className="dashboard-item" onClick={() => handleCollectionChangeRequests('AidRequests', 'in process')}>
+            <div className="dashboard-item" 
+            onClick={() => handleCollectionChangeRequests('AidRequests', 'in process')}
+            style={{
+              backgroundColor: collectionName === 'AidRequests'  && status === 'in process' ? '#acacacba' : '#d3d3d3ba',
+              color: collectionName === 'AidRequests'  && status === 'in process' ? '#3a3a3a' : 'black',
+            }}  
+            >
               <h3>בקשות בטיפול</h3>
               <p>{inProcessRequests}</p>
             </div>
           </div>
         )}
-
-      {collectionName && (
+        <div className="admin-show-lists-container">
+        {collectionName && (
         <div className="admin-lists-buttons-container">
           <button className="lists-button" onClick={() => setShowFilters(!showFilters)}>
             {showFilters ? 'הסתר סינון' : 'סנן'}
@@ -596,6 +626,11 @@ function AdminMain() {
           !loading && <p>No documents found</p>
         )}
       </div>
+
+
+
+        </div>
+      
       <Modal
         isOpen={isModalOpen}
         onRequestClose={handleModalCancel}

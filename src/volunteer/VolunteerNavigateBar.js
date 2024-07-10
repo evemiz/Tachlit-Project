@@ -59,7 +59,7 @@ function Navbar({ handleLogout, openEditUser, openPasswordReset }) {
     };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark ">
       <div className={`navbar-brand ${flash ? 'flash' : ''}`}>
         <img
           src={logo}
