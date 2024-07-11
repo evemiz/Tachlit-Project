@@ -7,6 +7,8 @@ import days from '../Days';
 import langues from '../Languges';
 import Modal from 'react-modal';
 import {addDocument } from "./VolunteerFunctions.js";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
 
 Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
 
@@ -95,11 +97,21 @@ function VolunteerForm() {
     setIsSuccessModalOpen(false);
   };
 
+  const openWhatsAppChat = () => {
+    // Replace with the WhatsApp chat link (replace placeholders with actual phone number and message)
+    const phoneNumber = "+972545559682";
+    const whatsappUrl = `https://wa.me/${phoneNumber}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
   return (
+    <div className="page">
     <div className="Form">
-      <h1>טופס מתנדב חדש</h1>
+
+      <h1>הרשמה להתנדבות בתכלית</h1>
       <fieldset>
         <form action="#" method="get" onSubmit={handleSubmit}>
+        <div className='Fileds'>
           <label htmlFor="firstname">שם פרטי</label>
           <input
             type="text"
@@ -141,6 +153,7 @@ function VolunteerForm() {
             id="contact"
             value={contact}
             onChange={(e) => setContact(e.target.value)}
+            dir="rtl"
             required
           />
           {!contactValid && (
@@ -250,10 +263,14 @@ function VolunteerForm() {
           לא
 
           <br></br>
+          </div>
 
+          <div className='ruls'>
           <h2>תקנון למתנדב חדש</h2>
           <p>יש לשמור על אנונימיות של מבקש הסיוע ולנהוג</p>
           <p>בסובלנות ובחמלה כלפי מבקש הסיוע.</p>
+
+
           <div className="terms-container">
             <input
               type="checkbox"
@@ -265,6 +282,7 @@ function VolunteerForm() {
             <label htmlFor="terms">אני מאשר את תנאי השימוש</label>
           </div>
 
+          </div>
           <button
             type="submit"
             value="Submit"
@@ -286,6 +304,19 @@ function VolunteerForm() {
           <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
         </div>
       </Modal>
+      </div>
+
+
+      <div className='footer'>
+      <h2>צור איתנו קשר ב - whatsapp </h2>
+        <button className="whatsapp-button" onClick={openWhatsAppChat}>
+            <FontAwesomeIcon icon={faWhatsapp} size="2x" />
+        </button>
+      </div>
+
+
+
+
     </div>
   );
 }

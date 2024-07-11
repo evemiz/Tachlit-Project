@@ -43,8 +43,7 @@ body {
     display: block;
     width: 100%;
     padding: 8px;
-    box-sizing: border-box;
-    border: 1px solid #009ba6;
+    border: 1px solid #bdbdbd;
     border-radius: 3px;
     font-size: 12px;
     font-family: 'Rubik';

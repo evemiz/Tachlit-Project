@@ -143,7 +143,7 @@ h1, h2 {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   padding: 10px 20px;
   transition: transform 0.2s;
-  width: 500px;
+  width: 800px; /* Increase width to accommodate both sections */
   text-align: center;
   margin: auto;
   margin-top: 32px;
@@ -152,9 +152,83 @@ h1, h2 {
 }
 
 .Form h1 {
-  font-size: x-large;
+  font-size: xx-large;
   text-align: center;
   color: #009ba6;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.Form button {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.Form button:hover {
+  background-color: #8fb5b9;
+}
+
+.Fileds, .ruls {
+  flex: 1; /* Ensure each section takes up equal space */
+  margin: 10px;
+}
+
+.Fileds {
+  text-align: right; /* Align text to the right for RTL language */
+}
+
+.ruls h2{
+  font-size: x-large;
+  color: #009ba6;
+  margin: 20px;
+}
+
+.Form-container {
+  display: flex;
+  justify-content: space-between; /* Space out the sections */
+  align-items: flex-start; /* Align sections at the top */
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row; /* Align items vertically */
+  background: linear-gradient(to left, #141414 ,#535252); 
+  height: fit-content;
+  margin-top: 20px;
+  left: 0;
+  width: 100%;
+}
+
+.footer h2 {
+  font-size: large;
+  color: white;
+  margin: 10px; /* Space between text and button */
+  text-align: center;
+  height:auto;
+  size: 20px;
+}
+
+.footer .whatsapp-button {
+  background-color: #1ebc57; /* WhatsApp green */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin: 10px;
+}
+
+.footer .whatsapp-button:hover {
+  background-color: #179b47; /* Slightly darker green on hover */
 }
 
 /*Login*/
@@ -243,3 +317,4 @@ h1, h2 {
   display: block;
   margin: 0 auto; /* Center the image */
 }
+
