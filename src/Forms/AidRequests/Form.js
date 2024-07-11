@@ -9,6 +9,8 @@ import { addDocument, addFieldToDocument, addMatchToDocument } from "./RequestFu
 import days from '../Days.js';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
 
 Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
 
@@ -156,9 +158,17 @@ function RequestForm() {
     setIsSuccessModalOpen(false);
   };
 
+  const openWhatsAppChat = () => {
+    // Replace with the WhatsApp chat link (replace placeholders with actual phone number and message)
+    const phoneNumber = "+972545559682";
+    const whatsappUrl = `https://wa.me/${phoneNumber}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
   return (
+    <div className="page">
     <div className="Form">
-      <h1>טופס בקשת סיוע חדשה</h1>
+      <h1>הגשת בקשת סיוע </h1>
       <fieldset>
         <form action="#" method="get" onSubmit={handleSubmit}>
           <label htmlFor="firstname">שם פרטי</label>
@@ -203,6 +213,7 @@ function RequestForm() {
             value={contact}
             onChange={(e) => setContact(e.target.value)}
             required
+            dir="rtl"
           />
         {!contactValid && (
           <label style={{ color: 'red', fontSize: '12px' }}>הקלד מספר טלפון חוקי</label>
@@ -269,8 +280,7 @@ function RequestForm() {
             onChange={(e) => setComments(e.target.value)}
             dir="rtl"
           />
-
-          <br />
+          <div className='ruls'>
           <h2>תקנון הגשת בקשת סיוע</h2>
           <p>יש לשמור על פרטיות המתנדב ולא להקשות מעבר.</p>
           <p>אין לקחת מספרים ופרטים ולהתנהל מולם מלבד פלטפורמה זו,</p>
@@ -284,6 +294,8 @@ function RequestForm() {
               required      
             />
             <label htmlFor="terms">אני מאשר את תנאי השימוש</label>
+            </div>
+
           </div>
 
 
@@ -308,6 +320,15 @@ function RequestForm() {
           <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
         </div>
       </Modal>
+      </div>
+
+      <div className='footer'>
+      <h2>צור איתנו קשר ב - whatsapp </h2>
+        <button className="whatsapp-button" onClick={openWhatsAppChat}>
+            <FontAwesomeIcon icon={faWhatsapp} size="2x" />
+        </button>
+      </div>
+
     </div>
   );
 }
