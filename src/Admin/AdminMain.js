@@ -744,9 +744,6 @@ function AdminMain() {
           <SignUpNewAdmin closeModal={closeSignUpModal} />
         </Modal>
 
-        <div className='pageEnd'>
-          <h2>חזרה לעמוד הבית</h2>
-        </div>
       </div>
     </div>
   );
