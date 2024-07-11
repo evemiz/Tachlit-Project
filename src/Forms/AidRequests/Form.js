@@ -11,10 +11,14 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
+import { useNavigate } from "react-router-dom";
+
 
 Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
 
 function RequestForm() {
+  const navigate = useNavigate();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [id, setId] = useState("");
@@ -156,6 +160,7 @@ function RequestForm() {
 
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
+    navigate('/'); 
   };
 
   const openWhatsAppChat = () => {
@@ -314,6 +319,7 @@ function RequestForm() {
         className="Modal"
         overlayClassName="Overlay"
       >
+        
         <h2>פעולה הצליחה</h2>
         <p>{successMessage}</p>
         <div className="modal-buttons">

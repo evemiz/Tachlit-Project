@@ -9,10 +9,13 @@ import Modal from 'react-modal';
 import {addDocument } from "./VolunteerFunctions.js";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
+import { useNavigate } from "react-router-dom";
 
 Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
 
 function VolunteerForm() {
+  const navigate = useNavigate();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [id, setId] = useState("");
@@ -95,6 +98,7 @@ function VolunteerForm() {
 
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
+    navigate('/'); 
   };
 
   const openWhatsAppChat = () => {
