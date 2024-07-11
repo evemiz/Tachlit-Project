@@ -2,25 +2,22 @@ import React, { useState, useEffect } from "react";
 import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { db } from "../firebaseConfig";
-import { collection, query, where, getDocs , getDoc, doc} from "firebase/firestore";
+import { collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
 import Modal from 'react-modal';
 import '../custom.css';
-import '../navbar.css'; // ייבוא CSS מותאם אישית
+import '../navbar.css';
 import { useNavigate } from "react-router-dom";
-import Navbar from "./AdminNavigateBar"; // ייבוא הרכיב של הניווט
-import ListDisplay from '../ListDisplay'; // ייבוא רכיב להצגת הרשימות
-import SignUpNewAdmin from './SignUpNewAdmin'; // עדכון לשם נכון
-import { readDocuments, addDocument, deleteDocument, updateDocument } from './AdminFunctions'; // Adjust the import path as necessary
-import { handleApproveVolunteer } from './handleApproveVolunteer'; // Adjust the import path as necessary
-import citiesInIsrael from '../Forms/Cities.js'; // Adjust the import path as necessary
-import languages from '../Forms/Languges.js'; // Adjust the import path as necessary
-import days from '../Forms/Days.js'; // Adjust the import path as necessary
-import volunteering from '../Forms/Volunteerings.js'; // Adjust the import path as necessary
-import FilterSidebar from './FilterSidebar'; // Import the new FilterSidebar component
-import Select from 'react-select'; // Import react-select for dropdowns
+import ListDisplay from '../ListDisplay';
+import SignUpNewAdmin from './SignUpNewAdmin';
+import { readDocuments, addDocument, deleteDocument, updateDocument } from './AdminFunctions';
+import { handleApproveVolunteer } from './handleApproveVolunteer';
+import citiesInIsrael from '../Forms/Cities.js';
+import languages from '../Forms/Languges.js';
+import days from '../Forms/Days.js';
+import volunteering from '../Forms/Volunteerings.js';
+import Select from 'react-select';
 import '@fontsource/rubik';
 import logo from '../images/logo.png';
-
 
 const getColumnDisplayName = (columnName) => {
   const columnMapping = {
@@ -93,7 +90,7 @@ function AdminMain() {
   const [closedRequestsThisMonth, setClosedRequestsThisMonth] = useState(0);
   const [openRequests, setOpenRequests] = useState(0);
   const [inProcessRequests, setInProcessRequests] = useState(0);
-  const [selectedList, setSelectedList] = useState(null); // סטייט להצגת הרשימה הנבחרת
+  const [selectedList, setSelectedList] = useState(null);
   const [collectionName, setCollectionName] = useState('');
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -112,9 +109,9 @@ function AdminMain() {
   const [volunteers, setVolunteers] = useState([]);
   const [status, setStatus] = useState("");
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [filterVisibility, setFilterVisibility] = useState({});
 
   useEffect(() => {
-    // Fetch the current user's data to check if they are a superAdmin
     const fetchCurrentUser = async () => {
       const user = auth.currentUser;
       if (user) {
@@ -128,7 +125,6 @@ function AdminMain() {
   }, []);
 
   useEffect(() => {
-    // Fetch all volunteers' data
     const fetchVolunteers = async () => {
       try {
         const volunteersData = await readDocuments('Volunteers');
@@ -148,7 +144,7 @@ function AdminMain() {
     setCollectionName(name);
     setStatus("");
     setFilters({});
-    setDocuments([]); // Clear previous documents when collection changes
+    setDocuments([]);
   };
 
   const handleCollectionChangeRequests = (name, status) => {
@@ -158,24 +154,11 @@ function AdminMain() {
     setDocuments([]);
   };
 
-  const handleFilterChange = (event, key) => {
-    const { value, checked } = event.target;
-    setFilters(prevFilters => {
-      const newFilters = { ...prevFilters };
-      if (!newFilters[key]) {
-        newFilters[key] = {};
-      }
-      if (checked) {
-        newFilters[key][value] = true;
-      } else {
-        delete newFilters[key][value];
-        if (Object.keys(newFilters[key]).length === 0) {
-          delete newFilters[key];
-        }
-      }
-      console.log('Updated Filters:', newFilters);
-      return newFilters;
-    });
+  const handleFilterChange = (key, value) => {
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      [key]: value
+    }));
   };
 
   const fetchDocuments = async () => {
@@ -184,12 +167,12 @@ function AdminMain() {
       setError(null);
       try {
         const docs = await readDocuments(collectionName, status);
-        console.log('Fetched documents:', docs); // Debug log
-        setDocuments(docs || []); // Ensure docs is an array
+        console.log('Fetched documents:', docs);
+        setDocuments(docs || []);
       } catch (err) {
         console.error('Error fetching documents:', err);
         setError(err.message);
-        setDocuments([]); // Reset documents on error
+        setDocuments([]);
       } finally {
         setLoading(false);
       }
@@ -205,22 +188,20 @@ function AdminMain() {
   const handleAddRecord = async (e) => {
     e.preventDefault();
     if (collectionName) {
-      // Convert newRecord to match the expected data types
       const formattedRecord = {};
       for (const [key, value] of Object.entries(newRecord)) {
         if (columnDataTypes[key] === 'boolean') {
           formattedRecord[key] = value === true || value === 'true';
         } else if (columnDataTypes[key] === 'array') {
-          formattedRecord[key] = value.map(item => item.value); // Ensure the value is an array of selected options
+          formattedRecord[key] = value.map(item => item.value);
         } else if (columnDataTypes[key] === 'object') {
           formattedRecord[key] = value ? { value: value.value, label: value.label } : null;
         } else if (columnDataTypes[key] === 'date') {
           formattedRecord[key] = value ? new Date(value) : null;
         } else {
-          formattedRecord[key] = value || null; // Handle undefined values
+          formattedRecord[key] = value || null;
         }
       }
-      // Filter out undefined values
       const cleanedRecord = Object.fromEntries(
         Object.entries(formattedRecord).filter(([_, v]) => v !== undefined)
       );
@@ -228,7 +209,7 @@ function AdminMain() {
         if (editMode) {
           confirmAction(() => updateDocument(collectionName, currentEditId, cleanedRecord), '?האם אתה בטוח שברצונך לערוך רשומה זו');
         } else {
-          confirmAction(() => addDocument(collectionName, cleanedRecord),  '?האם אתה בטוח שברצונך להוסיף רשומה זו');
+          confirmAction(() => addDocument(collectionName, cleanedRecord), '?האם אתה בטוח שברצונך להוסיף רשומה זו');
         }
       } catch (err) {
         console.error(`Error ${editMode ? 'updating' : 'adding'} document:`, err);
@@ -262,7 +243,6 @@ function AdminMain() {
   };
 
   const handleEditRecord = (doc) => {
-    // Convert arrays back to the format expected by react-select
     const formattedDoc = { ...doc };
     for (const key in formattedDoc) {
       if (columnDataTypes[key] === 'array' && Array.isArray(formattedDoc[key])) {
@@ -283,7 +263,6 @@ function AdminMain() {
   const getColumns = () => {
     if (documents.length === 0) return [];
     const docKeys = Object.keys(documents[0]).filter(key => key);
-    // Ensure the columns appear in the fixed order if they exist in the data
     return fixedColumnOrder.filter(column => docKeys.includes(column));
   };
 
@@ -312,7 +291,7 @@ function AdminMain() {
   const handleModalConfirm = async () => {
     await modalAction();
     setIsModalOpen(false);
-    fetchDocuments(); // Refresh documents after action
+    fetchDocuments();
     setSuccessMessage('!הפעולה בוצעה בהצלחה');
     setIsSuccessModalOpen(true);
     setNewRecord({});
@@ -337,32 +316,27 @@ function AdminMain() {
     console.log("Fetching data...");
 
     try {
-      // מתנדבים שנוספו החודש
       const newVolunteersRef = collection(db, 'NewVolunteers');
       const newVolunteersSnapshot = await getDocs(newVolunteersRef);
       setVolunteersThisMonth(newVolunteersSnapshot.size);
       console.log("New volunteers this month:", newVolunteersSnapshot.size);
 
-      // סך כל המתנדבים
       const totalVolunteersRef = collection(db, 'Volunteers');
       const totalVolunteersSnapshot = await getDocs(totalVolunteersRef);
       setTotalVolunteers(totalVolunteersSnapshot.size);
       console.log("Total volunteers:", totalVolunteersSnapshot.size);
 
-      // בקשות שנסגרו החודש
       const closedRequestsRef = collection(db, 'AidRequests');
       const closedRequestsQuery = query(closedRequestsRef, where('status', '==', 'close'));
       const closedRequestsSnapshot = await getDocs(closedRequestsQuery);
       setClosedRequestsThisMonth(closedRequestsSnapshot.size);
       console.log("Closed requests this month:", closedRequestsSnapshot.size);
 
-      // בקשות פתוחות
       const openRequestsQuery = query(closedRequestsRef, where('status', '==', 'open'));
       const openRequestsSnapshot = await getDocs(openRequestsQuery);
       setOpenRequests(openRequestsSnapshot.size);
       console.log("Open requests:", openRequestsSnapshot.size);
 
-      // בקשות בטיפול
       const inProcessRequestsQuery = query(closedRequestsRef, where('status', '==', 'in process'));
       const inProcessRequestsSnapshot = await getDocs(inProcessRequestsQuery);
       setInProcessRequests(inProcessRequestsSnapshot.size);
@@ -437,22 +411,96 @@ function AdminMain() {
     }
   };
 
+  const toggleFilterVisibility = (column) => {
+    setFilterVisibility(prevState => ({
+      ...prevState,
+      [column]: !prevState[column]
+    }));
+  };
+
+  const renderFilterForColumn = (column) => {
+    const columnType = columnDataTypes[column];
+
+    switch (columnType) {
+      case 'boolean':
+        return (
+          <div className="filter-box">
+            <label>
+              <input
+                type="radio"
+                name={`filter-${column}`}
+                value="true"
+                onChange={() => handleFilterChange(column, true)}
+                checked={filters[column] === true}
+              />
+              כן
+            </label>
+            <label>
+              <input
+                type="radio"
+                name={`filter-${column}`}
+                value="false"
+                onChange={() => handleFilterChange(column, false)}
+                checked={filters[column] === false}
+              />
+              לא
+            </label>
+            <label>
+              <input
+                type="radio"
+                name={`filter-${column}`}
+                value=""
+                onChange={() => handleFilterChange(column, '')}
+                checked={filters[column] === ''}
+              />
+              הכל
+            </label>
+          </div>
+        );
+      case 'array':
+        return (
+          <Select
+            options={filterOptions[column].map(item => ({ value: item, label: item }))}
+            isMulti
+            onChange={selectedOptions => handleFilterChange(column, selectedOptions.map(option => option.value))}
+            value={(filters[column] || []).map(value => ({ value, label: value }))}
+          />
+        );
+      case 'date':
+        return (
+          <input
+            type="date"
+            value={filters[column] || ''}
+            onChange={(e) => handleFilterChange(column, e.target.value)}
+          />
+        );
+      default:
+        return (
+          <input
+            type="text"
+            value={filters[column] || ''}
+            onChange={(e) => handleFilterChange(column, e.target.value)}
+          />
+        );
+    }
+  };
+
   return (
     <div className="AdminMainPage">
       <div className="navbar-custom">
         <div className="navbar-logo">
-        <img
-          src={logo}
-          alt="Logo"
-          className="logo-image"
-          style={{ cursor: 'pointer' }}
-        />
+          <img
+            src={logo}
+            alt="Logo"
+            className="logo-image"
+            style={{ cursor: 'pointer' }}
+          />
         </div>
         <div className="navbar-buttons">
           <button onClick={openModal} className="btn btn-custom">שנה סיסמה</button>
           <button onClick={handleLogout} className="btn btn-custom">התנתק</button>
           {isSuperAdmin && (
-          <button onClick={openSignUpModal} className="btn btn-custom">הוספת מנהל חדש</button>
+            <button onClick={openSignUpModal} className="btn btn-custom">הוספת מנהל חדש</button>
           )}
         </div>
       </div>
@@ -464,191 +512,191 @@ function AdminMain() {
           <ListDisplay collectionName={selectedList.collectionName} status={selectedList.status} />
         ) : (
           <div className="dashboard">
-            <div className="dashboard-item" 
-            onClick={() => handleCollectionChange('NewVolunteers')}
-            style={{
-              backgroundColor: collectionName === 'NewVolunteers' ? '#acacacba' : '#d3d3d3ba',
-              color: collectionName === 'NewVolunteers' ? '#3a3a3a' : 'black',
-            }}          
+            <div className="dashboard-item"
+              onClick={() => handleCollectionChange('NewVolunteers')}
+              style={{
+                backgroundColor: collectionName === 'NewVolunteers' ? '#acacacba' : '#d3d3d3ba',
+                color: collectionName === 'NewVolunteers' ? '#3a3a3a' : 'black',
+              }}
             >
               <h3>מתנדבים ממתינים לאישור</h3>
               <p>{volunteersThisMonth}</p>
             </div>
-            <div className="dashboard-item" 
-            onClick={() => handleCollectionChange('Volunteers')}
-            style={{
-              backgroundColor: collectionName === 'Volunteers' ? '#acacacba' : '#d3d3d3ba',
-              color: collectionName === 'Volunteers' ? '#3a3a3a' : 'black',
-            }}   
+            <div className="dashboard-item"
+              onClick={() => handleCollectionChange('Volunteers')}
+              style={{
+                backgroundColor: collectionName === 'Volunteers' ? '#acacacba' : '#d3d3d3ba',
+                color: collectionName === 'Volunteers' ? '#3a3a3a' : 'black',
+              }}
             >
               <h3>סך כל המתנדבים</h3>
               <p>{totalVolunteers}</p>
             </div>
-            <div className="dashboard-item" 
-            onClick={() => handleCollectionChangeRequests('AidRequests', 'close')}
-            style={{
-              backgroundColor: collectionName === 'AidRequests' && status === 'close' ? '#acacacba' : '#d3d3d3ba',
-              color: collectionName === 'AidRequests'  && status === 'close' ? '#3a3a3a' : 'black',
-            }}  
+            <div className="dashboard-item"
+              onClick={() => handleCollectionChangeRequests('AidRequests', 'close')}
+              style={{
+                backgroundColor: collectionName === 'AidRequests' && status === 'close' ? '#acacacba' : '#d3d3d3ba',
+                color: collectionName === 'AidRequests' && status === 'close' ? '#3a3a3a' : 'black',
+              }}
             >
               <h3>בקשות שנסגרו</h3>
               <p>{closedRequestsThisMonth}</p>
             </div>
-            <div className="dashboard-item" 
-            onClick={() => handleCollectionChangeRequests('AidRequests', 'open')}
-            style={{
-              backgroundColor: collectionName === 'AidRequests' && status === 'open' ? '#acacacba' : '#d3d3d3ba',
-              color: collectionName === 'AidRequests'  && status === 'open' ? '#3a3a3a' : 'black',
-            }}  
+            <div className="dashboard-item"
+              onClick={() => handleCollectionChangeRequests('AidRequests', 'open')}
+              style={{
+                backgroundColor: collectionName === 'AidRequests' && status === 'open' ? '#acacacba' : '#d3d3d3ba',
+                color: collectionName === 'AidRequests' && status === 'open' ? '#3a3a3a' : 'black',
+              }}
             >
               <h3>בקשות פתוחות</h3>
               <p>{openRequests}</p>
             </div>
-            <div className="dashboard-item" 
-            onClick={() => handleCollectionChangeRequests('AidRequests', 'in process')}
-            style={{
-              backgroundColor: collectionName === 'AidRequests'  && status === 'in process' ? '#acacacba' : '#d3d3d3ba',
-              color: collectionName === 'AidRequests'  && status === 'in process' ? '#3a3a3a' : 'black',
-            }}  
+            <div className="dashboard-item"
+              onClick={() => handleCollectionChangeRequests('AidRequests', 'in process')}
+              style={{
+                backgroundColor: collectionName === 'AidRequests' && status === 'in process' ? '#acacacba' : '#d3d3d3ba',
+                color: collectionName === 'AidRequests' && status === 'in process' ? '#3a3a3a' : 'black',
+              }}
             >
               <h3>בקשות בטיפול</h3>
               <p>{inProcessRequests}</p>
             </div>
           </div>
         )}
-        <div className="admin-show-lists-container">
+
         {collectionName && (
-        <div className="admin-lists-buttons-container">
-          <button className="lists-button" onClick={() => setShowFilters(!showFilters)}>
-            {showFilters ? 'הסתר סינון' : 'סנן'}
-          </button>
-          <button className="lists-button" onClick={() => setShowAddForm(!showAddForm)}>
-            {showAddForm ? 'הסתר טופס' : 'הוספת רשומה'}
-          </button>
-        </div>
-      )}
-      <div className={`content ${showFilters ? 'sidebar-open' : ''}`}>
-        <FilterSidebar
-          filters={filters}
-          handleFilterChange={handleFilterChange}
-          filterOptions={filterOptions}
-          showFilters={showFilters}
-        />
-        {showAddForm && (
-          <div className="add-form">
-            <form onSubmit={handleAddRecord}>
-              {columns.map((column) => (
-                <div key={column}>
-                  <label>{getColumnDisplayName(column)}:</label>
-                  {columnDataTypes[column] === 'boolean' ? (
-                    <>
-                      <input
-                        type="radio"
-                        name={column}
-                        value="true"
-                        checked={newRecord[column] === true}
-                        onChange={handleInputChange}
-                      /> כן
-                      <input
-                        type="radio"
-                        name={column}
-                        value="false"
-                        checked={newRecord[column] === false}
-                        onChange={handleInputChange}
-                      /> לא
-                    </>
-                  ) : columnDataTypes[column] === 'array' ? (
-                    <Select
-                      name={column}
-                      options={filterOptions[column].map(item => ({ value: item, label: item }))}
-                      isMulti
-                      value={newRecord[column] || []}
-                      onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                      placeholder={`Select ${getColumnDisplayName(column)}`}
-                    />
-                  ) : columnDataTypes[column] === 'object' ? (
-                    <Select
-                      name={column}
-                      options={filterOptions[column].map(item => ({ value: item, label: item }))}
-                      value={newRecord[column] || null}
-                      onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                      placeholder={`Select ${getColumnDisplayName(column)}`}
-                    />
-                  ) : columnDataTypes[column] === 'date' ? (
-                    <input
-                      type="date"
-                      name={column}
-                      value={newRecord[column] || ''}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    <input
-                      type="text"
-                      name={column}
-                      value={newRecord[column] || ''}
-                      onChange={handleInputChange}
-                    />
-                  )}
-                </div>
-              ))}
-              <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
-              {collectionName === 'NewVolunteers' && editMode && <button type="button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
-            </form>
+          <div className="admin-lists-buttons-container">
+            <button className="lists-button" onClick={() => setShowAddForm(!showAddForm)}>
+              {showAddForm ? 'הסתר טופס' : 'הוספת רשומה'}
+            </button>
           </div>
         )}
-        {loading && <p>Loading...</p>}
-        {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-        {filteredDocuments.length > 0 ? (
-          <div className="table-container">
-            <table className="table">
-              <thead>
-                <tr>
-                  {columns.map((key) => (
-                    <th key={key}>{getColumnDisplayName(key)}</th>
-                  ))}
-                  <th>פעולות</th> {/* Add column for actions */}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredDocuments.map((doc, index) => (
-                  <tr key={doc.id || index}> {/* Ensure each row has a unique key */}
-                    {columns.map((column) => (
-                      <td key={`${doc.id}-${column}`}>
-                        {Array.isArray(doc[column])
-                          ? doc[column].map((item, idx) => (
+        <div className={`content ${showFilters ? 'sidebar-open' : ''}`}>
+          {showAddForm && (
+            <div className="add-form">
+              <form onSubmit={handleAddRecord}>
+                {columns.map((column) => (
+                  <div key={column}>
+                    <label>{getColumnDisplayName(column)}:</label>
+                    {columnDataTypes[column] === 'boolean' ? (
+                      <>
+                        <input
+                          type="radio"
+                          name={column}
+                          value="true"
+                          checked={newRecord[column] === true}
+                          onChange={handleInputChange}
+                        /> כן
+                        <input
+                          type="radio"
+                          name={column}
+                          value="false"
+                          checked={newRecord[column] === false}
+                          onChange={handleInputChange}
+                        /> לא
+                      </>
+                    ) : columnDataTypes[column] === 'array' ? (
+                      <Select
+                        name={column}
+                        options={filterOptions[column].map(item => ({ value: item, label: item }))}
+                        isMulti
+                        value={newRecord[column] || []}
+                        onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
+                        placeholder={`Select ${getColumnDisplayName(column)}`}
+                      />
+                    ) : columnDataTypes[column] === 'object' ? (
+                      <Select
+                        name={column}
+                        options={filterOptions[column].map(item => ({ value: item, label: item }))}
+                        value={newRecord[column] || null}
+                        onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
+                        placeholder={`Select ${getColumnDisplayName(column)}`}
+                      />
+                    ) : columnDataTypes[column] === 'date' ? (
+                      <input
+                        type="date"
+                        name={column}
+                        value={newRecord[column] || ''}
+                        onChange={handleInputChange}
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        name={column}
+                        value={newRecord[column] || ''}
+                        onChange={handleInputChange}
+                      />
+                    )}
+                  </div>
+                ))}
+                <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
+                {collectionName === 'NewVolunteers' && editMode && <button type="button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
+              </form>
+            </div>
+          )}
+          {loading && <p>Loading...</p>}
+          {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+          {filteredDocuments.length > 0 ? (
+            <div className="table-container">
+              <table className="table">
+                <thead>
+                  <tr>
+                    {columns.map((key) => (
+                      <th key={key}>
+                        {getColumnDisplayName(key)}
+                        <span
+                          className="filter-arrow"
+                          onClick={() => toggleFilterVisibility(key)}
+                        >
+                          ▼
+                        </span>
+                        {filterVisibility[key] && renderFilterForColumn(key)}
+                      </th>
+                    ))}
+                    <th>פעולות</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredDocuments.map((doc, index) => (
+                    <tr key={doc.id || index}>
+                      {columns.map((column) => (
+                        <td key={`${doc.id}-${column}`}>
+                          {Array.isArray(doc[column])
+                            ? doc[column].map((item, idx) => (
                               <span key={`${doc.id}-${column}-${idx}`}>
                                 {column === 'matches'
                                   ? getVolunteerNameById(item)
                                   : typeof item === 'object' && item !== null && 'label' in item
-                                  ? item.label
-                                  : item}
+                                    ? item.label
+                                    : item}
                                 {idx < doc[column].length - 1 ? ', ' : ''}
                               </span>
                             ))
-                          : typeof doc[column] === 'boolean'
-                          ? doc[column] ? '✓' : '✗'
-                          : typeof doc[column] === 'object' && doc[column] !== null && 'label' in doc[column]
-                          ? doc[column].label
-                          : typeof doc[column] === 'object'
-                          ? JSON.stringify(doc[column])
-                          : doc[column]}
+                            : typeof doc[column] === 'boolean'
+                              ? doc[column] ? '✓' : '✗'
+                              : typeof doc[column] === 'object' && doc[column] !== null && 'label' in doc[column]
+                                ? doc[column].label
+                                : typeof doc[column] === 'object'
+                                  ? JSON.stringify(doc[column])
+                                  : doc[column]}
+                        </td>
+                      ))}
+                      <td>
+                        <button className="buttons-inside-table" onClick={() => handleEditRecord(doc)}>ערוך</button>
+                        <button className="buttons-inside-table" onClick={() => handleDeleteRecord(doc.id)}>מחק</button>
                       </td>
-                    ))}
-                    <td>
-                      <button className="buttons-inside-table" onClick={() => handleEditRecord(doc)}>ערוך</button>
-                      <button className="buttons-inside-table" onClick={() => handleDeleteRecord(doc.id)}>מחק</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          !loading && <p>No documents found</p>
-        )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            !loading && <p>No documents found</p>
+          )}
+        </div>
       </div>
-      </div>
-      
+
       <Modal
         isOpen={isModalOpen}
         onRequestClose={handleModalCancel}
@@ -677,74 +725,61 @@ function AdminMain() {
         </div>
       </Modal>
 
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        contentLabel="Change Password Modal"
+        className={"Modal"}
+      >
+        <h2>שינוי סיסמה</h2>
+        <form onSubmit={handleChangePassword}>
+          <input
+            type="email"
+            className="form-control mb-2"
+            placeholder="אימייל"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            dir="rtl"
+          />
+          <input
+            type="password"
+            className="form-control mb-2"
+            placeholder="סיסמה ישנה"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            dir="rtl"
+          />
+          <input
+            type="password"
+            className="form-control mb-2"
+            placeholder="סיסמה חדשה"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            dir="rtl"
+          />
+          <input
+            type="password"
+            className="form-control mb-2"
+            placeholder="הקש שוב את סיסמתך"
+            value={confirmNewPassword}
+            onChange={(e) => setConfirmNewPassword(e.target.value)}
+            dir="rtl"
+          />
+          <button type="submit" className="btn btn-custom w-100 mb-2">שנה סיסמה</button>
+        </form>
+        {message && <p className="alert alert-custom">{message}</p>}
+        <button onClick={closeModal} className="btn btn-secondary w-100">סגור</button>
+      </Modal>
 
+      <Modal
+        isOpen={signUpModalIsOpen}
+        onRequestClose={closeSignUpModal}
+        contentLabel="Sign Up New Admin Modal"
+        className={"Modal"}
+      >
+        <SignUpNewAdmin closeModal={closeSignUpModal} />
+      </Modal>
 
-
-
-
-
-
-
-
-
-
-
-        <Modal
-          isOpen={modalIsOpen}
-          onRequestClose={closeModal}
-          contentLabel="Change Password Modal"
-          className={"Modal"}
-        >
-          <h2>שינוי סיסמה</h2>
-          <form onSubmit={handleChangePassword}>
-            <input
-              type="email"
-              className="form-control mb-2"
-              placeholder="אימייל"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              dir="rtl"
-            />
-            <input
-              type="password"
-              className="form-control mb-2"
-              placeholder="סיסמה ישנה"
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-              dir="rtl"
-            />
-            <input
-              type="password"
-              className="form-control mb-2"
-              placeholder="סיסמה חדשה"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              dir="rtl"
-            />
-            <input
-              type="password"
-              className="form-control mb-2"
-              placeholder="הקש שוב את סיסמתך"
-              value={confirmNewPassword}
-              onChange={(e) => setConfirmNewPassword(e.target.value)}
-              dir="rtl"
-            />
-            <button type="submit" className="btn btn-custom w-100 mb-2">שנה סיסמה</button>
-          </form>
-          {message && <p className="alert alert-custom">{message}</p>}
-          <button onClick={closeModal} className="btn btn-secondary w-100">סגור</button>
-        </Modal>
-        
-        <Modal
-          isOpen={signUpModalIsOpen}
-          onRequestClose={closeSignUpModal}
-          contentLabel="Sign Up New Admin Modal"
-          className={"Modal"}
-        >
-          <SignUpNewAdmin closeModal={closeSignUpModal} />
-        </Modal>
-
-      </div>
     </div>
   );
 }
