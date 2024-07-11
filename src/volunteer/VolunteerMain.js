@@ -290,7 +290,7 @@ const openWhatsAppChat = () => {
         contentLabel="Edit User Modal"
       >
         <div className='volunteerApp'>
-        <h1>עריכת משתמש</h1>
+        <h1>עריכת פרטי משתמש</h1>
         <fieldset>
             <label htmlFor="firstname">שם פרטי</label>
             <input
@@ -510,7 +510,10 @@ const openWhatsAppChat = () => {
               <p>
                 סטטוס: 
                 {cur.status === 'in process' ? (
-                  <span style={{ color: '#009ba6' }}> בתהליך</span>
+                  <>
+                    <span style={{ color: '#009ba6' }}> בתהליך</span>
+                    <p>{`מספר טלפון: ${cur.phoneNumber}`}</p>
+                  </>
                 ) : (
                   ' טופל'
                 )}

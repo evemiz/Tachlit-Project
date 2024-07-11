@@ -318,3 +318,26 @@ h1, h2 {
   margin: 0 auto; /* Center the image */
 }
 
+
+/*Volunteer edit profile*/
+.volunteerApp h1 {
+  color: #009ba6;
+  font-size: xx-large;
+  font-weight: bold;
+  margin: 10px;
+  margin-bottom: 20px;
+}
+
+.volunteerApp button {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-bottom: 10px;
+  margin-top: 20px;
+}
+
+.volunteerApp button:hover {
+  background-color: #8fb5b9;
+}
