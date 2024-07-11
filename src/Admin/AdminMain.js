@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { db } from "../firebaseConfig";
-import { collection, query, where, getDocs , getDoc, doc} from "firebase/firestore";
+import { collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
 import Modal from 'react-modal';
 import '../custom.css';
 import '../navbar.css'; // ייבוא CSS מותאם אישית
@@ -16,11 +16,9 @@ import citiesInIsrael from '../Forms/Cities.js'; // Adjust the import path as ne
 import languages from '../Forms/Languges.js'; // Adjust the import path as necessary
 import days from '../Forms/Days.js'; // Adjust the import path as necessary
 import volunteering from '../Forms/Volunteerings.js'; // Adjust the import path as necessary
-import FilterSidebar from './FilterSidebar'; // Import the new FilterSidebar component
 import Select from 'react-select'; // Import react-select for dropdowns
 import '@fontsource/rubik';
 import logo from '../images/logo.png';
-
 
 const getColumnDisplayName = (columnName) => {
   const columnMapping = {
@@ -76,7 +74,6 @@ const columnDataTypes = {
   matches: 'array' // Added 'matches'
 };
 
-
 Modal.setAppElement('#root');
 
 function AdminMain() {
@@ -99,7 +96,7 @@ function AdminMain() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({});
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState({});
   const [showAddForm, setShowAddForm] = useState(false);
   const [newRecord, setNewRecord] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -173,7 +170,6 @@ function AdminMain() {
           delete newFilters[key];
         }
       }
-      console.log('Updated Filters:', newFilters);
       return newFilters;
     });
   };
@@ -184,10 +180,8 @@ function AdminMain() {
       setError(null);
       try {
         const docs = await readDocuments(collectionName, status);
-        console.log('Fetched documents:', docs); // Debug log
         setDocuments(docs || []); // Ensure docs is an array
       } catch (err) {
-        console.error('Error fetching documents:', err);
         setError(err.message);
         setDocuments([]); // Reset documents on error
       } finally {
@@ -334,39 +328,32 @@ function AdminMain() {
   }, []);
 
   const fetchDashboardData = async () => {
-    console.log("Fetching data...");
-
     try {
       // מתנדבים שנוספו החודש
       const newVolunteersRef = collection(db, 'NewVolunteers');
       const newVolunteersSnapshot = await getDocs(newVolunteersRef);
       setVolunteersThisMonth(newVolunteersSnapshot.size);
-      console.log("New volunteers this month:", newVolunteersSnapshot.size);
 
       // סך כל המתנדבים
       const totalVolunteersRef = collection(db, 'Volunteers');
       const totalVolunteersSnapshot = await getDocs(totalVolunteersRef);
       setTotalVolunteers(totalVolunteersSnapshot.size);
-      console.log("Total volunteers:", totalVolunteersSnapshot.size);
 
       // בקשות שנסגרו החודש
       const closedRequestsRef = collection(db, 'AidRequests');
       const closedRequestsQuery = query(closedRequestsRef, where('status', '==', 'close'));
       const closedRequestsSnapshot = await getDocs(closedRequestsQuery);
       setClosedRequestsThisMonth(closedRequestsSnapshot.size);
-      console.log("Closed requests this month:", closedRequestsSnapshot.size);
 
       // בקשות פתוחות
       const openRequestsQuery = query(closedRequestsRef, where('status', '==', 'open'));
       const openRequestsSnapshot = await getDocs(openRequestsQuery);
       setOpenRequests(openRequestsSnapshot.size);
-      console.log("Open requests:", openRequestsSnapshot.size);
 
       // בקשות בטיפול
       const inProcessRequestsQuery = query(closedRequestsRef, where('status', '==', 'in process'));
       const inProcessRequestsSnapshot = await getDocs(inProcessRequestsQuery);
       setInProcessRequests(inProcessRequestsSnapshot.size);
-      console.log("In-process requests:", inProcessRequestsSnapshot.size);
 
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -376,7 +363,6 @@ function AdminMain() {
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
-        console.log("User logged out");
         navigate("/login");
       })
       .catch((error) => {
@@ -424,12 +410,10 @@ function AdminMain() {
               closeModal();
             })
             .catch((error) => {
-              console.error("Error updating password:", error);
               setMessage("שגיאה בעדכון הסיסמה");
             });
         })
         .catch((error) => {
-          console.error("Error reauthenticating user:", error);
           setMessage(".שגיאה באימות המשתמש. נא לבדוק את הסיסמה הישנה");
         });
     } else {
@@ -437,16 +421,32 @@ function AdminMain() {
     }
   };
 
+  const toggleFilter = (column) => {
+    setShowFilters((prevShowFilters) => ({
+      ...prevShowFilters,
+      [column]: !prevShowFilters[column],
+    }));
+  };
+
+  const handleSort = (column) => {
+    const sortedDocs = [...documents].sort((a, b) => {
+      if (a[column] < b[column]) return -1;
+      if (a[column] > b[column]) return 1;
+      return 0;
+    });
+    setDocuments(sortedDocs);
+  };
+
   return (
     <div className="AdminMainPage">
       <div className="navbar-custom">
         <div className="navbar-logo">
-        <img
-          src={logo}
-          alt="Logo"
-          className="logo-image"
-          style={{ cursor: 'pointer' }}
-        />
+          <img
+            src={logo}
+            alt="Logo"
+            className="logo-image"
+            style={{ cursor: 'pointer' }}
+          />
         </div>
         <div className="navbar-buttons">
           <button onClick={openModal} className="btn btn-custom">שנה סיסמה</button>
@@ -464,52 +464,52 @@ function AdminMain() {
           <ListDisplay collectionName={selectedList.collectionName} status={selectedList.status} />
         ) : (
           <div className="dashboard">
-            <div className="dashboard-item" 
+            <div className="dashboard-item"
             onClick={() => handleCollectionChange('NewVolunteers')}
             style={{
               backgroundColor: collectionName === 'NewVolunteers' ? '#acacacba' : '#d3d3d3ba',
               color: collectionName === 'NewVolunteers' ? '#3a3a3a' : 'black',
-            }}          
+            }}
             >
               <h3>מתנדבים ממתינים לאישור</h3>
               <p>{volunteersThisMonth}</p>
             </div>
-            <div className="dashboard-item" 
+            <div className="dashboard-item"
             onClick={() => handleCollectionChange('Volunteers')}
             style={{
               backgroundColor: collectionName === 'Volunteers' ? '#acacacba' : '#d3d3d3ba',
               color: collectionName === 'Volunteers' ? '#3a3a3a' : 'black',
-            }}   
+            }}
             >
               <h3>סך כל המתנדבים</h3>
               <p>{totalVolunteers}</p>
             </div>
-            <div className="dashboard-item" 
+            <div className="dashboard-item"
             onClick={() => handleCollectionChangeRequests('AidRequests', 'close')}
             style={{
               backgroundColor: collectionName === 'AidRequests' && status === 'close' ? '#acacacba' : '#d3d3d3ba',
               color: collectionName === 'AidRequests'  && status === 'close' ? '#3a3a3a' : 'black',
-            }}  
+            }}
             >
               <h3>בקשות שנסגרו</h3>
               <p>{closedRequestsThisMonth}</p>
             </div>
-            <div className="dashboard-item" 
+            <div className="dashboard-item"
             onClick={() => handleCollectionChangeRequests('AidRequests', 'open')}
             style={{
               backgroundColor: collectionName === 'AidRequests' && status === 'open' ? '#acacacba' : '#d3d3d3ba',
               color: collectionName === 'AidRequests'  && status === 'open' ? '#3a3a3a' : 'black',
-            }}  
+            }}
             >
               <h3>בקשות פתוחות</h3>
               <p>{openRequests}</p>
             </div>
-            <div className="dashboard-item" 
+            <div className="dashboard-item"
             onClick={() => handleCollectionChangeRequests('AidRequests', 'in process')}
             style={{
               backgroundColor: collectionName === 'AidRequests'  && status === 'in process' ? '#acacacba' : '#d3d3d3ba',
               color: collectionName === 'AidRequests'  && status === 'in process' ? '#3a3a3a' : 'black',
-            }}  
+            }}
             >
               <h3>בקשות בטיפול</h3>
               <p>{inProcessRequests}</p>
@@ -517,138 +517,168 @@ function AdminMain() {
           </div>
         )}
         <div className="admin-show-lists-container">
-        {collectionName && (
-        <div className="admin-lists-buttons-container">
-          <button className="lists-button" onClick={() => setShowFilters(!showFilters)}>
-            {showFilters ? 'הסתר סינון' : 'סנן'}
-          </button>
-          <button className="lists-button" onClick={() => setShowAddForm(!showAddForm)}>
-            {showAddForm ? 'הסתר טופס' : 'הוספת רשומה'}
-          </button>
-        </div>
-      )}
-      <div className={`content ${showFilters ? 'sidebar-open' : ''}`}>
-        <FilterSidebar
-          filters={filters}
-          handleFilterChange={handleFilterChange}
-          filterOptions={filterOptions}
-          showFilters={showFilters}
-        />
-        {showAddForm && (
-          <div className="add-form">
-            <form onSubmit={handleAddRecord}>
-              {columns.map((column) => (
-                <div key={column}>
-                  <label>{getColumnDisplayName(column)}:</label>
-                  {columnDataTypes[column] === 'boolean' ? (
-                    <>
-                      <input
-                        type="radio"
-                        name={column}
-                        value="true"
-                        checked={newRecord[column] === true}
-                        onChange={handleInputChange}
-                      /> כן
-                      <input
-                        type="radio"
-                        name={column}
-                        value="false"
-                        checked={newRecord[column] === false}
-                        onChange={handleInputChange}
-                      /> לא
-                    </>
-                  ) : columnDataTypes[column] === 'array' ? (
-                    <Select
-                      name={column}
-                      options={filterOptions[column].map(item => ({ value: item, label: item }))}
-                      isMulti
-                      value={newRecord[column] || []}
-                      onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                      placeholder={`Select ${getColumnDisplayName(column)}`}
-                    />
-                  ) : columnDataTypes[column] === 'object' ? (
-                    <Select
-                      name={column}
-                      options={filterOptions[column].map(item => ({ value: item, label: item }))}
-                      value={newRecord[column] || null}
-                      onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                      placeholder={`Select ${getColumnDisplayName(column)}`}
-                    />
-                  ) : columnDataTypes[column] === 'date' ? (
-                    <input
-                      type="date"
-                      name={column}
-                      value={newRecord[column] || ''}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    <input
-                      type="text"
-                      name={column}
-                      value={newRecord[column] || ''}
-                      onChange={handleInputChange}
-                    />
-                  )}
-                </div>
-              ))}
-              <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
-              {collectionName === 'NewVolunteers' && editMode && <button type="button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
-            </form>
-          </div>
-        )}
-        {loading && <p>Loading...</p>}
-        {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-        {filteredDocuments.length > 0 ? (
-          <div className="table-container">
-            <table className="table">
-              <thead>
-                <tr>
-                  {columns.map((key) => (
-                    <th key={key}>{getColumnDisplayName(key)}</th>
+          {collectionName && (
+            <div className="admin-lists-buttons-container">
+              <button className="lists-button" onClick={() => setShowAddForm(!showAddForm)}>
+                {showAddForm ? 'הסתר טופס' : 'הוספת רשומה'}
+              </button>
+            </div>
+          )}
+          <div className="content">
+            {showAddForm && (
+              <div className="add-form">
+                <form onSubmit={handleAddRecord}>
+                  {columns.map((column) => (
+                    <div key={column}>
+                      <label>{getColumnDisplayName(column)}:</label>
+                      {columnDataTypes[column] === 'boolean' ? (
+                        <>
+                          <input
+                            type="radio"
+                            name={column}
+                            value="true"
+                            checked={newRecord[column] === true}
+                            onChange={handleInputChange}
+                          /> כן
+                          <input
+                            type="radio"
+                            name={column}
+                            value="false"
+                            checked={newRecord[column] === false}
+                            onChange={handleInputChange}
+                          /> לא
+                        </>
+                      ) : columnDataTypes[column] === 'array' ? (
+                        <Select
+                          name={column}
+                          options={filterOptions[column].map(item => ({ value: item, label: item }))}
+                          isMulti
+                          value={newRecord[column] || []}
+                          onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
+                          placeholder={`Select ${getColumnDisplayName(column)}`}
+                        />
+                      ) : columnDataTypes[column] === 'object' ? (
+                        <Select
+                          name={column}
+                          options={filterOptions[column].map(item => ({ value: item, label: item }))}
+                          value={newRecord[column] || null}
+                          onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
+                          placeholder={`Select ${getColumnDisplayName(column)}`}
+                        />
+                      ) : columnDataTypes[column] === 'date' ? (
+                        <input
+                          type="date"
+                          name={column}
+                          value={newRecord[column] || ''}
+                          onChange={handleInputChange}
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          name={column}
+                          value={newRecord[column] || ''}
+                          onChange={handleInputChange}
+                        />
+                      )}
+                    </div>
                   ))}
-                  <th>פעולות</th> {/* Add column for actions */}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredDocuments.map((doc, index) => (
-                  <tr key={doc.id || index}> {/* Ensure each row has a unique key */}
-                    {columns.map((column) => (
-                      <td key={`${doc.id}-${column}`}>
-                        {Array.isArray(doc[column])
-                          ? doc[column].map((item, idx) => (
-                              <span key={`${doc.id}-${column}-${idx}`}>
-                                {column === 'matches'
-                                  ? getVolunteerNameById(item)
-                                  : typeof item === 'object' && item !== null && 'label' in item
-                                  ? item.label
-                                  : item}
-                                {idx < doc[column].length - 1 ? ', ' : ''}
-                              </span>
-                            ))
-                          : typeof doc[column] === 'boolean'
-                          ? doc[column] ? '✓' : '✗'
-                          : typeof doc[column] === 'object' && doc[column] !== null && 'label' in doc[column]
-                          ? doc[column].label
-                          : typeof doc[column] === 'object'
-                          ? JSON.stringify(doc[column])
-                          : doc[column]}
-                      </td>
+                  <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
+                  {collectionName === 'NewVolunteers' && editMode && <button type="button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
+                </form>
+              </div>
+            )}
+            {loading && <p>Loading...</p>}
+            {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+            {filteredDocuments.length > 0 ? (
+              <div className="table-container">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      {columns.map((key) => (
+                        <th key={key} onClick={() => handleSort(key)}>{getColumnDisplayName(key)}
+                          <span className="filter-arrow" onClick={(e) => { e.stopPropagation(); toggleFilter(key); }}>▼</span>
+                          {showFilters[key] && (
+                            <div className="filter-box">
+                              {columnDataTypes[key] === 'boolean' ? (
+                                <>
+                                  <label>
+                                    <input
+                                      type="checkbox"
+                                      value="true"
+                                      onChange={(e) => handleFilterChange(e, key)}
+                                    /> True
+                                  </label>
+                                  <label>
+                                    <input
+                                      type="checkbox"
+                                      value="false"
+                                      onChange={(e) => handleFilterChange(e, key)}
+                                    /> False
+                                  </label>
+                                </>
+                              ) : columnDataTypes[key] === 'array' ? (
+                                filterOptions[key].map(option => (
+                                  <label key={option}>
+                                    <input
+                                      type="checkbox"
+                                      value={option}
+                                      onChange={(e) => handleFilterChange(e, key)}
+                                    /> {option}
+                                  </label>
+                                ))
+                              ) : (
+                                <input
+                                  type="text"
+                                  onChange={(e) => handleFilterChange(e, key)}
+                                />
+                              )}
+                            </div>
+                          )}
+                        </th>
+                      ))}
+                      <th>פעולות</th> {/* Add column for actions */}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredDocuments.map((doc, index) => (
+                      <tr key={doc.id || index}> {/* Ensure each row has a unique key */}
+                        {columns.map((column) => (
+                          <td key={`${doc.id}-${column}`}>
+                            {Array.isArray(doc[column])
+                              ? doc[column].map((item, idx) => (
+                                  <span key={`${doc.id}-${column}-${idx}`}>
+                                    {column === 'matches'
+                                      ? getVolunteerNameById(item)
+                                      : typeof item === 'object' && item !== null && 'label' in item
+                                      ? item.label
+                                      : item}
+                                    {idx < doc[column].length - 1 ? ', ' : ''}
+                                  </span>
+                                ))
+                              : typeof doc[column] === 'boolean'
+                              ? doc[column] ? '✓' : '✗'
+                              : typeof doc[column] === 'object' && doc[column] !== null && 'label' in doc[column]
+                              ? doc[column].label
+                              : typeof doc[column] === 'object'
+                              ? JSON.stringify(doc[column])
+                              : doc[column]}
+                          </td>
+                        ))}
+                        <td>
+                          <button className="buttons-inside-table" onClick={() => handleEditRecord(doc)}>ערוך</button>
+                          <button className="buttons-inside-table" onClick={() => handleDeleteRecord(doc.id)}>מחק</button>
+                        </td>
+                      </tr>
                     ))}
-                    <td>
-                      <button className="buttons-inside-table" onClick={() => handleEditRecord(doc)}>ערוך</button>
-                      <button className="buttons-inside-table" onClick={() => handleDeleteRecord(doc.id)}>מחק</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              !loading && <p>No documents found</p>
+            )}
           </div>
-        ) : (
-          !loading && <p>No documents found</p>
-        )}
-      </div>
-      </div>
-      
+        </div>
+
       <Modal
         isOpen={isModalOpen}
         onRequestClose={handleModalCancel}
@@ -676,18 +706,6 @@ function AdminMain() {
           <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
         </div>
       </Modal>
-
-
-
-
-
-
-
-
-
-
-
-
 
         <Modal
           isOpen={modalIsOpen}
@@ -734,7 +752,7 @@ function AdminMain() {
           {message && <p className="alert alert-custom">{message}</p>}
           <button onClick={closeModal} className="btn btn-secondary w-100">סגור</button>
         </Modal>
-        
+
         <Modal
           isOpen={signUpModalIsOpen}
           onRequestClose={closeSignUpModal}
