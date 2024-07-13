@@ -36,14 +36,14 @@ const getColumnDisplayName = (columnName) => {
     emergency: 'חירום',
     vehicle: 'רכב',
     matches: 'התאמות',
-    volunteerMatch: 'התאמת מתנדבים',
+    volunteerMatch: 'התנדבות מתאימה',
     // Add more mappings as necessary
   };
   return columnMapping[columnName] || columnName;
 };
 
 // Define the fixed column order
-const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'langueges', 'city', 'days', 'volunteering', 'mail', 'date', 'time', 'comments', 'emergency', 'vehicle', 'matches', 'volunteerMatch'];
+const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'langueges', 'city', 'days', 'volunteering', 'mail', 'date', 'time', 'comments', 'emergency', 'vehicle']; // Removed 'matches'
 
 // Define predefined options for each filter (example)
 const filterOptions = {
@@ -70,7 +70,7 @@ const columnDataTypes = {
   emergency: 'boolean',
   ID: 'string',
   matches: 'array',
-  volunteerMatch: 'array'
+  volunteerMatch: 'string' // Added 'volunteerMatch'
 };
 
 Modal.setAppElement('#root');
@@ -146,6 +146,7 @@ function AdminMain() {
     setStatus("");
     setFilters({});
     setDocuments([]);
+    fetchDocuments();
   };
 
   const handleCollectionChangeRequests = (name, status) => {
@@ -153,6 +154,7 @@ function AdminMain() {
     setStatus(status);
     setFilters({});
     setDocuments([]);
+    fetchDocuments();
   };
 
   const handleFilterChange = (key, value) => {
@@ -285,13 +287,24 @@ function AdminMain() {
   const getColumns = () => {
     if (documents.length === 0) return [];
     const docKeys = Object.keys(documents[0]).filter(key => key);
-    return fixedColumnOrder.filter(column => docKeys.includes(column));
+    const columns = fixedColumnOrder.filter(column => docKeys.includes(column));
+
+    // Conditionally add the 'matches' or 'volunteerMatch' column
+    if (collectionName === 'AidRequests') {
+      if (status === 'open') {
+        columns.push('matches');
+      } else {
+        columns.push('volunteerMatch');
+      }
+    }
+
+    return columns;
   };
 
   const getFilteredDocuments = () => {
     if (Object.keys(filters).length === 0) return documents;
 
-    return documents.filter(doc => {
+    const filteredDocs = documents.filter(doc => {
       return Object.keys(filters).every(key => {
         if (!filters[key] || filters[key].length === 0) return true;
 
@@ -307,6 +320,8 @@ function AdminMain() {
         }
       });
     });
+
+    return filteredDocs ;
   };
 
   const columns = getColumns();
@@ -375,7 +390,7 @@ function AdminMain() {
     signOut(auth)
       .then(() => {
         console.log("User logged out");
-        navigate("/login");
+        navigate("/");
       })
       .catch((error) => {
         console.error("Error logging out:", error);
@@ -669,19 +684,16 @@ function AdminMain() {
                 <thead>
                   <tr>
                     {columns.map((key) => (
-                      (key !== 'matches' || (collectionName === 'AidRequests' && status === 'open')) &&
-                      (key !== 'volunteerMatch' || (collectionName === 'AidRequests' && status !== 'open')) && (
-                        <th key={key}>
-                          {getColumnDisplayName(key)}
-                          <span
-                            className="filter-arrow"
-                            onClick={() => toggleFilterVisibility(key)}
-                          >
-                            ▼
-                          </span>
-                          {filterVisibility[key] && renderFilterForColumn(key)}
-                        </th>
-                      )
+                      <th key={key}>
+                        {getColumnDisplayName(key)}
+                        <span
+                          className="filter-arrow"
+                          onClick={() => toggleFilterVisibility(key)}
+                        >
+                          ▼
+                        </span>
+                        {filterVisibility[key] && renderFilterForColumn(key)}
+                      </th>
                     ))}
                     <th>פעולות</th>
                   </tr>
@@ -690,29 +702,26 @@ function AdminMain() {
                   {filteredDocuments.map((doc, index) => (
                     <tr key={doc.id || index}>
                       {columns.map((column) => (
-                        (column !== 'matches' || (collectionName === 'AidRequests' && status === 'open')) &&
-                        (column !== 'volunteerMatch' || (collectionName === 'AidRequests' && status !== 'open')) && (
-                          <td key={`${doc.id}-${column}`}>
-                            {Array.isArray(doc[column])
-                              ? doc[column].map((item, idx) => (
-                                <span key={`${doc.id}-${column}-${idx}`}>
-                                  {column === 'matches' || column === 'volunteerMatch'
-                                    ? getVolunteerNameById(item)
-                                    : typeof item === 'object' && item !== null && 'label' in item
-                                      ? item.label
-                                      : item}
-                                  {idx < doc[column].length - 1 ? ', ' : ''}
-                                </span>
-                              ))
-                              : typeof doc[column] === 'boolean'
-                                ? doc[column] ? '✓' : '✗'
-                                : typeof doc[column] === 'object' && doc[column] !== null && 'label' in doc[column]
-                                  ? doc[column].label
-                                  : typeof doc[column] === 'object'
-                                    ? JSON.stringify(doc[column])
-                                    : doc[column]}
-                          </td>
-                        )
+                        <td key={`${doc.id}-${column}`}>
+                          {Array.isArray(doc[column])
+                            ? doc[column].map((item, idx) => (
+                              <span key={`${doc.id}-${column}-${idx}`}>
+                                {column === 'matches'
+                                  ? getVolunteerNameById(item)
+                                  : typeof item === 'object' && item !== null && 'label' in item
+                                    ? item.label
+                                    : item}
+                                {idx < doc[column].length - 1 ? ', ' : ''}
+                              </span>
+                            ))
+                            : typeof doc[column] === 'boolean'
+                              ? doc[column] ? '✓' : '✗'
+                              : typeof doc[column] === 'object' && doc[column] !== null && 'label' in doc[column]
+                                ? doc[column].label
+                                : typeof doc[column] === 'object'
+                                  ? JSON.stringify(doc[column])
+                                  : doc[column]}
+                        </td>
                       ))}
                       <td>
                         <button className="buttons-inside-table" onClick={() => handleEditRecord(doc)}>ערוך</button>
