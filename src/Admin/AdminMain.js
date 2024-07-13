@@ -33,7 +33,6 @@ const getColumnDisplayName = (columnName) => {
     date: 'תאריך',
     time: 'שעה',
     comments: 'הערות',
-    status: 'סטטוס',
     emergency: 'חירום',
     vehicle: 'רכב',
     matches: 'התאמות',
@@ -43,7 +42,7 @@ const getColumnDisplayName = (columnName) => {
 };
 
 // Define the fixed column order
-const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'langueges', 'city', 'days', 'volunteering', 'mail', 'date', 'time', 'comments', 'status', 'emergency', 'vehicle', 'matches'];
+const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'langueges', 'city', 'days', 'volunteering', 'mail', 'date', 'time', 'comments', 'emergency', 'vehicle', 'matches']; // Added 'matches'
 
 // Define predefined options for each filter (example)
 const filterOptions = {
@@ -66,13 +65,11 @@ const columnDataTypes = {
   date: 'date',
   time: 'string',
   comments: 'string',
-  status: 'string',
   vehicle: 'boolean',
   emergency: 'boolean',
   ID: 'string',
-  matches: 'array'
+  matches: 'array' // Added 'matches'
 };
-
 
 Modal.setAppElement('#root');
 
@@ -110,6 +107,8 @@ function AdminMain() {
   const [status, setStatus] = useState("");
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [filterVisibility, setFilterVisibility] = useState({});
+  const [date, setDate] = useState("");
+  const [dayOfWeek, setDayOfWeek] = useState("");
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -193,13 +192,13 @@ function AdminMain() {
         if (columnDataTypes[key] === 'boolean') {
           formattedRecord[key] = value === true || value === 'true';
         } else if (columnDataTypes[key] === 'array') {
-          formattedRecord[key] = value.map(item => item.value);
+          formattedRecord[key] = Array.isArray(value) ? value.map(item => item.value || item) : [];
         } else if (columnDataTypes[key] === 'object') {
           formattedRecord[key] = value ? { value: value.value, label: value.label } : null;
         } else if (columnDataTypes[key] === 'date') {
-          formattedRecord[key] = value ? new Date(value) : null;
+          formattedRecord[key] = value ? new Date(value).toISOString().split('T')[0] : null;
         } else {
-          formattedRecord[key] = value || null;
+          formattedRecord[key] = value || '';
         }
       }
       const cleanedRecord = Object.fromEntries(
@@ -232,6 +231,17 @@ function AdminMain() {
     }));
   };
 
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+    setDate(selectedDate);
+    const dateObj = new Date(selectedDate);
+    setDayOfWeek(getDayName(dateObj.getDay()));
+  };
+
+  const getDayName = (dayIndex) => {
+    return days[dayIndex];
+  };
+
   const handleDeleteRecord = (id) => {
     if (collectionName) {
       confirmAction(() => deleteDocument(collectionName, id), '?האם אתה בטוח שברצונך למחוק רשומה זו');
@@ -244,11 +254,21 @@ function AdminMain() {
 
   const handleEditRecord = (doc) => {
     const formattedDoc = { ...doc };
+
     for (const key in formattedDoc) {
-      if (columnDataTypes[key] === 'array' && Array.isArray(formattedDoc[key])) {
-        formattedDoc[key] = formattedDoc[key].map(item => ({ value: item, label: item }));
+      if (columnDataTypes[key] === 'array') {
+        if (typeof formattedDoc[key] === 'string') {
+          formattedDoc[key] = formattedDoc[key].split(',').map(item => ({ value: item.trim(), label: item.trim() }));
+        } else if (Array.isArray(formattedDoc[key])) {
+          formattedDoc[key] = formattedDoc[key].map(item => ({ value: item, label: item }));
+        }
+      } else if (columnDataTypes[key] === 'date' && formattedDoc[key] instanceof Object && 'seconds' in formattedDoc[key]) {
+        formattedDoc[key] = new Date(formattedDoc[key].seconds * 1000).toISOString().split('T')[0];
       }
     }
+
+    console.log('Editing document:', formattedDoc);
+
     setNewRecord(formattedDoc);
     setEditMode(true);
     setCurrentEditId(doc.id);
@@ -353,7 +373,7 @@ function AdminMain() {
     signOut(auth)
       .then(() => {
         console.log("User logged out");
-        navigate("/login");
+        navigate("/");
       })
       .catch((error) => {
         console.error("Error logging out:", error);
@@ -461,12 +481,14 @@ function AdminMain() {
         );
       case 'array':
         return (
-          <Select
-            options={filterOptions[column].map(item => ({ value: item, label: item }))}
-            isMulti
-            onChange={selectedOptions => handleFilterChange(column, selectedOptions.map(option => option.value))}
-            value={(filters[column] || []).map(value => ({ value, label: value }))}
-          />
+          filterOptions[column] ? (
+            <Select
+              options={filterOptions[column].map(item => ({ value: item, label: item }))}
+              isMulti
+              onChange={selectedOptions => handleFilterChange(column, selectedOptions.map(option => option.value))}
+              value={(filters[column] || []).map(value => ({ value, label: value }))}
+            />
+          ) : null
         );
       case 'date':
         return (
@@ -601,17 +623,17 @@ function AdminMain() {
                     ) : columnDataTypes[column] === 'array' ? (
                       <Select
                         name={column}
-                        options={filterOptions[column].map(item => ({ value: item, label: item }))}
+                        options={filterOptions[column]?.map(item => ({ value: item, label: item })) || []}
                         isMulti
-                        value={newRecord[column] || []}
+                        value={newRecord[column]}
                         onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
                         placeholder={`Select ${getColumnDisplayName(column)}`}
                       />
                     ) : columnDataTypes[column] === 'object' ? (
                       <Select
                         name={column}
-                        options={filterOptions[column].map(item => ({ value: item, label: item }))}
-                        value={newRecord[column] || null}
+                        options={filterOptions[column]?.map(item => ({ value: item, label: item })) || []}
+                        value={newRecord[column]}
                         onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
                         placeholder={`Select ${getColumnDisplayName(column)}`}
                       />
