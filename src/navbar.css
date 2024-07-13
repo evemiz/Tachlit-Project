@@ -23,8 +23,15 @@
 }
 
 .navbar-buttons {
+  position: fixed;
+  left: 0;
+  transform: translateY(-50%);
+  padding: 10px; /* Adjust padding as needed */
+  z-index: 1000; /* Ensure it's above other content */
   display: flex;
-  gap: 10px;
+  flex-direction: row; /* Arrange buttons vertically */
+  margin-top: 30px;
+  margin-left: 20px;
 }
 
 .navbar-buttons .btn {

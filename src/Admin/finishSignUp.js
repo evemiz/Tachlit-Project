@@ -55,7 +55,7 @@ function FinishSignUp() {
           .then(() => {
             setMessage("הסיסמה הוגדרה בהצלחה.");
 
-            navigate('/login');
+            navigate('/');
           })
           .catch((error) => {
             console.error("Error setting password:", error);

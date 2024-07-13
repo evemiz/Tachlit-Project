@@ -166,6 +166,7 @@ button a:hover {
   max-height: 200px; 
   border-radius: 4px; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+
 }
 
 .city-list {
@@ -221,7 +222,20 @@ button a:hover {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background: linear-gradient(to left, #141414 ,#535252); 
+}
+
+.navMain {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #141414;
+  overflow: hidden; 
+  background-image: url('/src/images/image1.jpg');
+  background-size: cover; /* Adjust based on your image size requirements */
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh; /* Ensure component takes at least full viewport height */
 }
 
 .navbarVol-logo {
@@ -229,10 +243,24 @@ button a:hover {
   align-items: center;
 }
 
+.mainPageNav {
+  position: fixed; /* Fixed position to keep it at the top */
+  top: 0;
+  left: 0;
+  width: 100%; /* Full width */
+  color: white; /* Text color */
+  padding: 10px 20px; /* Padding inside the navbar */
+  z-index: 1000; /* Ensure it's above other content */  
+  align-items: center;
+}
+
 .logo-image {
   width: 125px; 
   height: 60px;
   margin-right: 10px; 
+  margin-bottom: 0px;
+  margin-right: 10px; /* Add margin to separate logo from buttons */
+
 }
 
 .navbarVol-links {
@@ -247,6 +275,29 @@ button a:hover {
   background: none;
   cursor: pointer;
   font-size: 16px;
+}
+
+.navbar-buttons button {
+  background-color: #009ba6;
+  color: white !important;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  width: auto;
+  border-radius: 50px !important;
+  display: flex; /* Ensure buttons are displayed in a row */
+  gap: 10px;
+}
+
+.navbar-buttons a {
+  color: white;
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.navbar-buttons button:hover {
+  background-color: #086d74;
 }
 
 .navbarVol-links button:hover, .navbarVol-links a:hover {
@@ -361,13 +412,27 @@ h2 {
 }
 
 .pageEnd {
-  margin-top: auto;
+  margin-bottom: 0vw;
   display: flex;
   justify-content: center; 
   align-items: center; 
-  padding: 10px;
   background: linear-gradient(to left, #141414, #535252);
   color: #f9f9f9;
+  margin-top: auto; /* Push the pageEnd to the bottom */
+  text-align: center; /* Center align contents */
+  padding: 10px; /* Adjust padding as needed */
+}
+
+.pageEnd h2 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.VolunteerMain {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure component takes at least full viewport height */
+  overflow: hidden; /* Prevent scrolling within VolunteerMain */
 }
 
 
@@ -384,8 +449,13 @@ h2 {
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s;
-  width: auto;
   border-radius: 50px !important;
+  width: auto; 
+  height: auto; 
+  padding: 10px;
+  font-size: large;
+  text-align: center;
+  margin-top: 10px;
 }
 
 .box button:hover {

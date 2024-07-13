@@ -66,7 +66,7 @@ function VolunteerMain() {
     signOut(auth)
       .then(() => {
         console.log("User logged out");
-        navigate("/login");
+        navigate("/");
       })
       .catch((error) => {
         console.error("Error logging out:", error);

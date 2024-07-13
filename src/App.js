@@ -11,46 +11,42 @@ import VolunteerMain from './volunteer/VolunteerMain';
 import '@fontsource/rubik';
 import './styles.css';
 import logo from './images/logo.png';
-import image1 from './images/image1.jpg'
 
 const Home = () => (
   <div>
-    <img
-          src={image1}
-          alt="image1"
-          className="image1"
-          style={{ cursor: 'pointer' }}
-        />
+    {/* Your home page content */}
   </div>
 );
 
 const Navigation = () => (
-  <nav className='navbarVol'>
-          <div className={'navbar-logo'}>
+  <nav className='navMain'>
+    <div className='mainPageNav'>
+      <div className="navbar-buttons">
+        <button>      
+          <Link to="/VolunteerForm">טופס התנדבות</Link>
+        </button>
+
+        <button>
+          <Link to="/RequestForm">טופס בקשת סיוע</Link>
+        </button>
+
+        <button>
+          <Link to="/Login">התחבר כמנהל</Link>
+        </button>
+
+        <button>
+          <Link to="/LoginVolunteer">התחבר כמתנדב</Link>
+        </button>
+      </div>
+      <div className='navbar-logo'>
         <img
           src={logo}
           alt="Logo"
           className="logo-image"
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer', marginLeft: 'auto' }}
         />
       </div>
-      <div className="navbar-links">
-      <button>      
-      <Link to="/VolunteerForm">טופס התנדבות</Link>
-    </button>
-
-    <button>
-      <Link to="/RequestForm">טופס בקשת סיוע</Link>
-    </button>
-
-    <button>
-      <Link to="/Login">התחבר כמנהל</Link>
-    </button>
-
-    <button>
-      <Link to="/LoginVolunteer">התחבר כמתנדב</Link>
-    </button>
-      </div>
+    </div>
   </nav>
 );
 
