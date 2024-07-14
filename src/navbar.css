@@ -30,7 +30,7 @@
   z-index: 1000; /* Ensure it's above other content */
   display: flex;
   flex-direction: row; /* Arrange buttons vertically */
-  margin-top: 30px;
+  margin-top: 70px;
   margin-left: 20px;
 }
 
