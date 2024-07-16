@@ -4,7 +4,6 @@ import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePasswor
 import Modal from 'react-modal';
 import { auth, db } from "../firebaseConfig"; 
 import { arrayUnion, query, where, collection, getDocs, getDoc, doc, setDoc, updateDoc, arrayRemove } from "firebase/firestore"; 
-import Navbar from './VolunteerNavigateBar';
 import citiesInIsrael from '../Forms/Cities.js';
 import volunteerings from '../Forms/Volunteerings.js';
 import Select from 'react-select';
