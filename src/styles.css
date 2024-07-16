@@ -489,3 +489,7 @@ h2 {
   color: white !important;
   text-decoration: none; 
 } 
+
+.boxes-container {
+  margin-top: 100px;
+}

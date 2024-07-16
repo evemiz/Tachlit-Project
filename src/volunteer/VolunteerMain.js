@@ -12,6 +12,9 @@ import days from '../Forms/Days.js';
 import langueges from '../Forms/Languges.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
+import logo from '../images/logo.png';
+import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+
 
 Modal.setAppElement('#root');
 
@@ -287,7 +290,27 @@ const openWhatsAppChat = () => {
 
   return (
     <div className='VolunteerMain'>
-      <Navbar handleLogout={handleLogout} openEditUser={openEditUser} openPasswordReset={openPasswordReset}/>
+      
+      <div className="navbar-custom">
+        <div className="navbar-logo">
+          <img
+            src={logo}
+            alt="Logo"
+            className="logo-image"
+            style={{ cursor: 'pointer' }}
+          />
+        </div>
+        <div className="navbar-buttons">
+          <button className='btn' onClick={openEditUser}>ערוך פרופיל</button>
+          <button className='btn' onClick={openPasswordReset}>שנה סיסמא</button>
+          <button className='btn-logout' onClick={handleLogout}>
+            <FontAwesomeIcon icon={faSignOutAlt} />
+          </button>
+        </div>
+      </div>
+
+
+
       <div className='modal-container'>
       <Modal
         isOpen={modalIsOpen}
@@ -480,55 +503,57 @@ const openWhatsAppChat = () => {
         </Modal>
       
       </div>
-      
-      <div className="box">
-        <h2>בקשות סיוע רלוונטיות עבורך</h2>
-        {matchDetails.length > 0 ? (
-          matchDetails.map((match) => (
-            <div key={match.id} className="match-container">
-              <div className="Request">
-                <p>{`${match.firstName + " " + match.lastName} מבקש/ת את עזרתך ב${match.volunteering} `}</p>
-                <p>{`ביום: ${match.day} ${formatDate(match.date)} בשעה: ${match.time}`}</p>
-                <p>{match.comments && <p>הערות: {match.comments}</p>}</p>
-                <button onClick={() => handleApproveRequest(match.status, match.id)}>אישור בקשה</button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>לא נמצאו התאמות.</p>
-        )}
-      </div>
-
-      <div className="box">
-      <h2>הבקשות שלי</h2>
-      {sortedRequests.length > 0 ? (
-        sortedRequests.map((cur) => (
-          <div key={cur.id} className="myRequests-container">
-            <div className="Request">
-              <p>{`סיוע ל${cur.firstName + " " + cur.lastName} ב${cur.volunteering}`}</p>
-              <p>{`בתאריך: ${formatDate(cur.date)} בשעה: ${cur.time}`}</p>
-              <p>
-                סטטוס: 
-                {cur.status === 'in process' ? (
-                  <>
-                    <span style={{ color: '#009ba6' }}> בתהליך</span>
-                    <p>{`מספר טלפון: ${cur.phoneNumber}`}</p>
-                  </>
-                ) : (
-                  ' טופל'
-                )}
-              </p>
-              {cur.status === 'in process' && (
-                <button onClick={() => closeRequest(cur.id)}>סגור בקשה</button>
-              )}
-            </div>
+      <div className="boxes-container">
+          <div className="box">
+            <h2>בקשות סיוע רלוונטיות עבורך</h2>
+            {matchDetails.length > 0 ? (
+              matchDetails.map((match) => (
+                <div key={match.id} className="match-container">
+                  <div className="Request">
+                    <p>{`${match.firstName + " " + match.lastName} מבקש/ת את עזרתך ב${match.volunteering} `}</p>
+                    <p>{`ביום: ${match.day} ${formatDate(match.date)} בשעה: ${match.time}`}</p>
+                    <p>{match.comments && <p>הערות: {match.comments}</p>}</p>
+                    <button onClick={() => handleApproveRequest(match.status, match.id)}>אישור בקשה</button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>לא נמצאו התאמות.</p>
+            )}
           </div>
-        ))
-      ) : (
-        <p>אין בקשות בטיפול</p>
-      )}
-    </div>
 
+          <div className="box">
+          <h2>הבקשות שלי</h2>
+          {sortedRequests.length > 0 ? (
+            sortedRequests.map((cur) => (
+              <div key={cur.id} className="myRequests-container">
+                <div className="Request">
+                  <p>{`סיוע ל${cur.firstName + " " + cur.lastName} ב${cur.volunteering}`}</p>
+                  <p>{`בתאריך: ${formatDate(cur.date)} בשעה: ${cur.time}`}</p>
+                  <p>
+                    סטטוס: 
+                    {cur.status === 'in process' ? (
+                      <>
+                        <span style={{ color: '#009ba6' }}> בתהליך</span>
+                        <p>{`מספר טלפון: ${cur.phoneNumber}`}</p>
+                      </>
+                    ) : (
+                      ' טופל'
+                    )}
+                  </p>
+                  {cur.status === 'in process' && (
+                    <button onClick={() => closeRequest(cur.id)}>סגור בקשה</button>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>אין בקשות בטיפול</p>
+          )}
+        </div>
+
+      </div>
+      
     <div className='pageEnd'>
         <h2>צור איתנו קשר ב - whatsapp </h2>
         <button className="whatsapp-button" onClick={openWhatsAppChat}>
