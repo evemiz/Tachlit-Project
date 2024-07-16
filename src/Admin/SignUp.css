@@ -1,0 +1,14 @@
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center the checkbox and label */
+    margin: 10px 0; /* Add some margin for spacing */
+  }
+
+  .checkbox-container input[type="checkbox"] {
+    margin-right: 10px; /* Space between checkbox and label */
+  }
+
+  .checkbox-container label {
+    margin: 0; /* Remove default margin from label */
+  }

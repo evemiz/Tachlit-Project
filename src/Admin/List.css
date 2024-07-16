@@ -1,0 +1,157 @@
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  font-family: 'Rubik';
+  align-items: center;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  display: flex; /* Add flexbox properties */
+  justify-content: center; /* Center the table */
+}
+
+.table {
+  border-collapse: collapse;
+  min-width: 80vw; /* Ensure table takes at least 80% of viewport width */
+  align-items: center;
+  font-family: 'Rubik';
+  overflow-x: scroll;
+}
+
+.table th,
+.table td {
+  border: 1px solid #009ba6;
+  padding: 8px;
+  white-space: nowrap;
+  font-family: 'Rubik';
+  align-items: center;
+  text-align: center;
+}
+
+.table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: center;
+  align-items: center;
+  background-color: #d9d9d9ba;
+  color: black;
+  font-family: 'Rubik';
+}
+
+.lists-button {
+  color: #ffffff;
+  background-color: #009ba6;
+  border: 2px solid #009ba6;
+  padding: 10px 20px;
+  font-size: 16px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  width: 200px;
+  font-weight: bold;
+  margin-bottom: 10px; /* Adjust margin as needed */
+  border-radius: 5px;
+  margin-right: 10%; /* Add margin to the right */
+}
+
+.lists-button:hover {
+  background-color: #ffffff;
+  color: #009ba6;
+}
+
+.Modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  z-index: 1000;
+  text-align: center;
+}
+
+.Overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  border-radius: 50px !important;
+  font-family: 'Rubik';
+}
+
+.modal-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  border-radius: 50px !important;
+  font-family: 'Rubik';
+}
+
+.modal-button.confirm {
+  background-color: #009ba6;
+  color: white;
+}
+
+.modal-button.cancel {
+  border: 2px solid #009ba6;
+  color: #009ba6 !important;
+  background-color:white;
+}
+
+.buttons-inside-table {
+  padding: 4px;
+  margin: 5px;
+  border: 2px solid #6c6c6c;
+  color: #6c6c6c;
+  cursor: pointer;
+  background-color: transparent;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.buttons-inside-table:hover {
+  background-color: #6c6c6c;
+  color: white;
+}
+
+.admin-lists-buttons-container {
+  display: flex;
+  gap: 10px; /* Adjust as needed */
+  margin: 10px;
+  justify-content: flex-start; /* Align buttons to the left */
+  align-items: center;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 20px; /* Keep margin for top space */
+  margin-bottom: 20px; /* Add margin at the bottom */
+  width: 100%; /* Ensure container takes full width */
+}
+
+.admin-show-lists-container {
+  background-color: #f5f4f4cb;
+  margin: 20px;
+  padding: 10px;
+  border-radius: 20px;
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 90vw; /* Ensure minimum width for the container */
+}
+

@@ -1,0 +1,126 @@
+body {
+    background: #f3f3f3;
+    text-align: center;
+    font-family: 'Rubik';
+  }
+  .App {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    padding: 10px 20px;
+    transition: transform 0.2s;
+    width: 500px;
+    text-align: center;
+    margin: auto;
+    margin-top: 32px;
+    font-family: 'Rubik';
+  }
+  .LogInModel  {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    padding: 10px 20px;
+    transition: transform 0.2s;
+    width: 500px;
+    text-align: center;
+    margin: auto;
+    margin-top: 18%;
+    font-family: 'Rubik';
+  }
+
+  h1 {
+    font-size: x-large;
+    text-align: center;
+    color: #009ba6;
+  }
+
+  fieldset {
+    border: none;
+
+  }
+
+  input {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #bdbdbd;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: 'Rubik';
+  }
+  input[type="radio"],
+  input[type="checkbox"] {
+    display: inline;
+    width: 10%;
+  }
+  select {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #009ba6;
+    border-radius: 5px;
+    font-family: 'Rubik';
+    color: #555;
+  }
+
+  label {
+    font-size: 15px;
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 5px;
+    text-align: right;
+    color: #009ba6;
+    font-weight: bold;
+  }
+
+  /* button {
+    padding: 15px;
+    border-radius: 50px;
+    margin: 15px;
+    border: none;
+    color: white !important;
+    cursor: pointer;
+    background-color: #009ba6;
+    width: 40%;
+    font-size: 16px;
+    font-family: 'Rubik';
+    font-weight: bold;
+  }
+  button:hover {
+    background-color: #555;
+} */
+  textarea {
+    resize: none;
+    width: 98%;
+    min-height: 100px;
+    max-height: 150px;
+    border: #bdbdbd 1px solid;
+  }
+
+
+  .phone-input-container {
+    margin-bottom: 20px;
+  }
+
+  .phone-input-container input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .whatsapp-button {
+    background-color: transparent; /* or rgba(0, 0, 0, 0) */
+    color: #fff;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.whatsapp-button:hover {
+    color: #29a963; 
+}
