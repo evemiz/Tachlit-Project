@@ -36,8 +36,7 @@ const getColumnDisplayName = (columnName) => {
     emergency: 'חירום',
     vehicle: 'רכב',
     matches: 'התאמות',
-    volunteerMatch: 'התנדבות מתאימה',
-    // Add more mappings as necessary
+    volunteerMatch: 'מתנדב'
   };
   return columnMapping[columnName] || columnName;
 };
@@ -552,7 +551,7 @@ function AdminMain() {
         </div>
       </div>
       <div className="admin-container">
-        <h1 className="text-center my-4">ברוכים הבאים לדף מנהל</h1>
+        <h1 className="text-center my-4"></h1>
         <div className="topBar"></div>
 
         {selectedList ? (
@@ -580,16 +579,6 @@ function AdminMain() {
               <p>{totalVolunteers}</p>
             </div>
             <div className="dashboard-item"
-              onClick={() => handleCollectionChangeRequests('AidRequests', 'close')}
-              style={{
-                backgroundColor: collectionName === 'AidRequests' && status === 'close' ? '#acacacba' : '#d3d3d3ba',
-                color: collectionName === 'AidRequests' && status === 'close' ? '#3a3a3a' : 'black',
-              }}
-            >
-              <h3>בקשות שנסגרו</h3>
-              <p>{closedRequestsThisMonth}</p>
-            </div>
-            <div className="dashboard-item"
               onClick={() => handleCollectionChangeRequests('AidRequests', 'open')}
               style={{
                 backgroundColor: collectionName === 'AidRequests' && status === 'open' ? '#acacacba' : '#d3d3d3ba',
@@ -609,16 +598,19 @@ function AdminMain() {
               <h3>בקשות בטיפול</h3>
               <p>{inProcessRequests}</p>
             </div>
+            <div className="dashboard-item"
+              onClick={() => handleCollectionChangeRequests('AidRequests', 'close')}
+              style={{
+                backgroundColor: collectionName === 'AidRequests' && status === 'close' ? '#acacacba' : '#d3d3d3ba',
+                color: collectionName === 'AidRequests' && status === 'close' ? '#3a3a3a' : 'black',
+              }}
+            >
+              <h3>בקשות שנסגרו</h3>
+              <p>{closedRequestsThisMonth}</p>
+            </div>
           </div>
         )}
 
-        {collectionName && (
-          <div className="admin-lists-buttons-container">
-            <button className="lists-button" onClick={() => setShowAddForm(!showAddForm)}>
-              {showAddForm ? 'הסתר טופס' : 'הוספת רשומה'}
-            </button>
-          </div>
-        )}
         <div className={`content ${showFilters ? 'sidebar-open' : ''}`}>
           {showAddForm && (
             <div className="add-form">
@@ -678,7 +670,7 @@ function AdminMain() {
                   </div>
                 ))}
                 <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
-                {collectionName === 'NewVolunteers' && editMode && <button type="button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
+                {collectionName === 'NewVolunteers' && editMode && <button type="button" className="lists-button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
               </form>
             </div>
           )}
@@ -778,19 +770,11 @@ function AdminMain() {
         contentLabel="Change Password Modal"
         className={"Modal"}
       >
-        <h2>שינוי סיסמה</h2>
+        <div className='passwordVolUpdate'>
+        <h1>שינוי סיסמה</h1>
         <form onSubmit={handleChangePassword}>
           <input
-            type="email"
-            className="form-control mb-2"
-            placeholder="אימייל"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            dir="rtl"
-          />
-          <input
             type="password"
-            className="form-control mb-2"
             placeholder="סיסמה ישנה"
             value={oldPassword}
             onChange={(e) => setOldPassword(e.target.value)}
@@ -798,7 +782,6 @@ function AdminMain() {
           />
           <input
             type="password"
-            className="form-control mb-2"
             placeholder="סיסמה חדשה"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
@@ -806,16 +789,15 @@ function AdminMain() {
           />
           <input
             type="password"
-            className="form-control mb-2"
             placeholder="הקש שוב את סיסמתך"
             value={confirmNewPassword}
             onChange={(e) => setConfirmNewPassword(e.target.value)}
             dir="rtl"
           />
-          <button type="submit" className="btn btn-custom w-100 mb-2">שנה סיסמה</button>
+          <button type="submit">שנה סיסמה</button>
         </form>
-        {message && <p className="alert alert-custom">{message}</p>}
-        <button onClick={closeModal} className="btn btn-secondary w-100">סגור</button>
+        {message && <p>{message}</p>}
+        </div>
       </Modal>
 
       <Modal

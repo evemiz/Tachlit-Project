@@ -437,13 +437,6 @@ const openWhatsAppChat = () => {
         <h1>שינוי סיסמה</h1>
         <form onSubmit={handleChangePassword}>
           <input
-            type="email"
-            placeholder="אימייל"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            dir="rtl"
-          />
-          <input
             type="password"
             placeholder="סיסמה ישנה"
             value={oldPassword}

@@ -47,12 +47,34 @@
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   width: 200px;
   font-weight: bold;
-  margin-bottom: 10px; /* Adjust margin as needed */
+  margin-left: 20px;
+  margin-top: 30px;
+  margin-bottom: 30px;
   border-radius: 5px;
-  margin-right: 10%; /* Add margin to the right */
 }
 
 .lists-button:hover {
+  background-color: #ffffff;
+  color: #009ba6;
+}
+
+.lists-button-a {
+  color: #ffffff;
+  background-color: #009ba6;
+  border: 2px solid #009ba6;
+  padding: 10px 20px;
+  font-size: 16px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  width: 200px;
+  font-weight: bold;
+  border-radius: 5px;
+  margin: 50px;
+  margin-bottom: 20px;
+}
+
+.lists-button-a:hover {
   background-color: #ffffff;
   color: #009ba6;
 }
