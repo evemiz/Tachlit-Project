@@ -526,6 +526,10 @@ function AdminMain() {
     }
   };
 
+  const handleViewStatistics = () => {
+    navigate('/Statistics');
+  };
+
   return (
     <div className="AdminMainPage">
       <div className="navbar-custom">
@@ -543,6 +547,8 @@ function AdminMain() {
           {isSuperAdmin && (
             <button onClick={openSignUpModal} className="btn btn-custom">הוספת מנהל חדש</button>
           )}
+            <button onClick={handleViewStatistics}className="btn btn-custom">צפייה בסטטיסטיקות</button>
+
         </div>
       </div>
       <div className="admin-container">

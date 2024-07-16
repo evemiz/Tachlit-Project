@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react-router-dom';
 import VolunteerForm from './Forms/Volunteers/Form';
 import RequestForm from './Forms/AidRequests/Form';
@@ -8,6 +9,7 @@ import SignUpNewAdmin from './Admin/SignUpNewAdmin';
 import FinishSignUp from './Admin/finishSignUp';
 import LoginVolunteer from './volunteer/VolunteerLogIn';
 import VolunteerMain from './volunteer/VolunteerMain';
+import Statistics from './Admin/Statistics';
 import '@fontsource/rubik';
 import './styles.css';
 import logo from './images/logo.png';
@@ -66,6 +68,7 @@ const App = () => {
         <Route path="/finishSignUp" element={<FinishSignUp />} />
         <Route path="/LoginVolunteer" element={<LoginVolunteer />} />
         <Route path="/VolunteerMain" element={<VolunteerMain />} />
+        <Route path="/Statistics" element={<Statistics />} />
         <Route path="/" element={<Home />} />
       </Routes>
     </div>
