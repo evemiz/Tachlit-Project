@@ -282,18 +282,6 @@ button a:hover {
   font-size: 16px;
 }
 
-.navbar-buttons button {
-  background-color: #009ba6;
-  color: white !important;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
-  width: auto;
-  border-radius: 50px !important;
-  display: flex; /* Ensure buttons are displayed in a row */
-  gap: 10px;
-}
 
 .navbar-buttons a {
   color: white;

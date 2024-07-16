@@ -44,6 +44,20 @@
   transition: background-color 0.3s ease;
 }
 
+.navbar-buttons .btn-logout {
+  background-color: transparent;
+  border: none;
+  color: #009ba6;
+  border-radius: 20px;
+  font-size: 30px;
+  margin-right: 10px;
+}
+
+.navbar-buttons .btn-logout:hover {
+  color: #002427;
+  background-color: transparent;
+}
+
 .navbar-buttons .btn:hover {
   background-color: #007c87;
   color: white;

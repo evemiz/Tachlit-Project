@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useLocation } from "react-router-dom";
 import logo from '../images/logo.png';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 function Navbar({ handleLogout, openEditUser, openPasswordReset }) {
     const location = useLocation();
@@ -31,8 +33,10 @@ function Navbar({ handleLogout, openEditUser, openPasswordReset }) {
       <div className="navbar-buttons">
         <button className='btn' onClick={openEditUser}>ערוך פרופיל</button>
         <button className='btn' onClick={openPasswordReset}>שנה סיסמא</button>
-        <button className='btn' onClick={handleLogout}>התנתק</button>
-      </div>
+        <button className='btn-logout' onClick={handleLogout}>
+          <FontAwesomeIcon icon={faSignOutAlt} />
+        </button>
+        </div>
     </nav>
   );
 }

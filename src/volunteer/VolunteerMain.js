@@ -464,7 +464,6 @@ const openWhatsAppChat = () => {
           />
           <button type="submit">שנה סיסמה</button>
         </form>
-        {message && <p>{message}</p>}
         </div>
       </Modal>
 
@@ -475,7 +474,7 @@ const openWhatsAppChat = () => {
         >
           <div className='message'>
             <button className='close-model-but' onClick={() => setPasswordChangeSuccess(false)}>X</button>
-            <h1>שינוי הסיסמה הושלם בהצלחה</h1>
+            <h1>הסיסמה שונתה בהצלחה</h1>
             <Modal closeModal={closeSignUpModal} />
           </div>
         </Modal>
