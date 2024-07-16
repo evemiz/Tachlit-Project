@@ -733,7 +733,7 @@ function AdminMain() {
               </table>
             </div>
           ) : (
-            !loading && <p></p>
+            !loading && <p>No documents found</p>
           )}
         </div>
       </div>
