@@ -110,6 +110,8 @@ function AdminMain() {
   const [filterVisibility, setFilterVisibility] = useState({});
   const [date, setDate] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("");
+  const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false);
+
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -426,8 +428,8 @@ function AdminMain() {
 
     const user = auth.currentUser;
 
-    if (user && user.email === email) {
-      const credential = EmailAuthProvider.credential(email, oldPassword);
+    if (user) {
+      const credential = EmailAuthProvider.credential(user.email, oldPassword);
       reauthenticateWithCredential(user, credential)
         .then(() => {
           updatePassword(user, newPassword)
@@ -799,16 +801,6 @@ function AdminMain() {
         {message && <p>{message}</p>}
         </div>
       </Modal>
-
-      <Modal
-        isOpen={signUpModalIsOpen}
-        onRequestClose={closeSignUpModal}
-        contentLabel="Sign Up New Admin Modal"
-        className={"Modal"}
-      >
-        <SignUpNewAdmin closeModal={closeSignUpModal} />
-      </Modal>
-
     </div>
   );
 }

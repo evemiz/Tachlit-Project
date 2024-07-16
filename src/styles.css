@@ -25,6 +25,11 @@ h1 {
   font-size: 24px;
 }
 
+.message h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
 .form-group {
   margin-bottom: 15px;
 }
@@ -323,6 +328,30 @@ button a:hover {
   max-width: 400px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.message {
+  display: flex;
+  align-items: center; /* Center items vertically */
+  justify-content: flex-start; /* Align items to the start horizontally */
+  padding: 10px;
+}
+
+.close-model-but {
+  border: none;
+  cursor: pointer;
+  font-size: 20px; /* Adjust font size for the X */
+  border-radius: 10px;
+  width: 30px; /* Set fixed width */
+  height: 30px; /* Set fixed height */
+  position: absolute; /* Position the button absolutely */
+  left: 10px; /* Adjust to position on the left */
+  top: 10px; /* Adjust to position at the top */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: transparent;
 }
 
 .passwordVolUpdate form {

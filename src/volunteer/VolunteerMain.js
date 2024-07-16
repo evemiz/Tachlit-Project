@@ -38,6 +38,7 @@ function VolunteerMain() {
   const [documentId, setDocumentId] = useState("");
   const [matches, setMatches] = useState([]);
   const [matchDetails, setMatchDetails] = useState([]);
+  const [signUpModalIsOpen, setSignUpModalIsOpen] = useState(false);
 
   const [myRequests, setMyRequests] = useState([]);
   const [myRequestsDetails, setMyRequestsDetails] = useState([]);
@@ -85,6 +86,10 @@ function VolunteerMain() {
     setModalPasswordIsOpen(false);
   }
 
+  const closeSignUpModal = () => {
+    setSignUpModalIsOpen(false);
+  };
+
   const openPasswordReset = async () => {
     setModalPasswordIsOpen(true);
   }
@@ -106,8 +111,8 @@ function VolunteerMain() {
 
     const user = auth.currentUser;
 
-    if (user && user.email === email) {
-      const credential = EmailAuthProvider.credential(email, oldPassword);
+    if (user) {
+      const credential = EmailAuthProvider.credential(user.email, oldPassword);
       reauthenticateWithCredential(user, credential)
         .then(() => {
           updatePassword(user, newPassword)
@@ -468,8 +473,11 @@ const openWhatsAppChat = () => {
           onRequestClose={() => setPasswordChangeSuccess(false)}
           contentLabel="Password Change Success Modal"
         >
-          <h1>שינוי הסיסמה הושלם בהצלחה</h1>
-          <button onClick={() => setPasswordChangeSuccess(false)}>סגור</button>
+          <div className='message'>
+            <button className='close-model-but' onClick={() => setPasswordChangeSuccess(false)}>X</button>
+            <h1>שינוי הסיסמה הושלם בהצלחה</h1>
+            <Modal closeModal={closeSignUpModal} />
+          </div>
         </Modal>
       
       </div>
