@@ -265,7 +265,12 @@ button a:hover {
   margin-right: 10px; 
   margin-bottom: 0px;
   margin-right: 10px; /* Add margin to separate logo from buttons */
+  transition: transform 0.3s ease;
+  transform-origin: center;
+}
 
+.logo-image:hover {
+  transform: scale(1.1);
 }
 
 .navbarVol-links {

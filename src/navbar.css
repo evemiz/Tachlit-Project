@@ -11,8 +11,22 @@
   z-index: 1000;
 }
 
+.navbar-custom-form{
+  background: linear-gradient(to left, #141414, #535252);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  padding-bottom: 20px;
+}
+
 .navbar-logo {
   max-height: 50px;
+  margin-left: 30px; ;
 }
 
 .navbar-content {
@@ -65,4 +79,23 @@
 
 .container {
   margin-top: 100px; /* Adjust the margin to account for the fixed navbar */
+}
+
+.phone {
+  width: 125px;
+  height: 60px;
+  margin-bottom: 0px;
+  font-size: xxx-large;
+  opacity: 1;
+  max-height: fit-content;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  transition: transform 0.3s ease; /* Smooth transition */
+  transform-origin: center; /* Center the scaling transformation */
+}
+
+.phone:hover {
+  transform: scale(1.1);
+  color: #cf2e2e;
 }

@@ -12,7 +12,7 @@ import { db } from '../../firebaseConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
 import { useNavigate } from "react-router-dom";
-
+import logo from '../../images/logo.png';
 
 Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
 
@@ -170,8 +170,26 @@ function RequestForm() {
     window.open(whatsappUrl, "_blank");
   };
 
+  const logoClick = () => {
+    navigate('/');
+  }
+
   return (
     <div className="page">
+
+       <div className="navbar-custom-form">
+        <div className="navbar-logo">
+          <img
+            src={logo}
+            alt="Logo"
+            className="logo-image"
+            style={{ cursor: 'pointer' }}
+            onClick={logoClick}
+          />
+        </div>
+        <a className='phone' href="tel:02-651-6325">*6031</a>
+      </div>
+
     <div className="Form">
       <h1>הגשת בקשת סיוע </h1>
       <fieldset>
