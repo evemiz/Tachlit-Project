@@ -328,7 +328,7 @@ function RequestForm() {
       </Modal>
       </div>
 
-      <div className='footer'>
+      <div className='pageEnd'>
       <h2>צור איתנו קשר ב - whatsapp </h2>
         <button className="whatsapp-button" onClick={openWhatsAppChat}>
             <FontAwesomeIcon icon={faWhatsapp} size="2x" />
