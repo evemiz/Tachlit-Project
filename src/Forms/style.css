@@ -114,7 +114,7 @@ body {
   }
 
   .whatsapp-button {
-    background-color: transparent; /* or rgba(0, 0, 0, 0) */
+    background-color: transparent; 
     color: #fff;
     border: none;
     padding: 10px;

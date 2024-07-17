@@ -265,7 +265,12 @@ button a:hover {
   margin-right: 10px; 
   margin-bottom: 0px;
   margin-right: 10px; /* Add margin to separate logo from buttons */
+  transition: transform 0.3s ease;
+  transform-origin: center;
+}
 
+.logo-image:hover {
+  transform: scale(1.1);
 }
 
 .navbarVol-links {
@@ -282,21 +287,10 @@ button a:hover {
   font-size: 16px;
 }
 
-.navbar-buttons button {
-  background-color: #009ba6;
-  color: white !important;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
-  width: auto;
-  border-radius: 50px !important;
-  display: flex; /* Ensure buttons are displayed in a row */
-  gap: 10px;
-}
 
 .navbar-buttons a {
-  color: white;
+  padding: 0;
+  color: black;
   font-size: 20px;
   text-decoration: none;
 }
@@ -500,3 +494,7 @@ h2 {
   color: white !important;
   text-decoration: none; 
 } 
+
+.boxes-container {
+  margin-top: 100px;
+}

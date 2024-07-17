@@ -4,15 +4,14 @@ import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePasswor
 import Modal from 'react-modal';
 import { auth, db } from "../firebaseConfig";
 import { arrayUnion, query, where, collection, getDocs, getDoc, doc, setDoc, updateDoc, arrayRemove } from "firebase/firestore";
+import Navbar from './VolunteerNavigateBar';
 import citiesInIsrael from '../Forms/Cities.js';
 import volunteerings from '../Forms/Volunteerings.js';
 import Select from 'react-select';
 import days from '../Forms/Days.js';
 import langueges from '../Forms/Languges.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
-import logo from '../images/logo.png';
-import {  faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
 
 Modal.setAppElement('#root');
 
@@ -296,24 +295,7 @@ function VolunteerMain() {
 
   return (
     <div className='VolunteerMain'>
-      <div className="navbar-custom">
-        <div className="navbar-logo">
-          <img
-            src={logo}
-            alt="Logo"
-            className="logo-image"
-            style={{ cursor: 'pointer' }}
-          />
-        </div>
-        <div className="navbar-buttons">
-          <button className='btn' onClick={openEditUser}>ערוך פרופיל</button>
-          <button className='btn' onClick={openPasswordReset}>שנה סיסמה</button>
-          <button className='btn-logout' onClick={handleLogout}>
-            <FontAwesomeIcon icon={faSignOutAlt} />
-          </button>
-        </div>
-      </div>
-
+      <Navbar handleLogout={handleLogout} openEditUser={openEditUser} openPasswordReset={openPasswordReset}/>
       <div className='modal-container'>
         <Modal
           isOpen={modalIsOpen}
@@ -458,39 +440,41 @@ function VolunteerMain() {
       </div>
 
       <div className='modal-container'>
-        <Modal
-          isOpen={modalPasswordIsOpen}
-          onRequestClose={closeModal}
-          contentLabel="Edit User Modal"
-        >
-          <div className='passwordVolUpdate'>
-            <h1>שינוי סיסמה</h1>
-            <form onSubmit={handleChangePassword}>
-              <input
-                type="password"
-                placeholder="סיסמה ישנה"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                dir="rtl"
-              />
-              <input
-                type="password"
-                placeholder="סיסמה חדשה"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                dir="rtl"
-              />
-              <input
-                type="password"
-                placeholder="הקש שוב את סיסמתך"
-                value={confirmNewPassword}
-                onChange={(e) => setConfirmNewPassword(e.target.value)}
-                dir="rtl"
-              />
-              <button type="submit">שנה סיסמה</button>
-            </form>
-          </div>
-        </Modal>
+      <Modal
+        isOpen={modalPasswordIsOpen}
+        onRequestClose={closeModal}
+        contentLabel="Edit User Modal"
+      >
+
+        <div className='passwordVolUpdate'>
+        <h1>שינוי סיסמה</h1>
+        <form onSubmit={handleChangePassword}>
+          <input
+            type="password"
+            placeholder="סיסמה ישנה"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            dir="rtl"
+          />
+          <input
+            type="password"
+            placeholder="סיסמה חדשה"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            dir="rtl"
+          />
+          <input
+            type="password"
+            placeholder="הקש שוב את סיסמתך"
+            value={confirmNewPassword}
+            onChange={(e) => setConfirmNewPassword(e.target.value)}
+            dir="rtl"
+          />
+          <button type="submit">שנה סיסמה</button>
+        </form>
+        {message && <p>{message}</p>}
+        </div>
+      </Modal>
 
         <Modal
           isOpen={passwordChangeSuccess}
@@ -505,58 +489,55 @@ function VolunteerMain() {
         </Modal>
       </div>
 
-      <div className="boxes-container">
-        <div className="box">
-          <h2>בקשות סיוע רלוונטיות עבורך</h2>
-          {matchDetails.length > 0 ? (
-            matchDetails.map((match) => (
-              <div key={match.id} className="match-container">
-                <div className="Request">
-                  <p>{`${match.firstName + " " + match.lastName} מבקש/ת את עזרתך ב${match.volunteering} `}</p>
-                  <p>{`ביום: ${match.day} ${formatDate(match.date)} בשעה: ${match.time}`}</p>
-                  <p>{match.comments && <p>הערות: {match.comments}</p>}</p>
-                  <button onClick={() => handleApproveRequest(match.status, match.id)}>אישור בקשה</button>
-                  <button onClick={() => handleRemoveRequest(match.id)}>מחק בקשה</button>
-                </div>
+      <div className="box">
+        <h2>בקשות סיוע רלוונטיות עבורך</h2>
+        {matchDetails.length > 0 ? (
+          matchDetails.map((match) => (
+            <div key={match.id} className="match-container">
+              <div className="Request">
+                <p>{`${match.firstName + " " + match.lastName} מבקש/ת את עזרתך ב${match.volunteering} `}</p>
+                <p>{`ביום: ${match.day} ${formatDate(match.date)} בשעה: ${match.time}`}</p>
+                <p>{match.comments && <p>הערות: {match.comments}</p>}</p>
+                <button onClick={() => handleApproveRequest(match.status, match.id)}>אישור בקשה</button>
               </div>
-            ))
-          ) : (
-            <p>לא נמצאו התאמות.</p>
-          )}
-        </div>
-
-        <div className="box">
-          <h2>הבקשות שלי</h2>
-          {sortedRequests.length > 0 ? (
-            sortedRequests.map((cur) => (
-              <div key={cur.id} className="myRequests-container">
-                <div className="Request">
-                  <p>{`סיוע ל${cur.firstName + " " + cur.lastName} ב${cur.volunteering}`}</p>
-                  <p>{`בתאריך: ${formatDate(cur.date)} בשעה: ${cur.time}`}</p>
-                  <p>
-                    סטטוס:
-                    {cur.status === 'in process' ? (
-                      <>
-                        <span style={{ color: '#009ba6' }}> בתהליך</span>
-                        <p>{`מספר טלפון: ${cur.phoneNumber}`}</p>
-                      </>
-                    ) : (
-                      ' טופל'
-                    )}
-                  </p>
-                  {cur.status === 'in process' && (
-                    <button onClick={() => closeRequest(cur.id)}>סגור בקשה</button>
-                  )}
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>אין בקשות בטיפול</p>
-          )}
-        </div>
+            </div>
+          ))
+        ) : (
+          <p>לא נמצאו התאמות.</p>
+        )}
       </div>
 
-      <div className='pageEnd'>
+      <div className="box">
+      <h2>הבקשות שלי</h2>
+      {sortedRequests.length > 0 ? (
+        sortedRequests.map((cur) => (
+          <div key={cur.id} className="myRequests-container">
+            <div className="Request">
+              <p>{`סיוע ל${cur.firstName + " " + cur.lastName} ב${cur.volunteering}`}</p>
+              <p>{`בתאריך: ${formatDate(cur.date)} בשעה: ${cur.time}`}</p>
+              <p>
+                סטטוס:
+                {cur.status === 'in process' ? (
+                  <>
+                    <span style={{ color: '#009ba6' }}> בתהליך</span>
+                    <p>{`מספר טלפון: ${cur.phoneNumber}`}</p>
+                  </>
+                ) : (
+                  ' טופל'
+                )}
+              </p>
+              {cur.status === 'in process' && (
+                <button onClick={() => closeRequest(cur.id)}>סגור בקשה</button>
+              )}
+            </div>
+          </div>
+        ))
+      ) : (
+        <p>אין בקשות בטיפול</p>
+      )}
+    </div>
+
+    <div className='pageEnd'>
         <h2>צור איתנו קשר ב - whatsapp </h2>
         <button className="whatsapp-button" onClick={openWhatsAppChat}>
           <FontAwesomeIcon icon={faWhatsapp} size="2x" />
