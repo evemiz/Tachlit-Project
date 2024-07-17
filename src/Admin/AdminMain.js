@@ -42,7 +42,7 @@ const getColumnDisplayName = (columnName) => {
 };
 
 // Define the fixed column order
-const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'langueges', 'city', 'days', 'volunteering', 'mail', 'date', 'time', 'comments', 'emergency', 'vehicle']; // Removed 'matches'
+const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail','langueges', 'city', 'days', 'volunteering',  'date', 'time', 'comments', 'emergency', 'vehicle']; // Removed 'matches'
 
 // Define predefined options for each filter (example)
 const filterOptions = {
@@ -222,12 +222,14 @@ function AdminMain() {
   };
 
   const handleInputChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value, type } = event.target;
+    const newValue = type === 'radio' ? value === 'true' : value;
     setNewRecord(prevRecord => ({
       ...prevRecord,
-      [name]: value
+      [name]: newValue
     }));
   };
+
 
   const handleSelectChange = (selectedOption, name) => {
     setNewRecord(prevRecord => ({
@@ -676,6 +678,7 @@ function AdminMain() {
               </form>
             </div>
           )}
+          <button className="lists-button" onClick={() => setShowAddForm(true)}>הוסף רשומה חדשה</button>
           {loading && <p>Loading...</p>}
           {error && <p style={{ color: 'red' }}>Error: {error}</p>}
           {filteredDocuments.length > 0 ? (
@@ -733,7 +736,7 @@ function AdminMain() {
               </table>
             </div>
           ) : (
-            !loading && <p>No documents found</p>
+            !loading && <p></p>
           )}
         </div>
       </div>
