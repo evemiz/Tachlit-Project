@@ -1,6 +1,6 @@
 import '../style.css';
 import citiesInIsrael from '../Cities';
-import volunteerings from '../Volunteerings';
+import volunteerings from './Volunteerings.js';
 import langues from '../Languges';
 import { React, useState } from "react";
 import Select from 'react-select';

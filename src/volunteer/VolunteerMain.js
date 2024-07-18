@@ -45,7 +45,7 @@ function VolunteerMain() {
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-
+  const [datePass, setDatePass] = useState(false);
   const isFetching = useRef(false);
 
   const fetchVolRecord = useCallback(async () => {
@@ -294,6 +294,14 @@ function VolunteerMain() {
     window.open(whatsappUrl, "_blank");
   };
 
+  const isDatePassed = (dateString) => {
+    const inputDate = new Date(dateString);
+    const today = new Date();
+    inputDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    setDatePass(inputDate < today);  
+  }
+
   return (
     <div className='VolunteerMain'>
       <div className="navbar-custom">
@@ -537,7 +545,9 @@ function VolunteerMain() {
         <div className="box">
           <h2>בקשות סיוע רלוונטיות עבורך</h2>
           {matchDetails.length > 0 ? (
-            matchDetails.map((match) => (
+            matchDetails
+            .filter((match) => new Date(match.date) >= new Date())
+            .map((match) => (
               <div key={match.id} className="match-container">
                 <div className="Request">
                   <p>{`${match.firstName + " " + match.lastName} מבקש/ת את עזרתך ב${match.volunteering} `}</p>
