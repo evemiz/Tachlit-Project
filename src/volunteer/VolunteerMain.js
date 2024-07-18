@@ -320,9 +320,23 @@ function VolunteerMain() {
           onRequestClose={closeModal}
           contentLabel="Edit User Modal"
         >
+          <button
+            onClick={closeModal}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              background: 'transparent',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
+          </button>
           <div className='volunteerApp'>
             <h1>עריכת פרטי משתמש</h1>
-            <fieldset>
+            <form action="#" method="get" onSubmit={handleSubmit}>
               <label htmlFor="firstname">שם פרטי</label>
               <input
                 type="text"
@@ -436,10 +450,10 @@ function VolunteerMain() {
               לא
 
               <br />
-              <button type="submit" value="Submit" onClick={handleSubmit}>
+              <button type="submit" value="Submit">
                 אישור עריכה
               </button>
-            </fieldset>
+              </form>
           </div>
         </Modal>
         <Modal
@@ -463,6 +477,20 @@ function VolunteerMain() {
           onRequestClose={closeModal}
           contentLabel="Edit User Modal"
         >
+        <button
+            onClick={closeModal}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              background: 'transparent',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
+          </button>
           <div className='passwordVolUpdate'>
             <h1>שינוי סיסמה</h1>
             <form onSubmit={handleChangePassword}>
