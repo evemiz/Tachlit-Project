@@ -44,6 +44,7 @@ function VolunteerMain() {
   const [myRequestsDetails, setMyRequestsDetails] = useState([]);
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [historyModal, setIsHistoryModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [datePass, setDatePass] = useState(false);
   const isFetching = useRef(false);
@@ -155,9 +156,14 @@ function VolunteerMain() {
     setModalIsOpen(true);
   };
 
+  const openHistory = async () => {
+    setIsHistoryModal(true);
+  };
+
   const closeModal = async () => {
     setModalIsOpen(false);
     setModalPasswordIsOpen(false);
+    setIsHistoryModal(false);
   }
 
   const closeSignUpModal = () => {
@@ -288,6 +294,10 @@ function VolunteerMain() {
     return myRequestsDetails.filter((request) => request.status === "in process");
   }, [myRequestsDetails]);
 
+  const sortedCloseRequests = useMemo(() => {
+    return myRequestsDetails.filter((request) => request.status === "close");
+  }, [myRequestsDetails]);
+
   const openWhatsAppChat = () => {
     const phoneNumber = "+972545559682";
     const whatsappUrl = `https://wa.me/${phoneNumber}`;
@@ -314,6 +324,7 @@ function VolunteerMain() {
           />
         </div>
         <div className="navbar-buttons">
+          <button className='btn' onClick={openHistory}>בקשות סגורות</button>
           <button className='btn' onClick={openEditUser}>ערוך פרופיל</button>
           <button className='btn' onClick={openPasswordReset}>שנה סיסמה</button>
           <button className='btn-logout' onClick={handleLogout}>
@@ -541,6 +552,72 @@ function VolunteerMain() {
         </Modal>
       </div>
 
+
+      <div className='modal-container'>
+        <Modal
+          isOpen={historyModal}
+          onRequestClose={closeModal}
+          contentLabel="History Modal"
+          style={{
+            content: {
+              width: 'auto',
+              maxWidth: 'fit-content',
+              margin: 'auto',
+              padding: '20px',
+            },
+          }}
+        >
+        <button
+            onClick={closeModal}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              background: 'transparent',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
+          </button>
+          <div className='volunteerApp'>
+            <h1>היסטוריית התנדבויות</h1>
+          {sortedCloseRequests.length > 0 ? (
+            <ul>
+              {sortedCloseRequests.map((match) => (
+                <li key={match.id} 
+                className="match-container-history"
+                style={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  backgroundColor: '#f9f9f9',
+                  padding: '10px',
+                  marginBottom: '15px',
+                  borderRadius: '5px',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  fontSize: '18px'
+                }}
+                >
+                  <div className="Request">
+                    {`סיוע ב${match.volunteering} ל${match.firstName + " " + match.lastName}`}
+                    {`, ביום: ${match.day} ${formatDate(match.date)} בשעה: ${match.time}`}
+                  </div>
+                </li>
+            ))}
+            </ul>
+            
+          ) : (
+            <p>לא נמצאו בקשות סגורות</p>
+          )}
+          </div>
+        </Modal>
+      </div>
+
+
+
+
       <div className="boxes-container">
         <div className="box">
           <h2>בקשות סיוע רלוונטיות עבורך</h2>
@@ -559,7 +636,7 @@ function VolunteerMain() {
               </div>
             ))
           ) : (
-            <p>לא נמצאו התאמות.</p>
+            <p>לא נמצאו התאמות</p>
           )}
         </div>
 
