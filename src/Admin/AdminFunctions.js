@@ -12,16 +12,21 @@ export function validateData(data) {
 // Function to read documents from a collection
 export const readDocuments = async (collectionName, status) => {
   try {
-    let collectionRef = collection(db, collectionName);
-
-    if (status !== "") {
-      collectionRef = query(collectionRef, where("status", "==", status));
+    let q;
+    if (status) {
+      q = query(collection(db, collectionName), where('status', '==', status));
+    } else {
+      q = query(collection(db, collectionName));
     }
 
-    const querySnapshot = await getDocs(collectionRef);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const querySnapshot = await getDocs(q);
+    const documents = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    return documents;
   } catch (error) {
-    console.error("Error getting documents: ", error);
+    console.error('Error getting documents: ', error);
     throw error;
   }
 };

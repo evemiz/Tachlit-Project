@@ -199,7 +199,7 @@ h1, h2 {
   justify-content: center;
   align-items: center;
   flex-direction: row; /* Align items vertically */
-  background: linear-gradient(to left, #141414 ,#535252); 
+  background: linear-gradient(to left, #141414 ,#535252);
   height: fit-content;
   margin-top: 20px;
   left: 0;
@@ -312,7 +312,7 @@ h1, h2 {
 
 .login .heart-image {
   border-radius: 8px;
-  width: 100%; 
+  width: 100%;
   max-width: 500px; /* Optional: set a max-width for better control */
   height: auto; /* Maintain aspect ratio */
   display: block;
@@ -364,3 +364,89 @@ h1, h2 {
 .passwordVolUpdate button:hover {
   background-color: #8fb5b9;
 }
+
+
+/* custom.css */
+
+.Overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.VolunteerModal, .MatchesModal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 90%;
+  width: 900px;
+  max-height: 80%;
+  overflow-y: auto;
+  align-items: center;
+}
+
+.VolunteerModal {
+  width: 300px;
+}
+
+.MatchesModal {
+  width: auto !important;
+  max-width: 1200px !important;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.matchesTable{
+  border-collapse: collapse;
+  align-items: center;
+  font-family: 'Rubik';
+}
+
+
+.matchesTable th,
+.matchesTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+  white-space: nowrap;
+
+
+}
+
+.matchesTable th {
+  background-color: #f2f2f2;
+}
+
+.matches-close-button {
+  border: 2px solid #6c6c6c;
+  color: #6c6c6c;
+  border-radius: 15%;
+  cursor: pointer;
+  font-size: 0.5em;
+  padding: 5px 10px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.matches-close-button:hover {
+  background-color: #6c6c6c;
+  color: white;
+}
+
+
