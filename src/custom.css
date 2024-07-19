@@ -283,6 +283,8 @@ h1, h2 {
 
 .login .image-container {
   position: relative;
+  display: inline-block; /* Make sure the container adjusts to the image size */
+  overflow: hidden; /* Hide any overflow text */
 }
 
 .login .image-container:hover .overlay {
@@ -302,12 +304,20 @@ h1, h2 {
   align-items: center;
   opacity: 0;
   transition: opacity 0.3s ease;
+  padding: 20px; /* Padding inside the overlay */
+  box-sizing: border-box; /* Include padding in the width and height */
+  text-align: center; /* Center text horizontally */
+  overflow: hidden; /* Ensure text doesn't overflow */
 }
 
 .login .overlay-text {
   color: #fff;
-  font-size: 1.5rem;
   text-align: center;
+
+  font-size: 1.2rem; /* Adjust font size as needed */
+  line-height: 1.4; /* Adjust line height for readability */
+  max-width: 90%; /* Ensure text fits within the overlay */
+  margin: 0 auto; /* Center text block */
 }
 
 .login .heart-image {
@@ -317,6 +327,7 @@ h1, h2 {
   height: auto; /* Maintain aspect ratio */
   display: block;
   margin: 0 auto; /* Center the image */
+  height: auto;
 }
 
 
