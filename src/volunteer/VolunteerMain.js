@@ -154,10 +154,14 @@ function VolunteerMain() {
 
   const openEditUser = async () => {
     setModalIsOpen(true);
+    setModalPasswordIsOpen(false);
+    setIsHistoryModal(false);
   };
 
   const openHistory = async () => {
     setIsHistoryModal(true);
+    setModalIsOpen(false);
+    setModalPasswordIsOpen(false);
   };
 
   const closeModal = async () => {
@@ -172,6 +176,8 @@ function VolunteerMain() {
 
   const openPasswordReset = async () => {
     setModalPasswordIsOpen(true);
+    setModalIsOpen(false);
+    setIsHistoryModal(false);
   }
 
   const handleChangePassword = (e) => {
