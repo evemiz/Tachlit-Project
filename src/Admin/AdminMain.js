@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
-import { auth } from "../firebaseConfig";
-import { db } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 import { collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
 import Modal from 'react-modal';
-import '../custom.css';
-import '../navbar.css';
 import { useNavigate } from "react-router-dom";
 import ListDisplay from '../ListDisplay';
 import SignUpNewAdmin from './SignUpNewAdmin';
@@ -18,6 +15,8 @@ import volunteering from '../Forms/Volunteerings.js';
 import Select from 'react-select';
 import '@fontsource/rubik';
 import logo from '../images/logo.png';
+import '../custom.css';
+import '../navbar.css';
 
 const getColumnDisplayName = (columnName) => {
   const columnMapping = {
@@ -112,6 +111,10 @@ function AdminMain() {
   const [dayOfWeek, setDayOfWeek] = useState("");
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false);
 
+  // Validation states
+  const [idValid, setIdValid] = useState(true);
+  const [contactValid, setContactValid] = useState(true);
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -141,6 +144,45 @@ function AdminMain() {
   useEffect(() => {
     fetchDocuments();
   }, [collectionName, status]);
+
+  const fetchDashboardData = async () => {
+    console.log("Fetching data...");
+
+    try {
+      const newVolunteersRef = collection(db, 'NewVolunteers');
+      const newVolunteersSnapshot = await getDocs(newVolunteersRef);
+      setVolunteersThisMonth(newVolunteersSnapshot.size);
+      console.log("New volunteers this month:", newVolunteersSnapshot.size);
+
+      const totalVolunteersRef = collection(db, 'Volunteers');
+      const totalVolunteersSnapshot = await getDocs(totalVolunteersRef);
+      setTotalVolunteers(totalVolunteersSnapshot.size);
+      console.log("Total volunteers:", totalVolunteersSnapshot.size);
+
+      const closedRequestsRef = collection(db, 'AidRequests');
+      const closedRequestsQuery = query(closedRequestsRef, where('status', '==', 'close'));
+      const closedRequestsSnapshot = await getDocs(closedRequestsQuery);
+      setClosedRequestsThisMonth(closedRequestsSnapshot.size);
+      console.log("Closed requests this month:", closedRequestsSnapshot.size);
+
+      const openRequestsQuery = query(closedRequestsRef, where('status', '==', 'open'));
+      const openRequestsSnapshot = await getDocs(openRequestsQuery);
+      setOpenRequests(openRequestsSnapshot.size);
+      console.log("Open requests:", openRequestsSnapshot.size);
+
+      const inProcessRequestsQuery = query(closedRequestsRef, where('status', '==', 'in process'));
+      const inProcessRequestsSnapshot = await getDocs(inProcessRequestsQuery);
+      setInProcessRequests(inProcessRequestsSnapshot.size);
+      console.log("In-process requests:", inProcessRequestsSnapshot.size);
+
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
   const handleCollectionChange = (name) => {
     setCollectionName(name);
@@ -191,7 +233,29 @@ function AdminMain() {
 
   const handleAddRecord = async (e) => {
     e.preventDefault();
-    if (collectionName) {
+    let isValid = true;
+
+    // Phone number validation
+    const phoneRegex = /^05\d{8}$/;
+    if (!phoneRegex.test(newRecord.phoneNumber)) {
+      setContactValid(false);
+      isValid = false;
+    } else {
+      setContactValid(true);
+    }
+
+    // ID validation
+    const idRegex = /^\d{9}$/;
+    if (!idRegex.test(newRecord.ID)) {
+      setIdValid(false);
+      isValid = false;
+    } else {
+      setIdValid(true);
+    }
+
+
+
+    if (isValid) {
       const formattedRecord = {};
       for (const [key, value] of Object.entries(newRecord)) {
         if (columnDataTypes[key] === 'boolean') {
@@ -213,7 +277,11 @@ function AdminMain() {
         if (editMode) {
           confirmAction(() => updateDocument(collectionName, currentEditId, cleanedRecord), '?האם אתה בטוח שברצונך לערוך רשומה זו');
         } else {
-          confirmAction(() => addDocument(collectionName, cleanedRecord), '?האם אתה בטוח שברצונך להוסיף רשומה זו');
+          if (collectionName === 'Volunteers' && cleanedRecord.ID) {
+            confirmAction(() => addDocument(collectionName, cleanedRecord, cleanedRecord.ID), '?האם אתה בטוח שברצונך להוסיף רשומה זו');
+          } else {
+            confirmAction(() => addDocument(collectionName, cleanedRecord), '?האם אתה בטוח שברצונך להוסיף רשומה זו');
+          }
         }
       } catch (err) {
         console.error(`Error ${editMode ? 'updating' : 'adding'} document:`, err);
@@ -229,7 +297,6 @@ function AdminMain() {
       [name]: newValue
     }));
   };
-
 
   const handleSelectChange = (selectedOption, name) => {
     setNewRecord(prevRecord => ({
@@ -348,45 +415,6 @@ function AdminMain() {
 
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
-  };
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
-    console.log("Fetching data...");
-
-    try {
-      const newVolunteersRef = collection(db, 'NewVolunteers');
-      const newVolunteersSnapshot = await getDocs(newVolunteersRef);
-      setVolunteersThisMonth(newVolunteersSnapshot.size);
-      console.log("New volunteers this month:", newVolunteersSnapshot.size);
-
-      const totalVolunteersRef = collection(db, 'Volunteers');
-      const totalVolunteersSnapshot = await getDocs(totalVolunteersRef);
-      setTotalVolunteers(totalVolunteersSnapshot.size);
-      console.log("Total volunteers:", totalVolunteersSnapshot.size);
-
-      const closedRequestsRef = collection(db, 'AidRequests');
-      const closedRequestsQuery = query(closedRequestsRef, where('status', '==', 'close'));
-      const closedRequestsSnapshot = await getDocs(closedRequestsQuery);
-      setClosedRequestsThisMonth(closedRequestsSnapshot.size);
-      console.log("Closed requests this month:", closedRequestsSnapshot.size);
-
-      const openRequestsQuery = query(closedRequestsRef, where('status', '==', 'open'));
-      const openRequestsSnapshot = await getDocs(openRequestsQuery);
-      setOpenRequests(openRequestsSnapshot.size);
-      console.log("Open requests:", openRequestsSnapshot.size);
-
-      const inProcessRequestsQuery = query(closedRequestsRef, where('status', '==', 'in process'));
-      const inProcessRequestsSnapshot = await getDocs(inProcessRequestsQuery);
-      setInProcessRequests(inProcessRequestsSnapshot.size);
-      console.log("In-process requests:", inProcessRequestsSnapshot.size);
-
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-    }
   };
 
   const handleLogout = () => {
@@ -674,11 +702,14 @@ function AdminMain() {
                   </div>
                 ))}
                 <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
+                <button type="button" className="lists-button" onClick={() => setShowAddForm(false)}>בטל</button>
                 {collectionName === 'NewVolunteers' && editMode && <button type="button" className="lists-button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
               </form>
             </div>
           )}
-          <button className="lists-button" onClick={() => setShowAddForm(true)}>הוסף רשומה חדשה</button>
+          {collectionName && (
+            <button className="lists-button" onClick={() => setShowAddForm(true)}>הוסף רשומה חדשה</button>
+          )}
           {loading && <p>Loading...</p>}
           {error && <p style={{ color: 'red' }}>Error: {error}</p>}
           {filteredDocuments.length > 0 ? (
