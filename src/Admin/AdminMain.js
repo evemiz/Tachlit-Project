@@ -6,12 +6,13 @@ import Modal from 'react-modal';
 import { useNavigate } from "react-router-dom";
 import ListDisplay from '../ListDisplay';
 import SignUpNewAdmin from './SignUpNewAdmin';
+import Statistics from './Statistics';
 import { readDocuments, addDocument, deleteDocument, updateDocument } from './AdminFunctions';
 import { handleApproveVolunteer } from './handleApproveVolunteer';
-import citiesInIsrael from '../Forms/Cities.js';
-import languages from '../Forms/Languges.js';
-import days from '../Forms/Days.js';
-import volunteering from '../Forms/Volunteerings.js';
+import citiesInIsrael from '../Forms/Cities';
+import languages from '../Forms/Languges';
+import days from '../Forms/Days';
+import volunteering from '../Forms/Volunteerings';
 import Select from 'react-select';
 import '@fontsource/rubik';
 import logo from '../images/logo.png';
@@ -41,7 +42,7 @@ const getColumnDisplayName = (columnName) => {
 };
 
 // Define the fixed column order
-const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail','langueges', 'city', 'days', 'volunteering',  'date', 'time', 'comments', 'emergency', 'vehicle']; // Removed 'matches'
+const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail', 'langueges', 'city', 'days', 'volunteering', 'date', 'time', 'comments', 'emergency', 'vehicle'];
 
 // Define predefined options for each filter (example)
 const filterOptions = {
@@ -68,7 +69,7 @@ const columnDataTypes = {
   emergency: 'boolean',
   ID: 'string',
   matches: 'array',
-  volunteerMatch: 'string' // Added 'volunteerMatch'
+  volunteerMatch: 'string'
 };
 
 Modal.setAppElement('#root');
@@ -77,6 +78,7 @@ function AdminMain() {
   const navigate = useNavigate();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [signUpModalIsOpen, setSignUpModalIsOpen] = useState(false);
+  const [statsModalIsOpen, setStatsModalIsOpen] = useState(false); // Added state for stats modal
   const [email, setEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -114,7 +116,7 @@ function AdminMain() {
   // Validation states
   const [idValid, setIdValid] = useState(true);
   const [contactValid, setContactValid] = useState(true);
-  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(true);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -146,34 +148,27 @@ function AdminMain() {
   }, [collectionName, status]);
 
   const fetchDashboardData = async () => {
-    console.log("Fetching data...");
-
     try {
       const newVolunteersRef = collection(db, 'NewVolunteers');
       const newVolunteersSnapshot = await getDocs(newVolunteersRef);
       setVolunteersThisMonth(newVolunteersSnapshot.size);
-      console.log("New volunteers this month:", newVolunteersSnapshot.size);
 
       const totalVolunteersRef = collection(db, 'Volunteers');
       const totalVolunteersSnapshot = await getDocs(totalVolunteersRef);
       setTotalVolunteers(totalVolunteersSnapshot.size);
-      console.log("Total volunteers:", totalVolunteersSnapshot.size);
 
       const closedRequestsRef = collection(db, 'AidRequests');
       const closedRequestsQuery = query(closedRequestsRef, where('status', '==', 'close'));
       const closedRequestsSnapshot = await getDocs(closedRequestsQuery);
       setClosedRequestsThisMonth(closedRequestsSnapshot.size);
-      console.log("Closed requests this month:", closedRequestsSnapshot.size);
 
       const openRequestsQuery = query(closedRequestsRef, where('status', '==', 'open'));
       const openRequestsSnapshot = await getDocs(openRequestsQuery);
       setOpenRequests(openRequestsSnapshot.size);
-      console.log("Open requests:", openRequestsSnapshot.size);
 
       const inProcessRequestsQuery = query(closedRequestsRef, where('status', '==', 'in process'));
       const inProcessRequestsSnapshot = await getDocs(inProcessRequestsQuery);
       setInProcessRequests(inProcessRequestsSnapshot.size);
-      console.log("In-process requests:", inProcessRequestsSnapshot.size);
 
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -213,7 +208,6 @@ function AdminMain() {
       setError(null);
       try {
         const docs = await readDocuments(collectionName, status);
-        console.log('Fetched documents:', docs);
         setDocuments(docs || []);
       } catch (err) {
         console.error('Error fetching documents:', err);
@@ -253,7 +247,20 @@ function AdminMain() {
       setIdValid(true);
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newRecord.mail)) {
+      setMessage('נא להזין כתובת דוא"ל חוקית');
+      return;
+    }
 
+    // Check for empty fields
+    for (const key in newRecord) {
+      if (newRecord[key] === '' || newRecord[key] === undefined || (Array.isArray(newRecord[key]) && newRecord[key].length === 0)) {
+        setMessage(`שדה ${getColumnDisplayName(key)} נדרש`);
+        return;
+      }
+    }
 
     if (isValid) {
       const formattedRecord = {};
@@ -262,8 +269,8 @@ function AdminMain() {
           formattedRecord[key] = value === true || value === 'true';
         } else if (columnDataTypes[key] === 'array') {
           formattedRecord[key] = Array.isArray(value) ? value.map(item => item.value || item) : [];
-        } else if (columnDataTypes[key] === 'object') {
-          formattedRecord[key] = value ? { value: value.value, label: value.label } : null;
+        } else if (columnDataTypes[key] === 'object' && key === 'city') {
+          formattedRecord[key] = value ? value.label : '';
         } else if (columnDataTypes[key] === 'date') {
           formattedRecord[key] = value ? new Date(value).toISOString().split('T')[0] : null;
         } else {
@@ -338,10 +345,10 @@ function AdminMain() {
         }
       } else if (columnDataTypes[key] === 'date' && formattedDoc[key] instanceof Object && 'seconds' in formattedDoc[key]) {
         formattedDoc[key] = new Date(formattedDoc[key].seconds * 1000).toISOString().split('T')[0];
+      } else if (key === 'city' && typeof formattedDoc[key] === 'string') {
+        formattedDoc[key] = { value: formattedDoc[key], label: formattedDoc[key] };
       }
     }
-
-    console.log('Editing document:', formattedDoc);
 
     setNewRecord(formattedDoc);
     setEditMode(true);
@@ -355,7 +362,7 @@ function AdminMain() {
   };
 
   const getColumns = () => {
-    if (documents.length === 0) return [];
+    if (documents.length === 0) return fixedColumnOrder;
     const docKeys = Object.keys(documents[0]).filter(key => key);
     const columns = fixedColumnOrder.filter(column => docKeys.includes(column));
 
@@ -391,7 +398,7 @@ function AdminMain() {
       });
     });
 
-    return filteredDocs ;
+    return filteredDocs;
   };
 
   const columns = getColumns();
@@ -420,7 +427,6 @@ function AdminMain() {
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
-        console.log("User logged out");
         navigate("/");
       })
       .catch((error) => {
@@ -447,6 +453,14 @@ function AdminMain() {
 
   const closeSignUpModal = () => {
     setSignUpModalIsOpen(false);
+  };
+
+  const openStatsModal = () => {
+    setStatsModalIsOpen(true);
+  };
+
+  const closeStatsModal = () => {
+    setStatsModalIsOpen(false);
   };
 
   const handleChangePassword = (e) => {
@@ -558,7 +572,7 @@ function AdminMain() {
   };
 
   const handleViewStatistics = () => {
-    navigate('/Statistics');
+    openStatsModal();
   };
 
   return (
@@ -578,8 +592,7 @@ function AdminMain() {
           {isSuperAdmin && (
             <button onClick={openSignUpModal} className="btn btn-custom">הוספת מנהל חדש</button>
           )}
-            <button onClick={handleViewStatistics}className="btn btn-custom">צפייה בסטטיסטיקות</button>
-
+          <button onClick={handleViewStatistics} className="btn btn-custom">צפייה בסטטיסטיקות</button>
         </div>
       </div>
       <div className="admin-container">
@@ -650,7 +663,15 @@ function AdminMain() {
                 {columns.map((column) => (
                   <div key={column}>
                     <label>{getColumnDisplayName(column)}:</label>
-                    {columnDataTypes[column] === 'boolean' ? (
+                    {column === 'city' ? (
+                      <Select
+                        name={column}
+                        options={citiesInIsrael.map(city => ({ value: city, label: city }))}
+                        value={newRecord[column]}
+                        onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
+                        placeholder=""
+                      />
+                    ) : columnDataTypes[column] === 'boolean' ? (
                       <>
                         <input
                           type="radio"
@@ -674,7 +695,7 @@ function AdminMain() {
                         isMulti
                         value={newRecord[column]}
                         onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                        placeholder={`Select ${getColumnDisplayName(column)}`}
+                        placeholder={``}
                       />
                     ) : columnDataTypes[column] === 'object' ? (
                       <Select
@@ -682,7 +703,7 @@ function AdminMain() {
                         options={filterOptions[column]?.map(item => ({ value: item, label: item })) || []}
                         value={newRecord[column]}
                         onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                        placeholder={`Select ${getColumnDisplayName(column)}`}
+                        placeholder={``}
                       />
                     ) : columnDataTypes[column] === 'date' ? (
                       <input
@@ -697,10 +718,15 @@ function AdminMain() {
                         name={column}
                         value={newRecord[column] || ''}
                         onChange={handleInputChange}
+                        className={!idValid && column === 'ID' ? 'invalid' : (!contactValid && column === 'phoneNumber' ? 'invalid' : '')}
                       />
                     )}
+                    {!idValid && column === 'ID' && <span className="error-message">הקלד תעודת זהות חוקית</span>}
+                    {!contactValid && column === 'phoneNumber' && <span className="error-message">הקלד מספר טלפון חוקי</span>}
+                    {message && <span className="error-message">{message}</span>}
                   </div>
                 ))}
+
                 <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
                 <button type="button" className="lists-button" onClick={() => setShowAddForm(false)}>בטל</button>
                 {collectionName === 'NewVolunteers' && editMode && <button type="button" className="lists-button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
@@ -767,7 +793,30 @@ function AdminMain() {
               </table>
             </div>
           ) : (
-            !loading && <p></p>
+            !loading && (
+              <div className="table-container">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      {columns.map((key) => (
+                        <th key={key}>
+                          {getColumnDisplayName(key)}
+                          <span
+                            className="filter-arrow"
+                            onClick={() => toggleFilterVisibility(key)}
+                          >
+                            ▼
+                          </span>
+                          {filterVisibility[key] && renderFilterForColumn(key)}
+                        </th>
+                      ))}
+                      <th>פעולות</th>
+                    </tr>
+                  </thead>
+                </table>
+                <p></p>
+              </div>
+            )
           )}
         </div>
       </div>
@@ -807,34 +856,45 @@ function AdminMain() {
         className={"Modal"}
       >
         <div className='passwordVolUpdate'>
-        <h1>שינוי סיסמה</h1>
-        <form onSubmit={handleChangePassword}>
-          <input
-            type="password"
-            placeholder="סיסמה ישנה"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            dir="rtl"
-          />
-          <input
-            type="password"
-            placeholder="סיסמה חדשה"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            dir="rtl"
-          />
-          <input
-            type="password"
-            placeholder="הקש שוב את סיסמתך"
-            value={confirmNewPassword}
-            onChange={(e) => setConfirmNewPassword(e.target.value)}
-            dir="rtl"
-          />
-          <button type="submit">שנה סיסמה</button>
-        </form>
-        {message && <p>{message}</p>}
+          <h1>שינוי סיסמה</h1>
+          <form onSubmit={handleChangePassword}>
+            <input
+              type="password"
+              placeholder="סיסמה ישנה"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              dir="rtl"
+            />
+            <input
+              type="password"
+              placeholder="סיסמה חדשה"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              dir="rtl"
+            />
+            <input
+              type="password"
+              placeholder="הקש שוב את סיסמתך"
+              value={confirmNewPassword}
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+              dir="rtl"
+            />
+            <button type="submit">שנה סיסמה</button>
+          </form>
+          {message && <p>{message}</p>}
         </div>
       </Modal>
+
+      <Modal
+        isOpen={statsModalIsOpen}
+        onRequestClose={closeStatsModal}
+        contentLabel="Statistics Modal"
+        className="StatsModal" // Custom CSS class for statistics modal
+        overlayClassName="Overlay"
+      >
+        <Statistics closeModal={closeStatsModal} />
+      </Modal>
+
     </div>
   );
 }

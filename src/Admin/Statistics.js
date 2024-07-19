@@ -3,11 +3,11 @@ import { db } from "../firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import './Statistics.css'; // הקובץ CSS עבור העיצוב
+import './Statistics.css'; // Import the CSS file
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const Statistics = () => {
+const Statistics = ({ closeModal }) => {
   const [cityOpenRequestCounts, setCityOpenRequestCounts] = useState({});
   const [cityVolunteerCounts, setCityVolunteerCounts] = useState({});
   const [volunteeringFieldCounts, setVolunteeringFieldCounts] = useState({});
@@ -19,7 +19,6 @@ const Statistics = () => {
         const aidRequestsSnapshot = await getDocs(collection(db, 'AidRequests'));
         const aidRequests = aidRequestsSnapshot.docs.map(doc => doc.data());
 
-        // חישוב מספר הבקשות הפתוחות מכל עיר
         const openRequestCounts = {};
         aidRequests.forEach(data => {
           if (data.city && data.status === 'open') {
@@ -45,7 +44,6 @@ const Statistics = () => {
         const volunteersSnapshot = await getDocs(collection(db, 'Volunteers'));
         const volunteers = volunteersSnapshot.docs.map(doc => doc.data());
 
-        // חישוב מספר המתנדבים מכל עיר
         const volunteerCounts = {};
         const fieldCounts = {
           'שינוע': 0,
@@ -65,7 +63,6 @@ const Statistics = () => {
             }
           }
 
-          // חישוב מספר המתנדבים לכל תחום התנדבות
           if (data.volunteering) {
             data.volunteering.forEach(field => {
               if (fieldCounts[field] !== undefined) {
@@ -75,24 +72,21 @@ const Statistics = () => {
           }
         });
 
-        // הסרת ערים ללא מתנדבים
         const nonEmptyVolunteerCounts = Object.fromEntries(Object.entries(volunteerCounts).filter(([_, count]) => count > 0));
 
         setCityVolunteerCounts(nonEmptyVolunteerCounts);
         setVolunteeringFieldCounts(fieldCounts);
 
-        // חישוב ערים עם הרבה בקשות פתוחות ומעט מתנדבים
         const highOpenRequestLowVolunteer = {};
         Object.keys(openRequestCounts).forEach(city => {
           const openRequestCount = openRequestCounts[city];
-          const volunteerCount = volunteerCounts[city] || 0; // אם אין מתנדבים, נניח שהמספר הוא 0
+          const volunteerCount = volunteerCounts[city] || 0;
           const difference = openRequestCount - volunteerCount;
           if (difference > 0) {
             highOpenRequestLowVolunteer[city] = { openRequests: openRequestCount, volunteers: volunteerCount };
           }
         });
 
-        // המרת האובייקט למערך, מיון ובחירת 10 הערים עם הפער הגדול ביותר
         const sortedDifferences = Object.entries(highOpenRequestLowVolunteer).sort((a, b) => (b[1].openRequests - b[1].volunteers) - (a[1].openRequests - a[1].volunteers));
         const topDifferences = sortedDifferences.slice(0, 10);
         const topHighOpenRequestLowVolunteerCounts = Object.fromEntries(topDifferences);
@@ -112,7 +106,6 @@ const Statistics = () => {
     fetchData();
   }, []);
 
-  // הכנת הנתונים לגרפים
   const openRequestLabels = Object.keys(cityOpenRequestCounts);
   const openRequestData = {
     labels: openRequestLabels,
@@ -190,6 +183,7 @@ const Statistics = () => {
 
   return (
     <div className="statistics-grid">
+      <button className="close-button" onClick={closeModal}>X</button>
       <div className="chart-container">
         <h2>מספר בקשות סיוע עבור כל עיר</h2>
         <Bar data={openRequestData} options={{ ...options, title: { text: 'מספר בקשות פתוחות מכל עיר' } }} />
