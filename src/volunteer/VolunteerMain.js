@@ -302,9 +302,6 @@ function VolunteerMain() {
     return [...inProcessRequests, ...closedRequests];
   }, [myRequestsDetails]);
 
-  const sortedCloseRequests = useMemo(() => {
-    return myRequestsDetails.filter((request) => request.status === "close");
-  }, [myRequestsDetails]);
 
   const openWhatsAppChat = () => {
     const phoneNumber = "+972545559682";
@@ -604,11 +601,11 @@ function VolunteerMain() {
                     </tr>
                     <tr>
                       <td>{t('type_of_request')}</td>
-                      <td>{`${match.volunteering}`}</td>
+                      <td>{t(`he-volunteering.${match.volunteering}`)}</td>
                     </tr>
                     <tr>
                       <td>{t('date')}</td>
-                      <td>{` ${match.day} ${formatDate(match.date)}`}</td>
+                      <td>{` ${t(`he-days.${match.day}`)} ${formatDate(match.date)}`}</td>
                     </tr>
                     <tr>
                       <td>{t('time')}</td>
@@ -646,11 +643,11 @@ function VolunteerMain() {
                   </tr>
                   <tr>
                     <td>{t('type_of_request')}</td>
-                    <td>{cur.volunteering}</td>
+                    <td>{t(`he-volunteering.${cur.volunteering}`)}</td>
                   </tr>
                   <tr>
                     <td>{t('date')}</td>
-                    <td>{`${cur.day} ${formatDate(cur.date)}`}</td>
+                    <td>{` ${t(`he-days.${cur.day}`)} ${formatDate(cur.date)}`}</td>
                   </tr>
                   <tr>
                     <td>{t('time')}</td>

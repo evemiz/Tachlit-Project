@@ -144,6 +144,15 @@
     "Friday": "Friday",
     "Saturday": "Saturday"
   },
+  "he-days": {
+    "ראשון": "Sunday",
+    "שני": "Monday",
+    "שלישי": "Tuesday",
+    "רביעי": "Wednesday",
+    "חמישי": "Thursday",
+    "שישי": "Friday",
+    "שבת": "Saturday"
+  },
   "volunteering": {
     "Transport": "Transport",
     "Visiting Patients": "Visiting Patients",
@@ -151,6 +160,14 @@
     "Food Packing": "Food Packing",
     "Physical Volunteering": "Physical Volunteering",
     "Administrative Volunteering": "Administrative Volunteering"
+  },
+  "he-volunteering": {
+    "שינוע": "Transport",
+    "ביקור חולים": "Visiting Patients",
+    "הסעת חולים": "Transporting Patients",
+    "אריזת מזון": "Food Packing",
+    "התנדבות פיזית": "Physical Volunteering",
+    "התנדבות משרדית": "Administrative Volunteering"
   },
   "Sending a request for assistance": "Sending a request for assistance",
   "id": "ID",
