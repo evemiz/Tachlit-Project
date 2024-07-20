@@ -164,6 +164,7 @@ function VolunteerMain() {
   const closeModal = async () => {
     setModalIsOpen(false);
     setModalPasswordIsOpen(false);
+    setIsSuccessModalOpen(false);
   }
 
   const closeSignUpModal = () => {
@@ -477,11 +478,22 @@ function VolunteerMain() {
           className="Modal"
           overlayClassName="Overlay"
         >
+        <button
+            onClick={closeModal}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              background: 'transparent',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
+          </button>
           <h2>{t('done_successfully')}</h2>
           <p>{successMessage}</p>
-          <div className="modal-buttons">
-            <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
-          </div>
         </Modal>
       </div>
 

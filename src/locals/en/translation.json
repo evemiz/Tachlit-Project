@@ -47,5 +47,4 @@
   "password_update_error": "Error updating the password.",
   "reauthentication_error": "Error reauthenticating the user. Please check the old password.",
   "email_mismatch": "The entered email does not match the email of the currently signed-in user."
-
 }
