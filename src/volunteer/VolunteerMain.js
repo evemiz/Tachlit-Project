@@ -596,24 +596,24 @@ function VolunteerMain() {
                 <table className={`match-details-table ${isRtl ? 'rtl' : 'ltr'}`}>
                   <tbody>
                     <tr>
-                      <td>{t('assistance_requester')}</td>
+                      <td><strong>{t('assistance_requester')}</strong></td>
                       <td>{`${match.firstName + " " + match.lastName}`}</td>
                     </tr>
                     <tr>
-                      <td>{t('type_of_request')}</td>
+                      <td><strong>{t('type_of_request')}</strong></td>
                       <td>{t(`he-volunteering.${match.volunteering}`)}</td>
                     </tr>
                     <tr>
-                      <td>{t('date')}</td>
+                      <td><strong>{t('date')}</strong></td>
                       <td>{` ${t(`he-days.${match.day}`)} ${formatDate(match.date)}`}</td>
                     </tr>
                     <tr>
-                      <td>{t('time')}</td>
+                      <td><strong>{t('time')}</strong></td>
                       <td>{`${match.time}`}</td>
                     </tr>
                     {match.comments && 
                       <tr>
-                        <td>{t('comments')}</td>
+                        <td><strong>{t('comments')}</strong></td>
                         <td>{match.comments}</td>
                       </tr>
                     }
@@ -638,38 +638,38 @@ function VolunteerMain() {
               <table className={`match-details-table ${isRtl ? 'rtl' : 'ltr'}`}>
                 <tbody>
                   <tr>
-                    <td>{t('assistance_requester')}</td>
+                    <td><strong>{t('assistance_requester')}</strong></td>
                     <td>{`${cur.firstName} ${cur.lastName}`}</td>
                   </tr>
                   <tr>
-                    <td>{t('type_of_request')}</td>
+                    <td><strong>{t('type_of_request')}</strong></td>
                     <td>{t(`he-volunteering.${cur.volunteering}`)}</td>
                   </tr>
                   <tr>
-                    <td>{t('date')}</td>
-                    <td>{` ${t(`he-days.${cur.day}`)} ${formatDate(cur.date)}`}</td>
+                    <td><strong>{t('date')}</strong></td>
+                    <td>{`${t(`he-days.${cur.day}`)} ${formatDate(cur.date)}`}</td>
                   </tr>
                   <tr>
-                    <td>{t('time')}</td>
+                    <td><strong>{t('time')}</strong></td>
                     <td>{cur.time}</td>
                   </tr>
                   {cur.comments && 
                     <tr>
-                      <td>{t('comments')}</td>
+                      <td><strong>{t('comments')}</strong></td>
                       <td>{cur.comments}</td>
                     </tr>
                   }
                   <tr>
-                    <td>{t('phone_number')}</td>
+                    <td><strong>{t('phone_number')}</strong></td>
                     <td>{cur.phoneNumber}</td>
                   </tr>
                   <tr>
-                    <td>{t('status')}</td>
+                    <td><strong>{t('status')}</strong></td>
                     <td>
                       {cur.status === 'in process' ? (
-                        <span style={{ color: '#009ba6' }}>{t('in_process')}</span>
+                        <strong>{<span style={{ color: '#009ba6', fontSize: '20px'}}>{t('in_process')}</span>}</strong>
                       ) : (
-                        <span style={{ color: '#dc3545' }}>{t('done')}</span>
+                        <strong><span style={{ color: '#dc3545', fontSize: '20px' }}>{t('done')}</span></strong>
                       )}
                     </td>
                   </tr>
