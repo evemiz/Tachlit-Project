@@ -13,10 +13,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import logo from '../images/logo.png';
 import {  faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../LanguageSwitcher.js';
 
 Modal.setAppElement('#root');
 
 function VolunteerMain() {
+  const { t, i18n } = useTranslation();
+  const isEnglish = i18n.language === 'en';
   const navigate = useNavigate();
   const location = useLocation();
   const userId = location.state?.userId;
@@ -310,13 +314,6 @@ function VolunteerMain() {
     window.open(whatsappUrl, "_blank");
   };
 
-  const isDatePassed = (dateString) => {
-    const inputDate = new Date(dateString);
-    const today = new Date();
-    inputDate.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
-    setDatePass(inputDate < today);  
-  }
 
   return (
     <div className='VolunteerMain'>
@@ -330,9 +327,9 @@ function VolunteerMain() {
           />
         </div>
         <div className="navbar-buttons">
-          <button className='btn' onClick={openHistory}>בקשות סגורות</button>
-          <button className='btn' onClick={openEditUser}>ערוך פרופיל</button>
-          <button className='btn' onClick={openPasswordReset}>שנה סיסמה</button>
+          <button className='btn' onClick={openHistory}>{t('close_requests')}</button>
+          <button className='btn' onClick={openEditUser}>{t('edit_profile')}</button>
+          <button className='btn' onClick={openPasswordReset}>{t('change_password')}</button>
           <button className='btn-logout' onClick={handleLogout}>
             <FontAwesomeIcon icon={faSignOutAlt} />
           </button>
@@ -360,9 +357,9 @@ function VolunteerMain() {
             &times;
           </button>
           <div className='volunteerApp'>
-            <h1>עריכת פרטי משתמש</h1>
+            <h1>{t('edit_user_details')}</h1>
             <form action="#" method="get" onSubmit={handleSubmit}>
-              <label htmlFor="firstname">שם פרטי</label>
+              <label htmlFor="firstname">{t('first_name')}</label>
               <input
                 type="text"
                 name="firstname"
@@ -372,7 +369,7 @@ function VolunteerMain() {
                 dir="rtl"
                 required
               />
-              <label htmlFor="lastname">שם משפחה</label>
+              <label htmlFor="lastname">{t('last_name')}</label>
               <input
                 type="text"
                 name="lastname"
@@ -383,7 +380,7 @@ function VolunteerMain() {
                 required
               />
 
-              <label>עיר מגורים</label>
+              <label>{t('city')}</label>
               <Select
                 name="select"
                 options={citiesInIsrael.map(city => ({ value: city, label: city }))}
@@ -395,7 +392,7 @@ function VolunteerMain() {
                 required
               />
 
-              <label>תחומי התנדבות</label>
+              <label>{t('volunteerings')}</label>
               <Select
                 isMulti
                 name="volunteerings"
@@ -404,11 +401,11 @@ function VolunteerMain() {
                 classNamePrefix="select"
                 value={volSelectedOptions}
                 onChange={setVolSelectedOptions}
-                placeholder="בחר תחומי התנדבות"
+                placeholder={t('volunteerings_select')}
                 required
               />
 
-              <label>ימי זמינות</label>
+              <label>{t('days_of_availability')}</label>
               <Select
                 isMulti
                 name="days"
@@ -417,11 +414,11 @@ function VolunteerMain() {
                 classNamePrefix="select"
                 value={daySelectedOptions}
                 onChange={setDaySelectedOptions}
-                placeholder="בחר ימי זמינות"
+                placeholder={t('select_days_of_availability')}
                 required
               />
 
-              <label>שפות</label>
+              <label>{t('languages')}</label>
               <Select
                 isMulti
                 name="langueges"
@@ -430,11 +427,11 @@ function VolunteerMain() {
                 classNamePrefix="select"
                 value={langSelectedOptions}
                 onChange={setLangSelectedOptions}
-                placeholder="בחר שפות"
+                placeholder={t('select_languages')}
                 required
               />
 
-              <label htmlFor="available">זמינות לחירום</label>
+              <label htmlFor="available">{t('emergency_availability')}</label>
               <input
                 type="radio"
                 name="available"
@@ -443,7 +440,7 @@ function VolunteerMain() {
                 checked={available === true}
                 onChange={(e) => setAvailable(true)}
               />
-              כן
+              {t('yse')}
               <input
                 type="radio"
                 name="available"
@@ -452,9 +449,9 @@ function VolunteerMain() {
                 checked={available === false}
                 onChange={(e) => setAvailable(false)}
               />
-              לא
+              {t('no')}
 
-              <label htmlFor="vehicle">רכב</label>
+              <label htmlFor="vehicle">{t('vehicle')}</label>
               <input
                 type="radio"
                 name="vehicle"
@@ -463,7 +460,7 @@ function VolunteerMain() {
                 checked={vehicle === true}
                 onChange={(e) => setVehicle(true)}
               />
-              כן
+              {t('yse')}
               <input
                 type="radio"
                 name="vehicle"
@@ -472,11 +469,11 @@ function VolunteerMain() {
                 checked={vehicle === false}
                 onChange={(e) => setVehicle(false)}
               />
-              לא
+              {t('no')}
 
               <br />
               <button type="submit" value="Submit">
-                אישור עריכה
+                {t('confirm_edit')}
               </button>
               </form>
           </div>
@@ -488,7 +485,7 @@ function VolunteerMain() {
           className="Modal"
           overlayClassName="Overlay"
         >
-          <h2>פעולה הצליחה</h2>
+          <h2>{t('done_successfully')}</h2>
           <p>{successMessage}</p>
           <div className="modal-buttons">
             <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
@@ -517,30 +514,30 @@ function VolunteerMain() {
             &times;
           </button>
           <div className='passwordVolUpdate'>
-            <h1>שינוי סיסמה</h1>
+            <h1>{t('change_password')}</h1>
             <form onSubmit={handleChangePassword}>
               <input
                 type="password"
-                placeholder="סיסמה ישנה"
+                placeholder={t('old_password')}
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
                 dir="rtl"
               />
               <input
                 type="password"
-                placeholder="סיסמה חדשה"
+                placeholder={t('new_password')}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 dir="rtl"
               />
               <input
                 type="password"
-                placeholder="הקש שוב את סיסמתך"
+                placeholder={t('again_password')}
                 value={confirmNewPassword}
                 onChange={(e) => setConfirmNewPassword(e.target.value)}
                 dir="rtl"
               />
-              <button type="submit">שנה סיסמה</button>
+              <button type="submit">{t('confirm')}</button>
             </form>
           </div>
         </Modal>
@@ -552,7 +549,7 @@ function VolunteerMain() {
         >
           <div className='message'>
             <button className='close-model-but' onClick={() => setPasswordChangeSuccess(false)}>X</button>
-            <h1>הסיסמה שונתה בהצלחה</h1>
+            <h1>{t('password_change_success')}</h1>
             <Modal closeModal={closeSignUpModal} />
           </div>
         </Modal>
@@ -588,7 +585,7 @@ function VolunteerMain() {
             &times;
           </button>
           <div className='volunteerApp'>
-            <h1>היסטוריית התנדבויות</h1>
+            <h1>{t('history')}</h1>
           {sortedCloseRequests.length > 0 ? (
             <ul>
               {sortedCloseRequests.map((match) => (
@@ -607,15 +604,15 @@ function VolunteerMain() {
                 }}
                 >
                   <div className="Request">
-                    {`סיוע ב${match.volunteering} ל${match.firstName + " " + match.lastName}`}
-                    {`, ביום: ${match.day} ${formatDate(match.date)} בשעה: ${match.time}`}
+                    {`${t('assistance_with')}${match.volunteering} ${t('to')}${match.firstName + " " + match.lastName}`}
+                    {`, ${t('on_day')}: ${match.day} ${formatDate(match.date)} ${t('at_time')}: ${match.time}`}
                   </div>
                 </li>
             ))}
             </ul>
             
           ) : (
-            <p>לא נמצאו בקשות סגורות</p>
+            <p>{t('no_closed_requests')}</p>
           )}
           </div>
         </Modal>
@@ -626,59 +623,63 @@ function VolunteerMain() {
 
       <div className="boxes-container">
         <div className="box">
-          <h2>בקשות סיוע רלוונטיות עבורך</h2>
+          <h2>{t('relevant_requests_title')}</h2>
           {matchDetails.length > 0 ? (
             matchDetails
             .filter((match) => new Date(match.date) >= new Date())
             .map((match) => (
               <div key={match.id} className="match-container">
                 <div className="Request">
-                  <p>{`${match.firstName + " " + match.lastName} מבקש/ת את עזרתך ב${match.volunteering} `}</p>
-                  <p>{`ביום: ${match.day} ${formatDate(match.date)} בשעה: ${match.time}`}</p>
-                  <p>{match.comments && <p>הערות: {match.comments}</p>}</p>
-                  <button onClick={() => handleApproveRequest(match.status, match.id)}>אישור בקשה</button>
-                  <button onClick={() => handleRemoveRequest(match.id)}>מחק בקשה</button>
+                <p>
+                  {isEnglish ? match.mail : `${match.firstName} ${match.lastName}`} 
+                  {` ${t('ask_assistance_with')}${match.volunteering}`}
+                </p>
+                  <p>{`${t('on_day')}: ${match.day} ${formatDate(match.date)} ${t('at_time')}: ${match.time}`}</p>
+                  <p>{match.comments && <p>{t('comments')}: {match.comments}</p>}</p>
+                  <button onClick={() => handleApproveRequest(match.status, match.id)}>{t('approve_request')}</button>
+                  <button onClick={() => handleRemoveRequest(match.id)}>{t('remove_request')}</button>
                 </div>
               </div>
             ))
           ) : (
-            <p>לא נמצאו התאמות</p>
+            <p>{t('no_matches_found')}</p>
           )}
         </div>
 
         <div className="box">
-          <h2>הבקשות שלי</h2>
+          <h2>{t('my_requests')}</h2>
           {sortedRequests.length > 0 ? (
             sortedRequests.map((cur) => (
               <div key={cur.id} className="myRequests-container">
                 <div className="Request">
-                  <p>{`סיוע ל${cur.firstName + " " + cur.lastName} ב${cur.volunteering}`}</p>
-                  <p>{`בתאריך: ${formatDate(cur.date)} בשעה: ${cur.time}`}</p>
+                  <p>{`${t('assistance_to')}${cur.firstName + " " + cur.lastName} ${t('at')}${cur.volunteering}`}</p>
+                  <p>{`${t('on_date')}: ${formatDate(cur.date)} ${t('at_time')}: ${cur.time}`}</p>
                   <p>
-                    סטטוס:
+                  {t('status')}:
                     {cur.status === 'in process' ? (
                       <>
-                        <span style={{ color: '#009ba6' }}> בתהליך</span>
-                        <p>{`מספר טלפון: ${cur.phoneNumber}`}</p>
+                        <span style={{ color: '#009ba6' }}> {t('in_process')}</span>
+                        <p>{`${t('phone_number')}: ${cur.phoneNumber}`}</p>
                       </>
                     ) : (
                       ' טופל'
                     )}
                   </p>
                   {cur.status === 'in process' && (
-                    <button onClick={() => closeRequest(cur.id)}>סגור בקשה</button>
+                    <button onClick={() => closeRequest(cur.id)}>{t('close_request')}</button>
                   )}
                 </div>
               </div>
             ))
           ) : (
-            <p>אין בקשות בטיפול</p>
+            <p>{t('no_in_process_requests')}</p>
           )}
         </div>
       </div>
+      <LanguageSwitcher />
 
       <div className='pageEnd'>
-        <h2>צור איתנו קשר ב - whatsapp </h2>
+        <h2>{t('contact_whatsapp')}</h2>
         <button className="whatsapp-button" onClick={openWhatsAppChat}>
           <FontAwesomeIcon icon={faWhatsapp} size="2x" />
         </button>

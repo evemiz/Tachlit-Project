@@ -498,3 +498,45 @@ h2 {
 .boxes-container {
   margin-top: 100px;
 }
+
+.lang {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
+
+.lang button {
+  background-color: #4CAF50; /* Green background */
+  border: none;
+  color: white; /* White text */
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.lang button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+.lang button:focus {
+  outline: none;
+  box-shadow: 0 0 5px #45a049;
+}
+
+
+.ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+.rtl {
+  direction: rtl;  
+  text-align: right;
+
+}
