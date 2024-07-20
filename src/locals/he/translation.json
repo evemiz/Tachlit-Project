@@ -2,7 +2,7 @@
     "close_requests": "בקשות שהושלמו",
     "edit_profile": "ערוך פרופיל",
     "change_password": "שנה סיסמה",
-    "edit_user_ditailes": "עריכת פרטי משתמש",
+    "edit_user_details": "עריכת פרטי משתמש",
     "first_name": "שם פרטי",
     "last_name": "שם משפחה",
     "city": "עיר מגורים",
@@ -193,6 +193,24 @@
     "Wednesday": "רביעי",
     "Thursday": "חמישי",
     "Friday": "שישי",
-    "Saturday": "שבת"
+    "Saturday": "שבת",
+    "loginVolunteer": {
+      "title": "התחברות",
+      "emailLabel": "שם משתמש",
+      "emailPlaceholder": "הכנס את כתובת הדוא\"ל שלך",
+      "passwordLabel": "סיסמה",
+      "passwordPlaceholder": "הכנס את הסיסמה שלך",
+      "loginButton": "התחבר",
+      "forgotPassword": "שכחת סיסמה?",
+      "loginFailed": "ההתחברות נכשלה. אנא בדוק את פרטי ההתחברות שלך ונסה שוב.",
+      "notVolunteer": "!הנך בכניסת מתנדב",
+      "enterEmail": "אנא הכנס את כתובת הדוא\"ל שלך כדי לאפס את הסיסמה.",
+      "resetEmailSent": "אימייל לאיפוס סיסמה נשלח. אנא בדוק את תיבת הדואר הנכנס שלך.",
+      "resetEmailFailed": "שליחת אימייל לאיפוס סיסמה נכשלה. אנא נסה שוב.",
+      "heartImageAlt": "לב",
+      "visionTitle": "התכלית שלנו",
+      "visionText": "החזון שלנו הוא להמשיך להרחיב את פעילותינו ולתת מענה לכל מי שיזדקק לדבר בסיסי וטריוויאלי כל כך כמו מזון."
+    }
+
   }
 

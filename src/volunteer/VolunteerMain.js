@@ -454,7 +454,7 @@ function VolunteerMain() {
                 checked={available === true}
                 onChange={(e) => setAvailable(true)}
               />
-              {t('yse')}
+              {t('yes')}
               <input
                 type="radio"
                 name="available"
@@ -474,7 +474,7 @@ function VolunteerMain() {
                 checked={vehicle === true}
                 onChange={(e) => setVehicle(true)}
               />
-              {t('yse')}
+              {t('yes')}
               <input
                 type="radio"
                 name="vehicle"
