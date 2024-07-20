@@ -8,13 +8,17 @@
     "city": "עיר מגורים",
     "select_city": "בחר עיר מגורים",
     "volunteerings": "תחומי התנדבות",
+    "vol": "סוג הבקשה",
     "volunteerings_select": "בחר תחומי התנדבות",
+    "volunteering_select": "בחר סוג בקשה",
     "days_of_availability": "ימי זמינות",
     "select_days_of_availability": "בחר ימי זמינות",
     "languages": "שפות",
+    "language": "שפה",
     "select_languages": "בחר שפות",
+    "select_language": "בחר שפה",
     "emergency_availability": "זמינות לחירום",
-    "yse":"כן",
+    "yes":"כן",
     "no":"לא",
     "vehicle": "רכב",
     "confirm_edit": "אשר עריכה",
@@ -143,7 +147,10 @@
     "volunteering": {
       "Transport": "שינוע",
       "Visiting Patients": "ביקור חולים",
-      "Transporting Patients": "הסעת חולים"
+      "Transporting Patients": "הסעת חולים",
+      "Food Packing": "אריזת מזון",
+      "Physical Volunteering": "התנדבות פיזית",
+      "Administrative Volunteering": "התנדבות משרדית"
     },
     "Sending a request for assistance": "שליחת בקשה לסיוע",
     "id": "מספר תעודת זהות",
@@ -154,6 +161,21 @@
     "ruls_request2" : "אין לקחת מספרים ופרטים ולהתנהל מולם מלבד פלטפורמה זו,",
     "ruls_request3" : "אלא אם כן, המתנדב אישר זאת גם אצלנו.",
     "accept_terms" : "אני מאשר את תנאי השימוש",
-    "submit": "שלח"
+    "submit": "שלח",
+    "The request has been sent successfully": "הבקשה נשלחה בהצלחה!",
+    "Not all fields are filled out" : "לא כל השדות מלאים",
+    "Registration for volunteering" : "הרשמה להתנדבות בתכלית",
+    "mail" :"דוא״ל",
+    "Enter a valid Email": "הקלד דוא״ל חוקי",
+    "ruls_vol_title": "תקנון למתנדב חדש",
+    "ruls_vol1" : "יש לשמור על אנונימיות של מבקש הסיוע ולנהוג",
+    "ruls_vol2" : "בסובלנות ובחמלה כלפי מבקש הסיוע.",
+    "Sunday" : "ראשון",
+    "Monday": "שני",
+    "Tuesday": "שלישי",
+    "Wednesday": "רביעי",
+    "Thursday": "חמישי",
+    "Friday": "שישי",
+    "Saturday": "שבת"
   }
 

@@ -45,6 +45,10 @@ function RequestForm() {
     e.preventDefault();
     let isValid = true;
 
+    if (!firstName || !lastName || !id || !contact || !citySelectedOption || !volSelectedOptions || !langSelectedOptions || !date || !time){
+      isValid = false;
+    }
+
     const phoneRegex = /^05\d{8}$/; 
     if (!phoneRegex.test(contact)){
       setContactValid(false);
@@ -61,7 +65,7 @@ function RequestForm() {
       setIdValid(true);
     }
 
-    if (isValid) {
+    if (isValid ) {
       let translatedLang;
       let translatedVol;
       let translatedCity;
@@ -77,10 +81,6 @@ function RequestForm() {
         translatedVol = volSelectedOptions ? volSelectedOptions.label : "";
         translatedCity = citySelectedOption ? citySelectedOption.label : "";
       }
-
-      setLangSelectedOptions(translatedLang);
-      setVolSelectedOptions(translatedVol);
-      setCitySelectedOption(translatedCity);
 
       const formData = {
         firstName: firstName,
@@ -150,20 +150,8 @@ function RequestForm() {
                 console.error(`Error updating volunteer documents: ${error}`);
               }
           }
-    
-          // Reset the form
-          setFirstName("");
-          setLastName("");
-          setId("");
-          setContact("");
-          setCitySelectedOption("");
-          setVolSelectedOptions("");
-          setLangSelectedOptions("");
-          setDate("");
-          setTime("");
-          setComments("");
-          setDayOfWeek("");
-          setSuccessMessage("הבקשה נשלחה בהצלחה!"); // Set success message
+  
+          setSuccessMessage(t(`The request has been sent successfully`)); // Set success message
           setIsSuccessModalOpen(true); // Open success modal
         } catch (error) {
           console.error('Error during handleSubmit:', error);
@@ -199,7 +187,6 @@ function RequestForm() {
     navigate('/');
   }
 
-  // Translate the language options based on the current language
   const translatedLangues = langues.map(lang => ({
     value: lang,
     label: t(`langs.${lang}`)
@@ -296,12 +283,12 @@ function RequestForm() {
               required
             />
 
-            <label htmlFor="volunteerings">{t('volunteerings')}</label>
+            <label htmlFor="volunteerings">{t('vol')}</label>
             <Select
               options={translatedVol}
               value={volSelectedOptions}
               onChange={setVolSelectedOptions}
-              placeholder={t('volunteerings_select')}
+              placeholder={t('volunteering_select')}
               dir={isRtl ? 'rtl' : 'ltr'}
               required
             />
@@ -311,7 +298,7 @@ function RequestForm() {
               options={translatedLangues}
               value={langSelectedOptions}
               onChange={setLangSelectedOptions}
-              placeholder={t('select_languages')}
+              placeholder={t('select_language')}
               dir={isRtl ? 'rtl' : 'ltr'}
               required
             />
@@ -362,6 +349,7 @@ function RequestForm() {
               />
               <label htmlFor="terms">{t('accept_terms')}</label>
             </div>
+
           </div>
 
           <button
@@ -381,12 +369,24 @@ function RequestForm() {
         className="Modal"
         overlayClassName="Overlay"
       >
-        
+        <button
+            onClick={handleSuccessModalClose}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              background: 'transparent',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
+          </button>
+
         <h2>{t('done_successfully')}</h2>
         <p>{successMessage}</p>
-        <div className="modal-buttons">
-          <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
-        </div>
+
       </Modal>
 
       <div className='pageEnd'>

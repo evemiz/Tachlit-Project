@@ -8,7 +8,9 @@
   "city": "City",
   "select_city": "Selsect City",
   "volunteerings": "Volunteerings",
+  "vol": "Request Type",
   "volunteerings_select": "Select Volunteerings",
+  "volunteering_select": "Choose Request Type",
   "days_of_availability": "Days of Availability",
   "select_days_of_availability": "Select Days of Availability",
   "languages": "Languages",
@@ -145,7 +147,10 @@
   "volunteering": {
     "Transport": "Transport",
     "Visiting Patients": "Visiting Patients",
-    "Transporting Patients": "Transporting Patients"
+    "Transporting Patients": "Transporting Patients",
+    "Food Packing": "Food Packing",
+    "Physical Volunteering": "Physical Volunteering",
+    "Administrative Volunteering": "Administrative Volunteering"
   },
   "Sending a request for assistance": "Sending a request for assistance",
   "id": "ID",
@@ -156,5 +161,20 @@
   "ruls_request2" : ",Do not take numbers or details and interact with them outside of this platform",
   "ruls_request3" : ".unless the volunteer has also approved it with us",
   "accept_terms" : "I agree to the terms of use",
-  "submit": "Submit"
+  "submit": "Submit",
+  "The request has been sent successfully": "!The request has been sent successfully",
+  "Not all fields are filled out" : "Not all fields are filled out",
+  "Registration for volunteering" : "Registration for volunteering",
+  "mail" :"Email",
+  "Enter a valid Email": "Enter a valid Email",
+  "ruls_vol_title": "New Volunteer Code of Conduct",
+  "ruls_vol1" : "Maintain the anonymity of the aid seeker and act",
+  "ruls_vol2" : ".with tolerance and compassion towards the aid seeker",
+  "Sunday" : "Sunday",
+  "Monday": "Monday",
+  "Tuesday": "Tuesday",
+  "Wednesday": "Wednesday",
+  "Thursday": "Thursday",
+  "Friday": "Friday",
+  "Saturday": "Saturday"
 }

@@ -11,10 +11,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
 import { useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../LanguageSwitcher.js';
 
 Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
 
 function VolunteerForm() {
+  const { t, i18n } = useTranslation();
+  const isEnglish = i18n.language === 'en'; 
+  const isRtl = i18n.language === 'he';
   const navigate = useNavigate();
 
   const [firstName, setFirstName] = useState("");
@@ -64,35 +69,44 @@ function VolunteerForm() {
     }
 
     if (isValid) {
+
+      let translatedLang;
+      let translatedVol;
+      let translatedCity;
+      let translatedDay;
+
+      if (isEnglish) {
+        translatedLang = langSelectedOptions.map(option => t(`langs.${option.value}`, { lng: 'he' }));
+        translatedVol = volSelectedOptions.map(option => t(`volunteering.${option.value}`, { lng: 'he' }));
+        translatedDay = daySelectedOptions.map(option => t(`${option.value}`, { lng: 'he' }));
+        translatedCity = citySelectedOption ? t(`${citySelectedOption.label}`, { lng: 'he' }) : "";
+      }
+
+      else{
+        translatedLang = langSelectedOptions.map(option => option.value);
+        translatedVol = volSelectedOptions.map(option => option.value);
+        translatedDay = daySelectedOptions.map(option => option.value);
+        translatedCity = citySelectedOption ? citySelectedOption.label : "";
+      }
+
+
       const formData = {
         firstName: firstName,
         lastName: lastName,
         ID: id,
         phoneNumber: contact,
         mail: email,
-        city: citySelectedOption ? citySelectedOption.label : "",
-        languages: langSelectedOptions.map(option => option.value),
-        days: daySelectedOptions.map(option => option.value),
+        city: translatedCity,
+        languages: translatedLang,
+        days: translatedDay,
         emergency: available,
-        volunteering: volSelectedOptions.map(option => option.value),
+        volunteering: translatedVol,
         vehicle: vehicle,
       };
 
       await addDocument("NewVolunteers", formData, 'id');
 
-      // Reset the form
-      setFirstName("");
-      setLastName("");
-      setId("");
-      setContact("");
-      setEmail("");
-      setCitySelectedOption("");
-      setVolSelectedOptions([]);
-      setDaySelectedOptions([]);
-      setLangSelectedOptions([]);
-      setAvailable(Boolean);
-      setVehicle(Boolean);
-      setSuccessMessage("הטופס נשלח בהצלחה!"); // Set success message
+      setSuccessMessage(t(`The request has been sent successfully`)); // Set success message
       setIsSuccessModalOpen(true); // Open success modal
     }
   };
@@ -113,10 +127,33 @@ function VolunteerForm() {
     navigate('/');
   }
 
+  const translatedLangues = langues.map(lang => ({
+    value: lang,
+    label: t(`langs.${lang}`)
+  }));
+
+  const translatedVol = volunteerings.map(vol => ({
+    value: vol,
+    label: t(`volunteering.${vol}`)
+  }));
+
+  const translatedCity = citiesInIsrael.map(city => ({
+    value: city,
+    label: t(`${city}`)
+  }));
+
+  const translatedDay = days.map(day => ({
+    value: day,
+    label: t(`${day}`)
+  }));
+
   return (
     <div className="page">
 
     <div className="navbar-custom-form">
+    <div className="navbar-buttons">
+          <LanguageSwitcher />
+        </div>
         <div className="navbar-logo">
           <img
             src={logo}
@@ -131,11 +168,11 @@ function VolunteerForm() {
 
     <div className="Form">
 
-      <h1>הרשמה להתנדבות בתכלית</h1>
+      <h1>{t('Registration for volunteering')}</h1>
       <fieldset>
         <form action="#" method="get" onSubmit={handleSubmit}>
         <div className='Fileds'>
-          <label htmlFor="firstname">שם פרטי</label>
+          <label htmlFor="firstname">{t('first_name')}</label>
           <input
             type="text"
             name="firstname"
@@ -145,7 +182,7 @@ function VolunteerForm() {
             dir="rtl"
             required
           />
-          <label htmlFor="lastname">שם משפחה</label>
+          <label htmlFor="lastname">{t('last_name')}</label>
           <input
             type="text"
             name="lastname"
@@ -156,7 +193,7 @@ function VolunteerForm() {
             required
           />
 
-          <label htmlFor="id">מספר תעדות זהות</label>
+          <label htmlFor="id">{t('id')}</label>
           <input
             type="text"
             name="id"
@@ -166,10 +203,10 @@ function VolunteerForm() {
             required
           />
           {!idValid && (
-            <label style={{ color: 'red', fontSize: '12px' }}>הקלד תעודת זהות חוקית</label>
+            <label style={{ color: 'red', fontSize: '12px' }}>{t('Enter a valid ID')}</label>
           )}
 
-          <label htmlFor="tel">מספר טלפון</label>
+          <label htmlFor="tel">{t('phone_number')}</label>
           <input
             type="tel"
             name="contact"
@@ -180,10 +217,10 @@ function VolunteerForm() {
             required
           />
           {!contactValid && (
-            <label style={{ color: 'red', fontSize: '12px' }}>הקלד מספר טלפון חוקי</label>
+            <label style={{ color: 'red', fontSize: '12px' }}>{t('Enter a valid Phone Number')}</label>
           )}
 
-        <label htmlFor="mail">כתבות דוא״ל</label>
+        <label htmlFor="mail">{t('mail')}</label>
           <input
             name="mail"
             type='text'
@@ -193,59 +230,59 @@ function VolunteerForm() {
             required
           />
           {!emailValid && (
-            <label style={{ color: 'red', fontSize: '12px' }}>הקלד דוא״ל חוקי</label>
+            <label style={{ color: 'red', fontSize: '12px' }}>{t('Enter a valid Email')}</label>
           )}
 
-          <label>עיר מגורים</label>
+          <label>{t('city')}</label>
           <Select
             name="select"
-            options={citiesInIsrael.map(city => ({ value: city, label: city }))}
+            options={translatedCity}
             value={citySelectedOption}
             onChange={setCitySelectedOption}
-            placeholder="בחר עיר מגורים"
+            placeholder= {t('select_city')}
             required
           />
 
-          <label>תחומי התנדבות</label>
+          <label>{t('volunteerings')}</label>
           <Select
             isMulti
             name="volunteerings"
-            options={volunteerings.map(volunteer => ({ value: volunteer, label: volunteer }))}
+            options={translatedVol}
             className="basic-multi-select"
             classNamePrefix="select"
             value={volSelectedOptions}
             onChange={setVolSelectedOptions}
-            placeholder="בחר תחומי התנדבות"
+            placeholder={t('volunteerings_select')}
             required
           />
 
-          <label>ימי זמינות</label>
+          <label>{t('days_of_availability')}</label>
           <Select
             isMulti
             name="days"
-            options={days.map(day => ({ value: day, label: day }))}
+            options={translatedDay}
             className="basic-multi-select"
             classNamePrefix="select"
             value={daySelectedOptions}
             onChange={setDaySelectedOptions}
-            placeholder="בחר ימי זמינות"
+            placeholder={t('select_days_of_availability')}
             required
           />
 
-          <label>שפות</label>
+          <label>{t('languages')}</label>
           <Select
             isMulti
             name="languages"
-            options={langues.map(lang => ({ value: lang, label: lang }))}
+            options={translatedLangues}
             className="basic-multi-select"
             classNamePrefix="select"
             value={langSelectedOptions}
             onChange={setLangSelectedOptions}
-            placeholder="בחר שפות"
+            placeholder={t('select_languages')}
             required
           />
 
-          <label htmlFor="available">זמינות לחירום</label>
+          <label htmlFor="available">{t('emergency_availability')}</label>
           <input
             type="radio"
             name="available"
@@ -254,7 +291,7 @@ function VolunteerForm() {
             checked={available === true}
             onChange={(e) => setAvailable(true)}
           />
-          כן
+          {t('yes')}
           <input
             type="radio"
             name="available"
@@ -263,9 +300,9 @@ function VolunteerForm() {
             checked={available === false}
             onChange={(e) => setAvailable(false)}
           />
-          לא
+          {t('no')}
 
-          <label htmlFor="vehicle">רכב</label>
+          <label htmlFor="vehicle">{t('vehicle')}</label>
           <input
             type="radio"
             name="vehicle"
@@ -274,7 +311,7 @@ function VolunteerForm() {
             checked={vehicle === true}
             onChange={(e) => setVehicle(true)}
           />
-          כן
+          {t('yes')}
           <input
             type="radio"
             name="vehicle"
@@ -283,15 +320,15 @@ function VolunteerForm() {
             checked={vehicle === false}
             onChange={(e) => setVehicle(false)}
           />
-          לא
+          {t('no')}
 
           <br></br>
           </div>
 
           <div className='ruls'>
-          <h2>תקנון למתנדב חדש</h2>
-          <p>יש לשמור על אנונימיות של מבקש הסיוע ולנהוג</p>
-          <p>בסובלנות ובחמלה כלפי מבקש הסיוע.</p>
+          <h2>{t('ruls_vol_title')}</h2>
+          <p>{t('ruls_vol1')}</p>
+          <p>{t('ruls_vol2')}</p>
 
 
           <div className="terms-container">
@@ -302,7 +339,7 @@ function VolunteerForm() {
               onChange={() => setIsTermsAccepted(!isTermsAccepted)}
               required      
             />
-            <label htmlFor="terms">אני מאשר את תנאי השימוש</label>
+            <label htmlFor="terms">{t('accept_terms')}</label>
           </div>
 
           </div>
@@ -310,7 +347,7 @@ function VolunteerForm() {
             type="submit"
             value="Submit"
           >
-            הגש בקשה
+            {t('submit')}
           </button>
         </form>
       </fieldset>
@@ -321,24 +358,34 @@ function VolunteerForm() {
         className="Modal"
         overlayClassName="Overlay"
       >
-        <h2>פעולה הצליחה</h2>
+        <button
+            onClick={handleSuccessModalClose}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              background: 'transparent',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
+          </button>
+
+        <h2>{t('done_successfully')}</h2>
         <p>{successMessage}</p>
-        <div className="modal-buttons">
-          <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
-        </div>
+
       </Modal>
       </div>
 
 
       <div className='pageEnd'>
-      <h2>צור איתנו קשר ב - whatsapp </h2>
+      <h2>{t('contact_whatsapp')} </h2>
         <button className="whatsapp-button" onClick={openWhatsAppChat}>
             <FontAwesomeIcon icon={faWhatsapp} size="2x" />
         </button>
       </div>
-
-
-
 
     </div>
   );

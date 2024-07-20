@@ -1,10 +1,10 @@
 const volunteerings = [
-    "שינוע",
-    "ביקור חולים",
-    "הסעת חולים",
-    "אריזת מזון",
-    "התנדבות פיזית",
-    "התנדבות משרדית",
+    "Transport",
+    "Visiting Patients",
+    "Transporting Patients",
+    "Food Packing",
+    "Physical Volunteering",
+    "Administrative Volunteering"
     ];
   
     export default volunteerings;
