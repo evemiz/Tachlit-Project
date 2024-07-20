@@ -64,10 +64,6 @@ function VolunteerMain() {
         setDocumentId(doc.id);
         setFirstName(data.firstName || "");
         setLastName(data.lastName || "");
-        setCitySelectedOption(data.city ? { value: data.city, label: data.city } : null);
-        setVolSelectedOptions(data.volunteering ? data.volunteering.map(vol => ({ value: vol, label: vol })) : []);
-        setDaySelectedOptions(data.days ? data.days.map(day => ({ value: day, label: day })) : []);
-        setLangSelectedOptions(data.langueges ? data.langueges.map(lang => ({ value: lang, label: lang })) : []);
         setAvailable(data.emergency || false);
         setVehicle(data.vehicle || false);
         setMatches(data.matches || []);
@@ -157,6 +153,10 @@ function VolunteerMain() {
   };
 
   const openEditUser = async () => {
+    setCitySelectedOption(null);
+    setVolSelectedOptions([]);
+    setDaySelectedOptions([]);
+    setLangSelectedOptions([]);
     setModalIsOpen(true);
     setModalPasswordIsOpen(false);
   };
@@ -222,14 +222,19 @@ function VolunteerMain() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const translatedLang = langSelectedOptions.map(option => t(`langs.${option.value}`, { lng: 'he' }));
+    const translatedVol = volSelectedOptions.map(option => t(`volunteering.${option.value}`, { lng: 'he' }));
+    const translatedDay = daySelectedOptions.map(option => t(`${option.value}`, { lng: 'he' }));
+    const translatedCity = citySelectedOption ? t(`${citySelectedOption.label}`, { lng: 'he' }) : "";
+
     const formData = {
       firstName: firstName,
       lastName: lastName,
-      city: citySelectedOption ? citySelectedOption.label : "",
-      langueges: langSelectedOptions.map(option => option.value),
-      days: daySelectedOptions.map(option => option.value),
+      city: translatedCity,
+      langueges: translatedLang,
+      days: translatedDay,
       emergency: available,
-      volunteering: volSelectedOptions.map(option => option.value),
+      volunteering: translatedVol,
       vehicle: vehicle,
     };
 
@@ -307,6 +312,25 @@ function VolunteerMain() {
     window.open(whatsappUrl, "_blank");
   };
 
+  const translatedLangues = langueges.map(lang => ({
+    value: lang,
+    label: t(`langs.${lang}`)
+  }));
+
+  const translatedVol = volunteerings.map(vol => ({
+    value: vol,
+    label: t(`volunteering.${vol}`)
+  }));
+
+  const translatedCity = citiesInIsrael.map(city => ({
+    value: city,
+    label: t(`${city}`)
+  }));
+
+  const translatedDay = days.map(day => ({
+    value: day,
+    label: t(`${day}`)
+  }));
 
   return (
     <div className='VolunteerMain'>
@@ -376,7 +400,7 @@ function VolunteerMain() {
               <label>{t('city')}</label>
               <Select
                 name="select"
-                options={citiesInIsrael.map(city => ({ value: city, label: city }))}
+                options={translatedCity}
                 value={citySelectedOption}
                 onChange={setCitySelectedOption}
                 placeholder={t('select_city')}
@@ -389,7 +413,7 @@ function VolunteerMain() {
               <Select
                 isMulti
                 name="volunteerings"
-                options={volunteerings.map(volunteer => ({ value: volunteer, label: volunteer }))}
+                options={translatedVol}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 value={volSelectedOptions}
@@ -402,7 +426,7 @@ function VolunteerMain() {
               <Select
                 isMulti
                 name="days"
-                options={days.map(day => ({ value: day, label: day }))}
+                options={translatedDay}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 value={daySelectedOptions}
@@ -415,7 +439,7 @@ function VolunteerMain() {
               <Select
                 isMulti
                 name="langueges"
-                options={langueges.map(lang => ({ value: lang, label: lang }))}
+                options={translatedLangues}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 value={langSelectedOptions}
