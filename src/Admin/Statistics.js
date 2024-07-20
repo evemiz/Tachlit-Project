@@ -183,7 +183,8 @@ const Statistics = ({ closeModal }) => {
 
   return (
     <div className="statistics-grid">
-      <button className="close-button" onClick={closeModal}>X</button>
+      {/* <button className="close-button" onClick={closeModal}>X</button> */}
+
       <div className="chart-container">
         <h2>מספר בקשות סיוע עבור כל עיר</h2>
         <Bar data={openRequestData} options={{ ...options, title: { text: 'מספר בקשות פתוחות מכל עיר' } }} />

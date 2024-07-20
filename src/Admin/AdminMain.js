@@ -20,6 +20,8 @@ import '../custom.css';
 import '../navbar.css';
 import { faSignOutAlt, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import RequestForm from './RequestForm';
+import VolunteerForm from './VolunteerForm';
 
 Modal.setAppElement('#root');
 
@@ -27,7 +29,7 @@ const columnMapping = {
   firstName: 'שם פרטי ',
   lastName: ' שם משפחה ',
   phoneNumber: 'מספר טלפון ',
-  langueges: 'שפות ',
+  languages: 'שפות ',
   ID: 'ת.ז. ',
   city: 'עיר ',
   days: ' ימים',
@@ -42,11 +44,11 @@ const columnMapping = {
   volunteerMatch: 'מתנדב '
 };
 
-const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail', 'langueges', 'city', 'days', 'volunteering', 'date', 'time', 'comments', 'emergency', 'vehicle'];
+const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail', 'languages', 'city', 'days', 'volunteering', 'date', 'time', 'comments', 'emergency', 'vehicle'];
 
 const filterOptions = {
   city: citiesInIsrael,
-  langueges: languages,
+  languages: languages,
   days: days,
   volunteering: volunteering
 };
@@ -55,7 +57,7 @@ const columnDataTypes = {
   firstName: 'string',
   lastName: 'string',
   phoneNumber: 'string',
-  langueges: 'array',
+  languages: 'array',
   city: 'string',
   days: 'array',
   volunteering: 'array',
@@ -97,7 +99,7 @@ function AdminMain() {
     firstName: '',
     lastName: '',
     phoneNumber: '',
-    langueges: [],
+    languages: [],
     ID: '',
     city: '',
     days: [],
@@ -105,7 +107,6 @@ function AdminMain() {
     mail: '',
     vehicle: undefined,
     emergency: undefined
-
   });
   const [editMode, setEditMode] = useState(false);
   const [currentEditId, setCurrentEditId] = useState(null);
@@ -308,9 +309,16 @@ function AdminMain() {
         confirmAction(() => updateDocument(collectionName, currentEditId, cleanedRecord), '?האם אתה בטוח שברצונך לערוך רשומה זו');
       } else {
         if (collectionName === 'Volunteers' && cleanedRecord.ID) {
-          confirmAction(() => addDocument(collectionName, cleanedRecord, cleanedRecord.ID), '?האם אתה בטוח שברצונך להוסיף רשומה זו');
+          confirmAction(async () => {
+            await addDocument('Volunteers', cleanedRecord, cleanedRecord.ID);
+            await handleApproveVolunteer(cleanedRecord.ID); // Create user like 'אשר מתנדב חדש'
+            window.location.reload(); // Refresh the page to show the new record
+          }, '?האם אתה בטוח שברצונך להוסיף רשומה זו');
         } else {
-          confirmAction(() => addDocument(collectionName, cleanedRecord), '?האם אתה בטוח שברצונך להוסיף רשומה זו');
+          confirmAction(async () => {
+            await addDocument(collectionName, cleanedRecord);
+            window.location.reload(); // Refresh the page to show the new record
+          }, '?האם אתה בטוח שברצונך להוסיף רשומה זו');
         }
       }
     } catch (err) {
@@ -367,8 +375,6 @@ function AdminMain() {
         }
       } else if (columnDataTypes[key] === 'date' && formattedDoc[key] instanceof Object && 'seconds' in formattedDoc[key]) {
         formattedDoc[key] = new Date(formattedDoc[key].seconds * 1000).toISOString().split('T')[0];
-      } else if (key === 'city' && typeof formattedDoc[key] === 'string') {
-        formattedDoc[key] = { value: formattedDoc[key], label: formattedDoc[key] };
       }
     }
 
@@ -698,78 +704,78 @@ function AdminMain() {
 
         <div className={`content ${showFilters ? 'sidebar-open' : ''}`}>
           {showAddForm && (
-            <div className="add-form">
-              <form onSubmit={handleAddRecord}>
-                {columns.map((column) => (
-                  <div key={column}>
-                    <label>{columnMapping[column]}:</label>
-                    {column === 'city' ? (
-                      <Select
-                        name={column}
-                        options={citiesInIsrael.map(city => ({ value: city, label: city }))}
-                        value={newRecord[column]}
-                        onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                        placeholder=""
-                      />
-                    ) : columnDataTypes[column] === 'boolean' ? (
-                      <>
-                        <input
-                          type="radio"
-                          name={column}
-                          value="true"
-                          checked={newRecord[column] === true}
-                          onChange={handleInputChange}
-                        /> כן
-                        <input
-                          type="radio"
-                          name={column}
-                          value="false"
-                          checked={newRecord[column] === false}
-                          onChange={handleInputChange}
-                        /> לא  <br />
-                      </>
-                    ) : columnDataTypes[column] === 'array' ? (
-                      <Select
-                        name={column}
-                        options={filterOptions[column]?.map(item => ({ value: item, label: item })) || []}
-                        isMulti
-                        value={newRecord[column]}
-                        onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                        placeholder={``}
-                      />
-                    ) : columnDataTypes[column] === 'object' ? (
-                      <Select
-                        name={column}
-                        options={filterOptions[column]?.map(item => ({ value: item, label: item })) || []}
-                        value={newRecord[column]}
-                        onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-                        placeholder={``}
-                      />
-                    ) : columnDataTypes[column] === 'date' ? (
-                      <input
-                        type="date"
-                        name={column}
-                        value={newRecord[column] || ''}
-                        onChange={handleInputChange}
-                      />
-                    ) : (
-                      <input
-                        type="text"
-                        name={column}
-                        value={newRecord[column] || ''}
-                        onChange={handleInputChange}
-                        className={!validationErrors[column] ? '' : 'invalid'}
-                      />
-                    )}
-                    {validationErrors[column] && <span className="error-message">{validationErrors[column]}</span>}
-                  </div>
-                ))}
+            editMode ? (
+              <div className="add-form">
+                <form onSubmit={handleAddRecord}>
+                  {columns.map((column) => (
+                    column !== 'matches' && (
+                      <div key={column}>
+                        <label>{columnMapping[column]}:</label>
+                        {columnDataTypes[column] === 'boolean' ? (
+                          <>
+                            <input
+                              type="radio"
+                              name={column}
+                              value="true"
+                              checked={newRecord[column] === true}
+                              onChange={handleInputChange}
+                            /> כן
+                            <input
+                              type="radio"
+                              name={column}
+                              value="false"
+                              checked={newRecord[column] === false}
+                              onChange={handleInputChange}
+                            /> לא  <br />
+                          </>
+                        ) : columnDataTypes[column] === 'array' ? (
+                          <Select
+                            name={column}
+                            options={filterOptions[column]?.map(item => ({ value: item, label: item })) || []}
+                            isMulti
+                            value={newRecord[column]}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
+                            placeholder={``}
+                          />
+                        ) : columnDataTypes[column] === 'object' ? (
+                          <Select
+                            name={column}
+                            options={filterOptions[column]?.map(item => ({ value: item, label: item })) || []}
+                            value={newRecord[column]}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
+                            placeholder={``}
+                          />
+                        ) : columnDataTypes[column] === 'date' ? (
+                          <input
+                            type="date"
+                            name={column}
+                            value={newRecord[column] || ''}
+                            onChange={handleInputChange}
+                          />
+                        ) : (
+                          <input
+                            type="text"
+                            name={column}
+                            value={newRecord[column] || ''}
+                            onChange={handleInputChange}
+                            className={!validationErrors[column] ? '' : 'invalid'}
+                          />
+                        )}
+                        {validationErrors[column] && <span className="error-message">{validationErrors[column]}</span>}
+                      </div>
+                    )
+                  ))}
 
-                <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
-                <button type="button" className="lists-button" onClick={() => setShowAddForm(false)}>בטל</button>
-                {collectionName === 'NewVolunteers' && editMode && <button type="button" className="lists-button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
-              </form>
-            </div>
+                  <button className="lists-button" type="submit">{editMode ? 'עדכן' : 'אשר'}</button>
+                  <button type="button" className="lists-button" onClick={() => { setShowAddForm(false); setNewRecord({}); setEditMode(false); setCurrentEditId(null); }}>בטל</button>
+                  {collectionName === 'NewVolunteers' && editMode && <button type="button" className="lists-button" onClick={() => handleApproveNewVolunteer(currentEditId)}>אשר מתנדב חדש</button>}
+                </form>
+              </div>
+            ) : collectionName === 'AidRequests' ? (
+              <RequestForm setIsSuccessModalOpen={setIsSuccessModalOpen} setSuccessMessage={setSuccessMessage} />
+            ) : collectionName === 'Volunteers' ? (
+              <VolunteerForm setIsSuccessModalOpen={setIsSuccessModalOpen} setSuccessMessage={setSuccessMessage} />
+            ) : null
           )}
           {collectionName && (
             <button className="lists-button" onClick={() => setShowAddForm(true)}>הוסף רשומה חדשה</button>
@@ -837,8 +843,27 @@ function AdminMain() {
               </table>
             </div>
           ) : (
-            !loading && collectionName && filteredDocuments.length === 0 && (
+            !loading && !editMode && (
               <div>
+                <table className="table">
+                  <thead>
+                    <tr>
+                      {columns.map((key) => (
+                        <th key={key}>
+                          {columnMapping[key]}
+                          <span
+                            className="filter-arrow"
+                            onClick={() => toggleFilterVisibility(key)}
+                          >
+                            ▼
+                          </span>
+                          {filterVisibility[key] && renderFilterForColumn(key)}
+                        </th>
+                      ))}
+                      <th>פעולות</th>
+                    </tr>
+                  </thead>
+                </table>
                 <p>לא נמצאו תוצאות</p>
               </div>
             )
@@ -880,6 +905,23 @@ function AdminMain() {
         contentLabel="Change Password Modal"
         className={"Modal"}
       >
+        <button
+            onClick={closeModal}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              background: 'transparent',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
+          </button>
+
+
+
         <div className='passwordVolUpdate'>
           <h1>שינוי סיסמה</h1>
           <form onSubmit={handleChangePassword}>
@@ -917,6 +959,21 @@ function AdminMain() {
         className="StatsModal"
         overlayClassName="Overlay"
       >
+         <button
+            onClick={closeStatsModal}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              background: 'transparent',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
+          </button>
+
         <Statistics closeModal={closeStatsModal} />
       </Modal>
 
@@ -939,19 +996,45 @@ function AdminMain() {
           ) : (
             <p>לא נמצאו פרטים</p>
           )}
-          <button className="matches-close-button" onClick={() => setVolunteerModalIsOpen(false)}>
-            <FontAwesomeIcon icon={faXmark} />
+           <button
+            onClick={() => setVolunteerModalIsOpen(false)}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              background: 'transparent',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
           </button>
         </div>
       </Modal>
 
       <Modal
+
         isOpen={matchesModalIsOpen}
         onRequestClose={() => setMatchesModalIsOpen(false)}
         contentLabel="Matches Modal"
         className="MatchesModal"
         overlayClassName="Overlay"
       >
+        <button
+            onClick={() => setMatchesModalIsOpen(false)}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              background: 'transparent',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
+          </button>
         <div>
           <h2>פרטי התאמות</h2>
           {selectedMatches.length > 0 ? (
@@ -978,9 +1061,7 @@ function AdminMain() {
           ) : (
             <p>לא נמצאו פרטים</p>
           )}
-          <button className="matches-close-button" onClick={() => setMatchesModalIsOpen(false)}>
-            <FontAwesomeIcon icon={faXmark} />
-          </button>
+
         </div>
       </Modal>
     </div>

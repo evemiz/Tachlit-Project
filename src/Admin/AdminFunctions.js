@@ -1,4 +1,4 @@
-import { doc, addDoc, collection, deleteDoc, getDocs, setDoc, query, where } from 'firebase/firestore';
+import { doc, addDoc, collection, deleteDoc, getDocs, setDoc, query, where, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig.js';
 import { doc as doc1, getDoc as getDoc1 } from 'firebase/firestore';
 import { sendSignInLinkToEmail } from 'firebase/auth';
@@ -122,5 +122,48 @@ export const sendApprovalEmail = async (email, volunteerId) => {
   } catch (error) {
     console.error("Error sending sign-in link:", error.code, error.message);
     throw error;
+  }
+};
+
+export const addMatchToDocument = async (collectionName, documentId, fieldValue) => {
+  try {
+    const docRef = doc(db, collectionName, documentId);
+
+    // Get the document to check if the 'matches' field exists
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const docData = docSnap.data();
+      if (docData.matches) {
+        // If the 'matches' field exists, add the value to the array
+        await updateDoc(docRef, {
+          matches: arrayUnion(fieldValue)
+        });
+      } else {
+        // If the 'matches' field does not exist, create it and set the value
+        await updateDoc(docRef, {
+          matches: [fieldValue]
+        });
+      }
+    }
+    return true;
+  } catch (error) {
+    console.error("Error adding field to document: ", error);
+    return false;
+  }
+};
+
+// Function to add a field to a specific document in a collection
+export const addFieldToDocument = async (collectionName, documentId, fieldName, fieldValue) => {
+  try {
+      const docRef = doc(db, collectionName, documentId);
+      await updateDoc(docRef, {
+          [fieldName]: fieldValue
+      });
+      console.log(`Field '${fieldName}' added to document '${documentId}' in collection '${collectionName}'`);
+      return true;
+  } catch (error) {
+      console.error("Error adding field to document: ", error);
+      return false;
   }
 };
