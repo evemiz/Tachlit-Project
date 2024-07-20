@@ -20,7 +20,9 @@ Modal.setAppElement('#root');
 
 function VolunteerMain() {
   const { t, i18n } = useTranslation();
-  const isEnglish = i18n.language === 'en';
+  const isEnglish = i18n.language === 'en'; 
+  const isRtl = i18n.language === 'he';
+
   const navigate = useNavigate();
   const location = useLocation();
   const userId = location.state?.userId;
@@ -48,7 +50,6 @@ function VolunteerMain() {
   const [myRequestsDetails, setMyRequestsDetails] = useState([]);
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [historyModal, setIsHistoryModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [datePass, setDatePass] = useState(false);
   const isFetching = useRef(false);
@@ -108,7 +109,6 @@ function VolunteerMain() {
     } catch (error) {
       console.error("Error fetching match details:", error);
     } finally {
-      // isFetching.current = false;
     }
   }, [matches, documentId]);
 
@@ -159,19 +159,11 @@ function VolunteerMain() {
   const openEditUser = async () => {
     setModalIsOpen(true);
     setModalPasswordIsOpen(false);
-    setIsHistoryModal(false);
-  };
-
-  const openHistory = async () => {
-    setIsHistoryModal(true);
-    setModalIsOpen(false);
-    setModalPasswordIsOpen(false);
   };
 
   const closeModal = async () => {
     setModalIsOpen(false);
     setModalPasswordIsOpen(false);
-    setIsHistoryModal(false);
   }
 
   const closeSignUpModal = () => {
@@ -181,7 +173,6 @@ function VolunteerMain() {
   const openPasswordReset = async () => {
     setModalPasswordIsOpen(true);
     setModalIsOpen(false);
-    setIsHistoryModal(false);
   }
 
   const handleChangePassword = (e) => {
@@ -189,12 +180,12 @@ function VolunteerMain() {
 
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
     if (!passwordRegex.test(newPassword)) {
-      setMessage("הסיסמה חייבת להיות באורך של לפחות 8 תווים ולכלול אותיות ומספרים.");
+      setMessage(t('password_requirements'));
       return;
     }
 
     if (newPassword !== confirmNewPassword) {
-      setMessage("הסיסמאות אינן תואמות.");
+      setMessage(t('passwords_do_not_match'));
       return;
     }
 
@@ -206,7 +197,6 @@ function VolunteerMain() {
         .then(() => {
           updatePassword(user, newPassword)
             .then(() => {
-              setMessage("הסיסמה שונתה בהצלחה");
               setEmail("");
               setOldPassword("");
               setNewPassword("");
@@ -216,15 +206,15 @@ function VolunteerMain() {
             })
             .catch((error) => {
               console.error("Error updating password:", error);
-              setMessage("שגיאה בעדכון הסיסמה");
+              setMessage(t('password_update_error'));
             });
         })
         .catch((error) => {
           console.error("Error reauthenticating user:", error);
-          setMessage("שגיאה באימות המשתמש. נא לבדוק את הסיסמה הישנה.");
+          setMessage(t('reauthentication_error'));
         });
     } else {
-      setMessage("האימייל שהוזן אינו תואם את האימייל של המשתמש המחובר");
+      setMessage(t('email_mismatch'));
     }
   };
 
@@ -301,7 +291,9 @@ function VolunteerMain() {
   };
 
   const sortedRequests = useMemo(() => {
-    return myRequestsDetails.filter((request) => request.status === "in process");
+    const inProcessRequests = myRequestsDetails.filter(cur => cur && cur.status === 'in process');
+    const closedRequests = myRequestsDetails.filter(cur => cur && cur.status === 'close');
+    return [...inProcessRequests, ...closedRequests];
   }, [myRequestsDetails]);
 
   const sortedCloseRequests = useMemo(() => {
@@ -327,16 +319,16 @@ function VolunteerMain() {
           />
         </div>
         <div className="navbar-buttons">
-          <button className='btn' onClick={openHistory}>{t('close_requests')}</button>
           <button className='btn' onClick={openEditUser}>{t('edit_profile')}</button>
           <button className='btn' onClick={openPasswordReset}>{t('change_password')}</button>
+          <LanguageSwitcher />
           <button className='btn-logout' onClick={handleLogout}>
             <FontAwesomeIcon icon={faSignOutAlt} />
           </button>
         </div>
       </div>
 
-      <div className='modal-container'>
+      <div className={`modal-container ${isRtl ? 'rtl' : 'ltr'}`}>
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={closeModal}
@@ -386,7 +378,7 @@ function VolunteerMain() {
                 options={citiesInIsrael.map(city => ({ value: city, label: city }))}
                 value={citySelectedOption}
                 onChange={setCitySelectedOption}
-                placeholder="בחר עיר מגורים"
+                placeholder={t('select_city')}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 required
@@ -539,6 +531,7 @@ function VolunteerMain() {
               />
               <button type="submit">{t('confirm')}</button>
             </form>
+            {message && <p>{message}</p>}
           </div>
         </Modal>
 
@@ -556,69 +549,6 @@ function VolunteerMain() {
       </div>
 
 
-      <div className='modal-container'>
-        <Modal
-          isOpen={historyModal}
-          onRequestClose={closeModal}
-          contentLabel="History Modal"
-          style={{
-            content: {
-              width: 'auto',
-              maxWidth: 'fit-content',
-              margin: 'auto',
-              padding: '20px',
-            },
-          }}
-        >
-        <button
-            onClick={closeModal}
-            style={{
-              position: 'absolute',
-              top: '10px',
-              left: '10px',
-              background: 'transparent',
-              border: 'none',
-              fontSize: '1.5rem',
-              cursor: 'pointer',
-            }}
-          >
-            &times;
-          </button>
-          <div className='volunteerApp'>
-            <h1>{t('history')}</h1>
-          {sortedCloseRequests.length > 0 ? (
-            <ul>
-              {sortedCloseRequests.map((match) => (
-                <li key={match.id} 
-                className="match-container-history"
-                style={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  backgroundColor: '#f9f9f9',
-                  padding: '10px',
-                  marginBottom: '15px',
-                  borderRadius: '5px',
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                  fontSize: '18px'
-                }}
-                >
-                  <div className="Request">
-                    {`${t('assistance_with')}${match.volunteering} ${t('to')}${match.firstName + " " + match.lastName}`}
-                    {`, ${t('on_day')}: ${match.day} ${formatDate(match.date)} ${t('at_time')}: ${match.time}`}
-                  </div>
-                </li>
-            ))}
-            </ul>
-            
-          ) : (
-            <p>{t('no_closed_requests')}</p>
-          )}
-          </div>
-        </Modal>
-      </div>
-
-
 
 
       <div className="boxes-container">
@@ -630,12 +560,32 @@ function VolunteerMain() {
             .map((match) => (
               <div key={match.id} className="match-container">
                 <div className="Request">
-                <p>
-                  {isEnglish ? match.mail : `${match.firstName} ${match.lastName}`} 
-                  {` ${t('ask_assistance_with')}${match.volunteering}`}
-                </p>
-                  <p>{`${t('on_day')}: ${match.day} ${formatDate(match.date)} ${t('at_time')}: ${match.time}`}</p>
-                  <p>{match.comments && <p>{t('comments')}: {match.comments}</p>}</p>
+                <table className={`match-details-table ${isRtl ? 'rtl' : 'ltr'}`}>
+                  <tbody>
+                    <tr>
+                      <td>{t('assistance_requester')}</td>
+                      <td>{`${match.firstName + " " + match.lastName}`}</td>
+                    </tr>
+                    <tr>
+                      <td>{t('type_of_request')}</td>
+                      <td>{`${match.volunteering}`}</td>
+                    </tr>
+                    <tr>
+                      <td>{t('date')}</td>
+                      <td>{` ${match.day} ${formatDate(match.date)}`}</td>
+                    </tr>
+                    <tr>
+                      <td>{t('time')}</td>
+                      <td>{`${match.time}`}</td>
+                    </tr>
+                    {match.comments && 
+                      <tr>
+                        <td>{t('comments')}</td>
+                        <td>{match.comments}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
                   <button onClick={() => handleApproveRequest(match.status, match.id)}>{t('approve_request')}</button>
                   <button onClick={() => handleRemoveRequest(match.id)}>{t('remove_request')}</button>
                 </div>
@@ -646,37 +596,64 @@ function VolunteerMain() {
           )}
         </div>
 
-        <div className="box">
-          <h2>{t('my_requests')}</h2>
-          {sortedRequests.length > 0 ? (
-            sortedRequests.map((cur) => (
-              <div key={cur.id} className="myRequests-container">
-                <div className="Request">
-                  <p>{`${t('assistance_to')}${cur.firstName + " " + cur.lastName} ${t('at')}${cur.volunteering}`}</p>
-                  <p>{`${t('on_date')}: ${formatDate(cur.date)} ${t('at_time')}: ${cur.time}`}</p>
-                  <p>
-                  {t('status')}:
-                    {cur.status === 'in process' ? (
-                      <>
-                        <span style={{ color: '#009ba6' }}> {t('in_process')}</span>
-                        <p>{`${t('phone_number')}: ${cur.phoneNumber}`}</p>
-                      </>
-                    ) : (
-                      ' טופל'
-                    )}
-                  </p>
-                  {cur.status === 'in process' && (
-                    <button onClick={() => closeRequest(cur.id)}>{t('close_request')}</button>
-                  )}
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>{t('no_in_process_requests')}</p>
-          )}
-        </div>
+        <div className={`box ${isRtl ? 'rtl' : 'ltr'}`}>
+      <h2>{t('my_requests')}</h2>
+      {sortedRequests.length > 0 ? (
+        sortedRequests.map((cur) => (
+          <div key={cur.id} className="myRequests-container">
+            <div className="Request">
+              <table className={`match-details-table ${isRtl ? 'rtl' : 'ltr'}`}>
+                <tbody>
+                  <tr>
+                    <td>{t('assistance_requester')}</td>
+                    <td>{`${cur.firstName} ${cur.lastName}`}</td>
+                  </tr>
+                  <tr>
+                    <td>{t('type_of_request')}</td>
+                    <td>{cur.volunteering}</td>
+                  </tr>
+                  <tr>
+                    <td>{t('date')}</td>
+                    <td>{`${cur.day} ${formatDate(cur.date)}`}</td>
+                  </tr>
+                  <tr>
+                    <td>{t('time')}</td>
+                    <td>{cur.time}</td>
+                  </tr>
+                  {cur.comments && 
+                    <tr>
+                      <td>{t('comments')}</td>
+                      <td>{cur.comments}</td>
+                    </tr>
+                  }
+                  <tr>
+                    <td>{t('phone_number')}</td>
+                    <td>{cur.phoneNumber}</td>
+                  </tr>
+                  <tr>
+                    <td>{t('status')}</td>
+                    <td>
+                      {cur.status === 'in process' ? (
+                        <span style={{ color: '#009ba6' }}>{t('in_process')}</span>
+                      ) : (
+                        <span style={{ color: '#dc3545' }}>{t('done')}</span>
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              {cur.status === 'in process' && (
+                <button onClick={() => closeRequest(cur.id)}>{t('close_request')}</button>
+              )}
+            </div>
+          </div>
+        ))
+      ) : (
+        <p>{t('no_in_process_requests')}</p>
+      )}
+    </div>
       </div>
-      <LanguageSwitcher />
 
       <div className='pageEnd'>
         <h2>{t('contact_whatsapp')}</h2>
