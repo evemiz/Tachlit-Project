@@ -27,7 +27,7 @@ const columnMapping = {
   firstName: 'שם פרטי ',
   lastName: ' שם משפחה ',
   phoneNumber: 'מספר טלפון ',
-  languages: 'שפות ',
+  langueges: 'שפות ',
   ID: 'ת.ז. ',
   city: 'עיר ',
   days: ' ימים',
@@ -42,11 +42,11 @@ const columnMapping = {
   volunteerMatch: 'מתנדב '
 };
 
-const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail', 'languages', 'city', 'days', 'volunteering', 'date', 'time', 'comments', 'emergency', 'vehicle'];
+const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail', 'langueges', 'city', 'days', 'volunteering', 'date', 'time', 'comments', 'emergency', 'vehicle'];
 
 const filterOptions = {
   city: citiesInIsrael,
-  languages: languages,
+  langueges: languages,
   days: days,
   volunteering: volunteering
 };
@@ -55,7 +55,7 @@ const columnDataTypes = {
   firstName: 'string',
   lastName: 'string',
   phoneNumber: 'string',
-  languages: 'array',
+  langueges: 'array',
   city: 'string',
   days: 'array',
   volunteering: 'array',
@@ -93,7 +93,20 @@ function AdminMain() {
   const [filters, setFilters] = useState({});
   const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newRecord, setNewRecord] = useState({});
+  const [newRecord, setNewRecord] = useState({
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    langueges: [],
+    ID: '',
+    city: '',
+    days: [],
+    volunteering: [],
+    mail: '',
+    vehicle: undefined,
+    emergency: undefined
+
+  });
   const [editMode, setEditMode] = useState(false);
   const [currentEditId, setCurrentEditId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -112,10 +125,7 @@ function AdminMain() {
   const [currentVolunteerDetails, setCurrentVolunteerDetails] = useState(null);
   const [matchesModalIsOpen, setMatchesModalIsOpen] = useState(false);
   const [selectedMatches, setSelectedMatches] = useState([]);
-
-  const [idValid, setIdValid] = useState(true);
-  const [contactValid, setContactValid] = useState(true);
-  const [termsAccepted, setTermsAccepted] = useState(true);
+  const [validationErrors, setValidationErrors] = useState({});
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -224,15 +234,18 @@ function AdminMain() {
   };
 
   const validateNewRecord = () => {
+    const newValidationErrors = {};
     let isValid = true;
-    let validationMessage = '';
 
     // Check for empty fields
     for (const key in newRecord) {
-      if (newRecord[key] === '' || newRecord[key] === undefined || (Array.isArray(newRecord[key]) && newRecord[key].length === 0)) {
-        validationMessage = `שדה ${columnMapping[key]} נדרש`;
+      if (
+        newRecord[key] === '' ||
+        newRecord[key] === undefined ||
+        (Array.isArray(newRecord[key]) && newRecord[key].length === 0)
+      ) {
+        newValidationErrors[key] = `שדה זה הינו שדה חובה`;
         isValid = false;
-        break;
       }
     }
 
@@ -241,32 +254,26 @@ function AdminMain() {
       // Phone number validation
       const phoneRegex = /^05\d{8}$/;
       if (!phoneRegex.test(newRecord.phoneNumber)) {
-        validationMessage = 'הקלד מספר טלפון חוקי';
-        setContactValid(false);
+        newValidationErrors.phoneNumber = 'הקלד מספר טלפון חוקי';
         isValid = false;
-      } else {
-        setContactValid(true);
       }
 
       // ID validation
       const idRegex = /^\d{9}$/;
       if (!idRegex.test(newRecord.ID)) {
-        validationMessage = 'הקלד תעודת זהות חוקית';
-        setIdValid(false);
+        newValidationErrors.ID = 'הקלד תעודת זהות חוקית';
         isValid = false;
-      } else {
-        setIdValid(true);
       }
 
       // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(newRecord.mail)) {
-        validationMessage = 'נא להזין כתובת דוא"ל חוקית';
+        newValidationErrors.mail = 'נא להזין כתובת דוא"ל חוקית';
         isValid = false;
       }
     }
 
-    setMessage(validationMessage);
+    setValidationErrors(newValidationErrors);
     return isValid;
   };
 
@@ -719,7 +726,7 @@ function AdminMain() {
                           value="false"
                           checked={newRecord[column] === false}
                           onChange={handleInputChange}
-                        /> לא
+                        /> לא  <br />
                       </>
                     ) : columnDataTypes[column] === 'array' ? (
                       <Select
@@ -751,12 +758,10 @@ function AdminMain() {
                         name={column}
                         value={newRecord[column] || ''}
                         onChange={handleInputChange}
-                        className={!idValid && column === 'ID' ? 'invalid' : (!contactValid && column === 'phoneNumber' ? 'invalid' : '')}
+                        className={!validationErrors[column] ? '' : 'invalid'}
                       />
                     )}
-                    {!idValid && column === 'ID' && <span className="error-message">הקלד תעודת זהות חוקית</span>}
-                    {!contactValid && column === 'phoneNumber' && <span className="error-message">הקלד מספר טלפון חוקי</span>}
-                    {message && <span className="error-message">{message}</span>}
+                    {validationErrors[column] && <span className="error-message">{validationErrors[column]}</span>}
                   </div>
                 ))}
 
@@ -832,27 +837,8 @@ function AdminMain() {
               </table>
             </div>
           ) : (
-            !loading && (
+            !loading && collectionName && filteredDocuments.length === 0 && (
               <div>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      {columns.map((key) => (
-                        <th key={key}>
-                          {columnMapping[key]}
-                          <span
-                            className="filter-arrow"
-                            onClick={() => toggleFilterVisibility(key)}
-                          >
-                            ▼
-                          </span>
-                          {filterVisibility[key] && renderFilterForColumn(key)}
-                        </th>
-                      ))}
-                      <th>פעולות</th>
-                    </tr>
-                  </thead>
-                </table>
                 <p>לא נמצאו תוצאות</p>
               </div>
             )
