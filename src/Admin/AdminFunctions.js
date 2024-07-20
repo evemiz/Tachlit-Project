@@ -1,59 +1,59 @@
-import { doc, addDoc, collection, deleteDoc, getDocs,setDoc, query, where, } from 'firebase/firestore';
+import { doc, addDoc, collection, deleteDoc, getDocs, setDoc, query, where, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig.js';
 import { doc as doc1, getDoc as getDoc1 } from 'firebase/firestore';
 import { sendSignInLinkToEmail } from 'firebase/auth';
 import { auth } from '../firebaseConfig.js'; // Adjust the import path as necessary
-
 
 export function validateData(data) {
   return true;
   //...
 }
 
-
-
 // Function to read documents from a collection
 export const readDocuments = async (collectionName, status) => {
   try {
-    let collectionRef = collection(db, collectionName);
-    
-    if (status !== "") {
-      collectionRef = query(collectionRef, where("status", "==", status));
+    let q;
+    if (status) {
+      q = query(collection(db, collectionName), where('status', '==', status));
+    } else {
+      q = query(collection(db, collectionName));
     }
 
-    const querySnapshot = await getDocs(collectionRef);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const querySnapshot = await getDocs(q);
+    const documents = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    return documents;
   } catch (error) {
-    console.error("Error getting documents: ", error);
+    console.error('Error getting documents: ', error);
     throw error;
   }
 };
 
-// Function to add a document to a collection with a custom ID (if provided)
-export const addDocument = async (collectionName, data) => {
-    if(!validateData(data))
-        console.error('Invalid data');
-    else{
-        try {
-            const docId = data.id;
-            if (!docId) {
-                console.error('Document ID is missing in the data');
-                return null;
-            }
-
-            // Create a document reference with the custom ID
-            const docRef = doc(collection(db, collectionName), docId);
-
-            // Use setDoc to create the document with the specified ID and data
-            await setDoc(docRef, data);
-            console.log("Document written with ID: ", docRef.id);
-            return docRef;
-          } catch (error) {
-            console.error("Error adding document: ", error);
-          }
+// Function to add a document to a collection
+export const addDocument = async (collectionName, data, customId = null) => {
+  if (!validateData(data)) {
+    console.error('Invalid data');
+  } else {
+    try {
+      let docRef;
+      if (customId) {
+        // Create a document reference with the custom ID
+        docRef = doc(collection(db, collectionName), customId);
+        await setDoc(docRef, data);
+      } else {
+        // Use addDoc to let Firestore generate a unique ID
+        docRef = await addDoc(collection(db, collectionName), data);
+      }
+      console.log("Document written with ID: ", docRef.id);
+      return docRef;
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      throw error;
     }
+  }
 };
-
 
 // Function to delete a document from a collection
 export const deleteDocument = async (collectionName, id) => {
@@ -67,8 +67,7 @@ export const deleteDocument = async (collectionName, id) => {
   }
 };
 
-
-
+// Function to update a document in a collection
 export const updateDocument = async (collectionName, docId, data) => {
   if (!validateData(data)) {
     console.error('Invalid data');
@@ -80,11 +79,10 @@ export const updateDocument = async (collectionName, docId, data) => {
       return docRef;
     } catch (error) {
       console.error("Error updating document: ", error);
+      throw error;
     }
   }
 };
-
-
 
 // Function to move a document from one collection to another
 export const MoveDoc = async (docId) => {
@@ -94,13 +92,13 @@ export const MoveDoc = async (docId) => {
 
     if (docSnap.exists()) {
       const docData = docSnap.data();
-      
+
       // Add the document to the Volunteers collection
       await addDocument('Volunteers', { ...docData, id: docId });
-      
+
       // Delete the document from the NewVolunteers collection
       await deleteDocument('NewVolunteers', docId);
-      
+
       console.log("Document moved from NewVolunteers to Volunteers with ID: ", docId);
     } else {
       console.error("No such document!");
@@ -126,4 +124,46 @@ export const sendApprovalEmail = async (email, volunteerId) => {
     throw error;
   }
 };
- 
+
+export const addMatchToDocument = async (collectionName, documentId, fieldValue) => {
+  try {
+    const docRef = doc(db, collectionName, documentId);
+
+    // Get the document to check if the 'matches' field exists
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const docData = docSnap.data();
+      if (docData.matches) {
+        // If the 'matches' field exists, add the value to the array
+        await updateDoc(docRef, {
+          matches: arrayUnion(fieldValue)
+        });
+      } else {
+        // If the 'matches' field does not exist, create it and set the value
+        await updateDoc(docRef, {
+          matches: [fieldValue]
+        });
+      }
+    }
+    return true;
+  } catch (error) {
+    console.error("Error adding field to document: ", error);
+    return false;
+  }
+};
+
+// Function to add a field to a specific document in a collection
+export const addFieldToDocument = async (collectionName, documentId, fieldName, fieldValue) => {
+  try {
+      const docRef = doc(db, collectionName, documentId);
+      await updateDoc(docRef, {
+          [fieldName]: fieldValue
+      });
+      console.log(`Field '${fieldName}' added to document '${documentId}' in collection '${collectionName}'`);
+      return true;
+  } catch (error) {
+      console.error("Error adding field to document: ", error);
+      return false;
+  }
+};
