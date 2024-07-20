@@ -6,17 +6,22 @@ import { React, useState } from "react";
 import Select from 'react-select';
 import Modal from 'react-modal';
 import { addDocument, addFieldToDocument, addMatchToDocument } from "./RequestFunctions.js";
-import days from '../Days.js';
+import days from './Days.js';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../LanguageSwitcher.js';
 
 Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
 
 function RequestForm() {
+  const { t, i18n } = useTranslation();
+  const isEnglish = i18n.language === 'en'; 
+  const isRtl = i18n.language === 'he';
   const navigate = useNavigate();
 
   const [firstName, setFirstName] = useState("");
@@ -57,14 +62,34 @@ function RequestForm() {
     }
 
     if (isValid) {
+      let translatedLang;
+      let translatedVol;
+      let translatedCity;
+
+      if (isEnglish) {
+        translatedLang = langSelectedOptions ? t(`langs.${langSelectedOptions.label}`, { lng: 'he' }) : "";
+        translatedVol = volSelectedOptions ? t(`volunteering.${volSelectedOptions.label}`, { lng: 'he' }) : "";
+        translatedCity = citySelectedOption ? t(`${citySelectedOption.label}`, { lng: 'he' }) : "";
+      }
+
+      else{
+        translatedLang = langSelectedOptions ? langSelectedOptions.label : "";
+        translatedVol = volSelectedOptions ? volSelectedOptions.label : "";
+        translatedCity = citySelectedOption ? citySelectedOption.label : "";
+      }
+
+      setLangSelectedOptions(translatedLang);
+      setVolSelectedOptions(translatedVol);
+      setCitySelectedOption(translatedCity);
+
       const formData = {
         firstName: firstName,
         lastName: lastName,
         ID: id,
         phoneNumber: contact,
-        city: citySelectedOption ? citySelectedOption.label : "",
-        langueges: langSelectedOptions ? langSelectedOptions.label : "",
-        volunteering: volSelectedOptions ? volSelectedOptions.label : "",
+        city: translatedCity,
+        langueges: translatedLang,
+        volunteering: translatedVol,
         date: date,
         day: dayOfWeek,
         time: time,
@@ -80,28 +105,28 @@ function RequestForm() {
           const volunteersCollection = collection(db, 'Volunteers');
   
           // First query: Filter by city
-          let qCity = query(volunteersCollection, where('city', '==', citySelectedOption.label));
+          let qCity = query(volunteersCollection, where('city', '==', translatedCity));
           const queryCitySnapshot = await getDocs(qCity);
   
           // Filter city results further by language
           let filteredDocs = queryCitySnapshot.docs;
-          if (langSelectedOptions.label) {
+          if (translatedLang) {
             filteredDocs = filteredDocs.filter(doc => {
               const data = doc.data();
-              return data.langueges && data.langueges.includes(langSelectedOptions.label);
+              return data.langueges && data.langueges.includes(translatedLang);
             });
           }
   
           // Filter city and language results further by volunteering
-          if (volSelectedOptions.label) {
+          if (translatedVol) {
             filteredDocs = filteredDocs.filter(doc => {
               const data = doc.data();
-              return data.volunteering && data.volunteering.includes(volSelectedOptions.label);
+              return data.volunteering && data.volunteering.includes(translatedVol);
             });
           }
   
           // Filter city, language and volunteering results further by day
-          if (volSelectedOptions.label) {
+          if (translatedVol) {
             filteredDocs = filteredDocs.filter(doc => {
               const data = doc.data();
               return data.days && data.days.includes(dayOfWeek);
@@ -174,10 +199,28 @@ function RequestForm() {
     navigate('/');
   }
 
+  // Translate the language options based on the current language
+  const translatedLangues = langues.map(lang => ({
+    value: lang,
+    label: t(`langs.${lang}`)
+  }));
+
+  const translatedVol = volunteerings.map(vol => ({
+    value: vol,
+    label: t(`volunteering.${vol}`)
+  }));
+
+  const translatedCity = citiesInIsrael.map(city => ({
+    value: city,
+    label: t(`${city}`)
+  }));
+
   return (
     <div className="page">
-
-       <div className="navbar-custom-form">
+      <div className="navbar-custom-form">
+        <div className="navbar-buttons">
+          <LanguageSwitcher />
+        </div>
         <div className="navbar-logo">
           <img
             src={logo}
@@ -190,146 +233,147 @@ function RequestForm() {
         <a className='phone' href="tel:02-651-6325">*6031</a>
       </div>
 
-    <div className="Form">
-      <h1>הגשת בקשת סיוע </h1>
-      <fieldset>
-        <form action="#" method="get" onSubmit={handleSubmit}>
-          <label htmlFor="firstname">שם פרטי</label>
-          <input
-            type="text"
-            name="firstname"
-            id="firstname"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            dir="rtl"
-            required
-          />
-          <label htmlFor="lastname">שם משפחה</label>
-          <input
-            type="text"
-            name="lastname"
-            id="lastname"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            dir="rtl"
-            required
-          />
-
-          <label htmlFor="id">מספר תעדות זהות</label>
-          <input
-            type="text"
-            name="id"
-            id="id"
-            value={id}
-            onChange={(e) => setId(e.target.value)}
-            required
-          />
-        {!idValid && (
-            <label style={{ color: 'red', fontSize: '12px' }}>הקלד תעודת זהות חוקית</label>
-        )}
-
-          <label htmlFor="tel">מספר טלפון</label>
-          <input
-            type="tel"
-            name="contact"
-            id="contact"
-            value={contact}
-            onChange={(e) => setContact(e.target.value)}
-            required
-            dir="rtl"
-          />
-        {!contactValid && (
-          <label style={{ color: 'red', fontSize: '12px' }}>הקלד מספר טלפון חוקי</label>
-        )}
-
-          <label>עיר מגורים</label>
-          <Select
-            name="select"
-            id="select"
-            options={citiesInIsrael.map(city => ({ value: city, label: city }))}
-            value={citySelectedOption}
-            onChange={setCitySelectedOption}
-            placeholder="בחר עיר מגורים"
-            required
-          />
-
-          <label>שפה מועדפת</label>
-          <Select
-            name="select"
-            id="select"
-            options={langues.map(lang => ({ value: lang, label: lang }))}
-            value={langSelectedOptions}
-            onChange={setLangSelectedOptions}
-            placeholder="בחר שפה "
-            required
-          />
-
-          <label>אופן הסיוע</label>
-          <Select
-            name="volunteerings"
-            id="volunteerings"
-            options={volunteerings.map(volunteer => ({ value: volunteer, label: volunteer }))}
-            value={volSelectedOptions}
-            onChange={setVolSelectedOptions}
-            placeholder="בחר תחום לסיוע"
-            required
-          />
-
-          <label>תאריך</label>
-          <input
-            type="date"
-            name="date"
-            id="date"
-            value={date}
-            onChange={handleDateChange}
-            required
-          />
-
-          <label>שעה</label>
-          <input
-            type="time"
-            name="time"
-            id="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            required
-          />
-
-          <label>הערות</label>
-          <textarea
-            name="comments"
-            id="comments"
-            value={comments}
-            onChange={(e) => setComments(e.target.value)}
-            dir="rtl"
-          />
-          <div className='ruls'>
-          <h2>תקנון הגשת בקשת סיוע</h2>
-          <p>יש לשמור על פרטיות המתנדב ולא להקשות מעבר.</p>
-          <p>אין לקחת מספרים ופרטים ולהתנהל מולם מלבד פלטפורמה זו,</p>
-          <p>אלא אם כן, המתנדב אישר זאת גם אצלנו.</p>
-          <div className="terms-container">
+      <div className="Form">
+        <h1>{t('Sending a request for assistance')}</h1>
+        <fieldset>
+          <form action="#" method="get" onSubmit={handleSubmit}>
+            <label htmlFor="firstname">{t('first_name')}</label>
             <input
-              type="checkbox"
-              id="terms"
-              checked={isTermsAccepted}
-              onChange={() => setIsTermsAccepted(!isTermsAccepted)}
-              required      
+              type="text"
+              name="firstname"
+              id="firstname"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              dir="rtl"
+              required
             />
-            <label htmlFor="terms">אני מאשר את תנאי השימוש</label>
+            <label htmlFor="lastname">{t('last_name')}</label>
+            <input
+              type="text"
+              name="lastname"
+              id="lastname"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              dir="rtl"
+              required
+            />
+
+            <label htmlFor="id">{t('id')}</label>
+            <input
+              type="text"
+              name="id"
+              id="id"
+              value={id}
+              onChange={(e) => setId(e.target.value)}
+              required
+            />
+            {!idValid && (
+              <label style={{ color: 'red', fontSize: '12px' }}>{t('Enter a valid ID')}</label>
+            )}
+
+            <label htmlFor="tel">{t('phone_number')}</label>
+            <input
+              type="tel"
+              name="contact"
+              id="contact"
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              required
+              dir="rtl"
+            />
+            {!contactValid && (
+              <label style={{ color: 'red', fontSize: '12px' }}>{t('Enter a valid Phone Number')}</label>
+            )}
+
+            <label htmlFor="city">{t('city')}</label>
+            <Select
+              name="city"
+              id="city"
+              options={translatedCity}
+              value={citySelectedOption}
+              onChange={setCitySelectedOption}
+              placeholder={t('select_city')}
+              required
+            />
+
+            <label htmlFor="volunteerings">{t('volunteerings')}</label>
+            <Select
+              options={translatedVol}
+              value={volSelectedOptions}
+              onChange={setVolSelectedOptions}
+              placeholder={t('volunteerings_select')}
+              dir={isRtl ? 'rtl' : 'ltr'}
+              required
+            />
+
+            <label htmlFor="langueges">{t('language')}</label>
+            <Select
+              options={translatedLangues}
+              value={langSelectedOptions}
+              onChange={setLangSelectedOptions}
+              placeholder={t('select_languages')}
+              dir={isRtl ? 'rtl' : 'ltr'}
+              required
+            />
+
+            <label htmlFor="date">{t('date')}</label>
+            <input
+              type="date"
+              name="date"
+              id="date"
+              value={date}
+              onChange={handleDateChange}
+              required
+              dir="rtl"
+            />
+
+            <label htmlFor="time">{t('time')}</label>
+            <input
+              type="time"
+              name="time"
+              id="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              required
+              dir="rtl"
+            />
+
+          <label>{t('comments')}</label>
+            <textarea
+              name="comments"
+              id="comments"
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              dir="rtl"
+            />
+
+          <div className='ruls'>
+            <h2>{t('ruls_request_title')}</h2>
+            <p>{t('ruls_request1')}</p>
+            <p>{t('ruls_request2')}</p>
+            <p>{t('ruls_request3')}</p>
+            <div className="terms-container">
+              <input
+                type="checkbox"
+                id="terms"
+                checked={isTermsAccepted}
+                onChange={() => setIsTermsAccepted(!isTermsAccepted)}
+                required      
+              />
+              <label htmlFor="terms">{t('accept_terms')}</label>
             </div>
-
           </div>
-
 
           <button
             type="submit"
             value="Submit"
           >
-            הגש בקשה
+            {t('submit')}
           </button>
-        </form>
-      </fieldset>
+         </form>
+        </fieldset>
+      </div>
+
       <Modal
         isOpen={isSuccessModalOpen}
         onRequestClose={handleSuccessModalClose}
@@ -338,16 +382,15 @@ function RequestForm() {
         overlayClassName="Overlay"
       >
         
-        <h2>פעולה הצליחה</h2>
+        <h2>{t('done_successfully')}</h2>
         <p>{successMessage}</p>
         <div className="modal-buttons">
           <button className="modal-button confirm" onClick={handleSuccessModalClose}>סגור</button>
         </div>
       </Modal>
-      </div>
 
       <div className='pageEnd'>
-      <h2>צור איתנו קשר ב - whatsapp </h2>
+      <h2>{t('contact_whatsapp')}</h2>
         <button className="whatsapp-button" onClick={openWhatsAppChat}>
             <FontAwesomeIcon icon={faWhatsapp} size="2x" />
         </button>

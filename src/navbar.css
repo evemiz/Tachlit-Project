@@ -23,6 +23,13 @@
   z-index: 1000;
   padding-bottom: 20px;
 }
+.navbar-custom-form .navbar-buttons .lang button{
+  color: white;
+}
+
+.navbar-custom-form .navbar-buttons .lang button:hover{
+  color: #009ba6;
+}
 
 .navbar-logo {
   max-height: 50px;

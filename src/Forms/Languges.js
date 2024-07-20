@@ -1,8 +1,8 @@
 const langueges = [
-    "עברית",
-    "אנגלית",
-    "צרפתית",
-    "רוסית",
-    "ספרדית",
+    "Hebrew",
+    "English",
+    "French",
+    "Russian",
+    "Spanish",
   ];
   export default langueges;
