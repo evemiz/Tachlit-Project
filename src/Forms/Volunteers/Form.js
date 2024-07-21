@@ -70,24 +70,11 @@ function VolunteerForm() {
 
     if (isValid) {
 
-      let translatedLang;
-      let translatedVol;
-      let translatedCity;
-      let translatedDay;
+    const translatedLang = langSelectedOptions.map(option => t(`langs.${option.value}`, { lng: 'he' }));
+    const translatedVol = volSelectedOptions.map(option => t(`volunteering.${option.value}`, { lng: 'he' }));
+    const translatedDay = daySelectedOptions.map(option => t(`${option.value}`, { lng: 'he' }));
+    const translatedCity = citySelectedOption ? t(`${citySelectedOption.label}`, { lng: 'he' }) : "";
 
-      if (isEnglish) {
-        translatedLang = langSelectedOptions.map(option => t(`langs.${option.value}`, { lng: 'he' }));
-        translatedVol = volSelectedOptions.map(option => t(`volunteering.${option.value}`, { lng: 'he' }));
-        translatedDay = daySelectedOptions.map(option => t(`${option.value}`, { lng: 'he' }));
-        translatedCity = citySelectedOption ? t(`${citySelectedOption.label}`, { lng: 'he' }) : "";
-      }
-
-      else{
-        translatedLang = langSelectedOptions.map(option => option.value);
-        translatedVol = volSelectedOptions.map(option => option.value);
-        translatedDay = daySelectedOptions.map(option => option.value);
-        translatedCity = citySelectedOption ? citySelectedOption.label : "";
-      }
 
 
       const formData = {
