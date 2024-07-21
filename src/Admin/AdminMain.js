@@ -29,7 +29,7 @@ const columnMapping = {
   firstName: 'שם פרטי ',
   lastName: ' שם משפחה ',
   phoneNumber: 'מספר טלפון ',
-  languages: 'שפות ',
+  langueges: 'שפות ',
   ID: 'ת.ז. ',
   city: 'עיר ',
   days: ' ימים',
@@ -44,7 +44,7 @@ const columnMapping = {
   volunteerMatch: 'מתנדב '
 };
 
-const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail', 'languages', 'city', 'days', 'volunteering', 'date', 'time', 'comments', 'emergency', 'vehicle'];
+const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail', 'langueges', 'city', 'days', 'volunteering', 'date', 'time', 'comments', 'emergency', 'vehicle'];
 
 const filterOptions = {
   city: citiesInIsrael,
@@ -57,7 +57,7 @@ const columnDataTypes = {
   firstName: 'string',
   lastName: 'string',
   phoneNumber: 'string',
-  languages: 'array',
+  langueges: 'array',
   city: 'string',
   days: 'array',
   volunteering: 'array',
@@ -98,15 +98,7 @@ function AdminMain() {
   const [newRecord, setNewRecord] = useState({
     firstName: '',
     lastName: '',
-    phoneNumber: '',
-    languages: [],
-    ID: '',
-    city: '',
-    days: [],
-    volunteering: [],
-    mail: '',
-    vehicle: undefined,
-    emergency: undefined
+    
   });
   const [editMode, setEditMode] = useState(false);
   const [currentEditId, setCurrentEditId] = useState(null);
