@@ -4,10 +4,10 @@ import Modal from 'react-modal';
 import { addDocument, addFieldToDocument, addMatchToDocument } from "../Forms/AidRequests/RequestFunctions";
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-import citiesInIsrael from '../Forms/Cities';
-import langues from '../Forms/Languges';
-import days from '../Forms/Days';
-import volunteerings from '../Forms/Volunteerings';
+import citiesInIsrael from "./db/Cities";
+import languages from "./db/Languges";
+import days from "./db/Days";
+import volunteerings from "./db/Volunteerings";
 
 Modal.setAppElement('#root');
 
@@ -210,7 +210,7 @@ function RequestForm({ setIsSuccessModalOpen, setSuccessMessage }) {
         <Select
         name="select"
         id="select"
-        options={langues.map(lang => ({ value: lang, label: lang }))}
+        options={languages.map(lang => ({ value: lang, label: lang }))}
         value={langSelectedOptions}
         onChange={setLangSelectedOptions}
         placeholder="בחר שפה "

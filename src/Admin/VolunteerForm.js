@@ -1,9 +1,9 @@
 import { React, useState } from "react";
 import Select from 'react-select';
-import citiesInIsrael from '../Forms/Cities';
-import langues from '../Forms/Languges';
-import days from '../Forms/Days';
-import volunteerings from '../Forms/Volunteerings';
+import citiesInIsrael from "./db/Cities";
+import languages from "./db/Languges";
+import days from "./db/Days";
+import volunteerings from "./db/Volunteerings";
 import Modal from 'react-modal';
 import {addDocument } from "../Forms/Volunteers/VolunteerFunctions";
 import { handleApproveVolunteer } from './handleApproveVolunteer';
@@ -201,7 +201,7 @@ function VolunteerForm({ setIsSuccessModalOpen, setSuccessMessage }) {
           <Select
             isMulti
             name="languages"
-            options={langues.map(lang => ({ value: lang, label: lang }))}
+            options={languages.map(lang => ({ value: lang, label: lang }))}
             className="basic-multi-select"
             classNamePrefix="select"
             value={langSelectedOptions}

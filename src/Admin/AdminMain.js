@@ -9,10 +9,10 @@ import SignUpNewAdmin from './SignUpNewAdmin';
 import Statistics from './Statistics';
 import { readDocuments, addDocument, deleteDocument, updateDocument } from './AdminFunctions';
 import { handleApproveVolunteer } from './handleApproveVolunteer';
-import citiesInIsrael from '../Forms/Cities';
-import languages from '../Forms/Languges';
-import days from '../Forms/Days';
-import volunteering from '../Forms/Volunteerings';
+import citiesInIsrael from "./db/Cities";
+import languages from "./db/Languges";
+import days from "./db/Days";
+import volunteerings from "./db/Volunteerings";
 import Select from 'react-select';
 import '@fontsource/rubik';
 import logo from '../images/logo.png';
@@ -48,9 +48,9 @@ const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail', 
 
 const filterOptions = {
   city: citiesInIsrael,
-  languages: languages,
+  langueges: languages,
   days: days,
-  volunteering: volunteering
+  volunteering: volunteerings
 };
 
 const columnDataTypes = {
@@ -445,6 +445,8 @@ function AdminMain() {
 
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
+    window.location.reload();
+
   };
 
   const handleLogout = () => {
@@ -627,7 +629,7 @@ function AdminMain() {
           {isSuperAdmin && (
             <button onClick={openSignUpModal} className="btn btn-custom">הוספת מנהל חדש</button>
           )}
-          <button onClick={handleViewStatistics} className="btn btn-custom">צפייה בסטטיסטיקות</button>
+          <button onClick={handleViewStatistics} className="btn btn-custom">צפייה בדוחות</button>
           <button onClick={handleLogout} className="btn-logout">
             <FontAwesomeIcon icon={faSignOutAlt} />
           </button>
@@ -767,6 +769,7 @@ function AdminMain() {
               <RequestForm setIsSuccessModalOpen={setIsSuccessModalOpen} setSuccessMessage={setSuccessMessage} />
             ) : collectionName === 'Volunteers' ? (
               <VolunteerForm setIsSuccessModalOpen={setIsSuccessModalOpen} setSuccessMessage={setSuccessMessage} />
+            
             ) : null
           )}
           {collectionName && (
@@ -852,11 +855,9 @@ function AdminMain() {
                           {filterVisibility[key] && renderFilterForColumn(key)}
                         </th>
                       ))}
-                      <th>פעולות</th>
                     </tr>
                   </thead>
                 </table>
-                <p>לא נמצאו תוצאות</p>
               </div>
             )
           )}
