@@ -95,11 +95,7 @@ function AdminMain() {
   const [filters, setFilters] = useState({});
   const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newRecord, setNewRecord] = useState({
-    firstName: '',
-    lastName: '',
-    
-  });
+  const [newRecord, setNewRecord] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [currentEditId, setCurrentEditId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -226,56 +222,12 @@ function AdminMain() {
     setIsModalOpen(true);
   };
 
-  const validateNewRecord = () => {
-    const newValidationErrors = {};
-    let isValid = true;
 
-    // Check for empty fields
-    for (const key in newRecord) {
-      if (
-        newRecord[key] === '' ||
-        newRecord[key] === undefined ||
-        (Array.isArray(newRecord[key]) && newRecord[key].length === 0)
-      ) {
-        newValidationErrors[key] = `שדה זה הינו שדה חובה`;
-        isValid = false;
-      }
-    }
-
-    // Additional validation for specific fields if not empty
-    if (isValid) {
-      // Phone number validation
-      const phoneRegex = /^05\d{8}$/;
-      if (!phoneRegex.test(newRecord.phoneNumber)) {
-        newValidationErrors.phoneNumber = 'הקלד מספר טלפון חוקי';
-        isValid = false;
-      }
-
-      // ID validation
-      const idRegex = /^\d{9}$/;
-      if (!idRegex.test(newRecord.ID)) {
-        newValidationErrors.ID = 'הקלד תעודת זהות חוקית';
-        isValid = false;
-      }
-
-      // Email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(newRecord.mail)) {
-        newValidationErrors.mail = 'נא להזין כתובת דוא"ל חוקית';
-        isValid = false;
-      }
-    }
-
-    setValidationErrors(newValidationErrors);
-    return isValid;
-  };
 
   const handleAddRecord = async (e) => {
     e.preventDefault();
 
-    if (!validateNewRecord()) {
-      return;
-    }
+
 
     const formattedRecord = {};
     for (const [key, value] of Object.entries(newRecord)) {
@@ -769,10 +721,10 @@ function AdminMain() {
               <RequestForm setIsSuccessModalOpen={setIsSuccessModalOpen} setSuccessMessage={setSuccessMessage} />
             ) : collectionName === 'Volunteers' ? (
               <VolunteerForm setIsSuccessModalOpen={setIsSuccessModalOpen} setSuccessMessage={setSuccessMessage} />
-            
+
             ) : null
           )}
-          {collectionName && (
+          {((collectionName === 'Volunteers')||((collectionName === 'AidRequests')&& status === 'open')) && (
             <button className="lists-button" onClick={() => setShowAddForm(true)}>הוסף רשומה חדשה</button>
           )}
           {loading && <p>Loading...</p>}
