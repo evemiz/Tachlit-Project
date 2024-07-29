@@ -53,6 +53,7 @@ function VolunteerMain() {
   const [successMessage, setSuccessMessage] = useState('');
   const [datePass, setDatePass] = useState(false);
   const isFetching = useRef(false);
+  const [uid, setUid] = useState("");
 
   const fetchVolRecord = useCallback(async () => {
     try {
@@ -66,6 +67,7 @@ function VolunteerMain() {
         setLastName(data.lastName || "");
         setAvailable(data.emergency || false);
         setVehicle(data.vehicle || false);
+        setUid(data.ID);
         setMatches(data.matches || []);
         setMyRequests(data.myRequests || []);
       } else {
@@ -296,9 +298,100 @@ function VolunteerMain() {
     }
   };
 
+  const cancelRequest = async (id) => {
+    try {
+      const docRef = doc(db, 'AidRequests', id);
+      const docSnap = await getDoc(docRef);
+  
+      if (!docSnap.exists()) {
+        throw new Error('Request document does not exist');
+      }
+  
+      const requestData = docSnap.data();
+  
+      await setDoc(docRef, { status: 'open' }, { merge: true });
+      await setDoc(docRef, { volunteerMatch: null }, { merge: true });
+  
+      const volunteersCollection = collection(db, 'Volunteers');
+  
+      let qCity = query(volunteersCollection, where('city', '==', requestData.city));
+      const queryCitySnapshot = await getDocs(qCity);
+  
+      let filteredDocs = queryCitySnapshot.docs;
+      if (requestData.languages) {
+        filteredDocs = filteredDocs.filter(doc => {
+          const data = doc.data();
+          return data.languages && data.languages.includes(requestData.languages);
+        });
+      }
+  
+      if (requestData.volunteering) {
+        filteredDocs = filteredDocs.filter(doc => {
+          const data = doc.data();
+          return data.volunteering && data.volunteering.includes(requestData.volunteering);
+        });
+      }
+  
+      if (requestData.day) {
+        filteredDocs = filteredDocs.filter(doc => {
+          const data = doc.data();
+          return data.days && data.days.includes(requestData.day);
+        });
+      }
+  
+      const volunteerIds = filteredDocs.map(doc => doc.id);
+      console.log('Volunteer IDs:', volunteerIds);
+  
+      await setDoc(docRef, { matches: volunteerIds }, { merge: true });
+  
+      if (volunteerIds.length > 0) {
+        try {
+          for (const volunteerId of volunteerIds) {
+            await addMatchToDocument('Volunteers', volunteerId, id);
+          }
+        } catch (error) {
+          console.error(`Error updating volunteer documents: ${error}`);
+        }
+      }
+  
+      window.location.reload();
+    } catch (error) {
+      console.error('Error canceling request:', error);
+    }
+  };
+  
+
+  const addMatchToDocument = async (collectionName, documentId, fieldValue) => {
+    try {
+      const docRef = doc(db, collectionName, documentId);
+  
+      // Get the document to check if the 'matches' field exists
+      const docSnap = await getDoc(docRef);
+  
+      if (docSnap.exists()) {
+        const docData = docSnap.data();
+        if (docData.matches) {
+          // If the 'matches' field exists, add the value to the array
+          await updateDoc(docRef, {
+            matches: arrayUnion(fieldValue)
+          });
+        } else {
+          // If the 'matches' field does not exist, create it and set the value
+          await updateDoc(docRef, {
+            matches: [fieldValue]
+          });
+        }
+      } 
+      return true;
+    } catch (error) {
+      console.error("Error adding field to document: ", error);
+      return false;
+    }
+  };
+
   const sortedRequests = useMemo(() => {
-    const inProcessRequests = myRequestsDetails.filter(cur => cur && cur.status === 'in process');
-    const closedRequests = myRequestsDetails.filter(cur => cur && cur.status === 'close');
+    const inProcessRequests = myRequestsDetails.filter(cur => cur && cur.status === 'in process' && cur.volunteerMatch === uid);
+    const closedRequests = myRequestsDetails.filter(cur => cur && cur.status === 'close' && cur.volunteerMatch === uid);
     return [...inProcessRequests, ...closedRequests];
   }, [myRequestsDetails]);
 
@@ -673,11 +766,14 @@ function VolunteerMain() {
                       )}
                     </td>
                   </tr>
-                </tbody>
+                </tbody>  
               </table>
 
               {cur.status === 'in process' && (
-                <button onClick={() => closeRequest(cur.id)}>{t('close_request')}</button>
+                <div>
+                  <button onClick={() => closeRequest(cur.id)}>{t('close_request')}</button>
+                  <button onClick={() => cancelRequest(cur.id)}>{t('cancel')}</button>
+                </div>
               )}
             </div>
           </div>

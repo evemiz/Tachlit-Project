@@ -37,6 +37,7 @@
   "in_process": "In Process",
   "phone_number": "Phone Number",
   "close_request": "Close Request",
+  "cancel": "Cancel",
   "no_in_process_requests": "No Requests in Process",
   "contact_whatsapp": "Contact Us on WhatsApp",
   "assistance_requester": "Aid Requester",
