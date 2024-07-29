@@ -428,10 +428,6 @@ function AdminMain() {
     setSignUpModalIsOpen(true);
   };
 
-  const closeSignUpModal = () => {
-    setSignUpModalIsOpen(false);
-  };
-
   const openStatsModal = () => {
     setStatsModalIsOpen(true);
   };
@@ -718,10 +714,17 @@ function AdminMain() {
                 </form>
               </div>
             ) : collectionName === 'AidRequests' ? (
-              <RequestForm setIsSuccessModalOpen={setIsSuccessModalOpen} setSuccessMessage={setSuccessMessage} />
+              <RequestForm
+                setIsSuccessModalOpen={setIsSuccessModalOpen}
+                setSuccessMessage={setSuccessMessage}
+                closeForm={() => setShowAddForm(false)}
+              />
             ) : collectionName === 'Volunteers' ? (
-              <VolunteerForm setIsSuccessModalOpen={setIsSuccessModalOpen} setSuccessMessage={setSuccessMessage} />
-
+              <VolunteerForm
+                setIsSuccessModalOpen={setIsSuccessModalOpen}
+                setSuccessMessage={setSuccessMessage}
+                closeForm={() => setShowAddForm(false)}
+              />
             ) : null
           )}
           {((collectionName === 'Volunteers')||((collectionName === 'AidRequests')&& status === 'open')) && (
