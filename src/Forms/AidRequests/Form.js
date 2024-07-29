@@ -178,7 +178,7 @@ function RequestForm() {
 
   const openWhatsAppChat = () => {
     // Replace with the WhatsApp chat link (replace placeholders with actual phone number and message)
-    const phoneNumber = "+972545559682";
+    const phoneNumber = "+972527298294";
     const whatsappUrl = `https://wa.me/${phoneNumber}`;
     window.open(whatsappUrl, "_blank");
   };

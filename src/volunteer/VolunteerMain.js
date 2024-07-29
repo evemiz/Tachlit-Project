@@ -397,7 +397,7 @@ function VolunteerMain() {
 
 
   const openWhatsAppChat = () => {
-    const phoneNumber = "+972545559682";
+    const phoneNumber = "+972527298294";
     const whatsappUrl = `https://wa.me/${phoneNumber}`;
     window.open(whatsappUrl, "_blank");
   };
