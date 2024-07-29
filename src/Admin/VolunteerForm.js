@@ -5,7 +5,7 @@ import languages from "./db/Languges";
 import days from "./db/Days";
 import volunteerings from "./db/Volunteerings";
 import Modal from 'react-modal';
-import {addDocument } from "../Forms/Volunteers/VolunteerFunctions";
+import {addDocument } from "./AdminFunctions";
 import { handleApproveVolunteer } from './handleApproveVolunteer';
 
 
@@ -70,7 +70,7 @@ function VolunteerForm({ setIsSuccessModalOpen, setSuccessMessage }) {
         vehicle: vehicle,
       };
 
-      await addDocument("Volunteers", formData, id);
+      await addDocument("NewVolunteers", formData, id);
       await handleApproveVolunteer(id);
 
 
@@ -88,7 +88,7 @@ function VolunteerForm({ setIsSuccessModalOpen, setSuccessMessage }) {
       setVehicle(Boolean);
       setSuccessMessage("הטופס נשלח בהצלחה!"); // Set success message
       setIsSuccessModalOpen(true); // Open success modal
-      window.location.reload(); // Refresh the page to show the new record
+      // window.location.reload(); // Refresh the page to show the new record
 
     }
 
