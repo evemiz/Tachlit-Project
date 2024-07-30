@@ -177,3 +177,79 @@
   min-width: 90vw; /* Ensure minimum width for the container */
 }
 
+/* admins management */
+.Management-Modal {
+  width: 80%;
+  max-width: 800px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  overflow-y: auto; /* Add this to handle overflow if content exceeds modal height */
+  max-height: 80vh; /* Set a max height to avoid overflowing off the screen */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  align-items: center;
+
+}
+
+.Management-Overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.75); /* Dim the background */
+  align-items: center;
+
+}
+
+.Management-table-responsive {
+  overflow-x: auto;
+  align-items: center;
+  text-align: center;
+
+}
+
+.Management-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  align-items: center;
+  text-align: center;
+
+
+}
+
+.Management-table th, .Management-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  align-items: center;
+  text-align: center;
+
+
+}
+
+.Management-table th {
+  background-color: #f2f2f2;
+  align-items: center;
+
+}
+
+.Management-buttons-inside-table {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 4px;
+  align-items: center;
+
+}
+
+.Management-buttons-inside-table:hover {
+  background-color: #d32f2f;
+  align-items: center;
+
+}

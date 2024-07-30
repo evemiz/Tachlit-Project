@@ -5,7 +5,6 @@ import { collection, query, where, getDocs, getDoc, doc } from "firebase/firesto
 import Modal from 'react-modal';
 import { useNavigate } from "react-router-dom";
 import ListDisplay from '../ListDisplay';
-import SignUpNewAdmin from './SignUpNewAdmin';
 import Statistics from './Statistics';
 import { readDocuments, addDocument, deleteDocument, updateDocument } from './AdminFunctions';
 import { handleApproveVolunteer } from './handleApproveVolunteer';
@@ -18,10 +17,12 @@ import '@fontsource/rubik';
 import logo from '../images/logo.png';
 import '../custom.css';
 import '../navbar.css';
-import { faSignOutAlt, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RequestForm from './RequestForm';
 import VolunteerForm from './VolunteerForm';
+import SignUpNewAdmin from './SignUpNewAdmin';
+import AdminManagementModal from './AdminManagementModal';
 
 Modal.setAppElement('#root');
 
@@ -43,16 +44,16 @@ const columnMapping = {
   matches: 'התאמות ',
   volunteerMatch: 'מתנדב '
 };
-
+// Define the order of columns in the table
 const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail', 'langueges', 'city', 'days', 'volunteering', 'date', 'time', 'comments', 'emergency', 'vehicle'];
-
+// Define the options for filtering
 const filterOptions = {
   city: citiesInIsrael,
   langueges: languages,
   days: days,
   volunteering: volunteerings
 };
-
+// Define the data types for each column
 const columnDataTypes = {
   firstName: 'string',
   lastName: 'string',
@@ -77,6 +78,7 @@ function AdminMain() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [signUpModalIsOpen, setSignUpModalIsOpen] = useState(false);
   const [statsModalIsOpen, setStatsModalIsOpen] = useState(false);
+  const [adminManagementModalIsOpen, setAdminManagementModalIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -115,6 +117,14 @@ function AdminMain() {
   const [matchesModalIsOpen, setMatchesModalIsOpen] = useState(false);
   const [selectedMatches, setSelectedMatches] = useState([]);
   const [validationErrors, setValidationErrors] = useState({});
+  const [isAdminManagementOpen, setIsAdminManagementOpen] = useState(false);
+  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+
+  const openAdminManagementModal = () => setIsAdminManagementOpen(true);
+  const closeAdminManagementModal = () => setIsAdminManagementOpen(false);
+
+  const openSignUpModal = () => setIsSignUpOpen(true);
+  const closeSignUpModal = () => setIsSignUpOpen(false);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -222,13 +232,8 @@ function AdminMain() {
     setIsModalOpen(true);
   };
 
-
-
   const handleAddRecord = async (e) => {
     e.preventDefault();
-
-
-
     const formattedRecord = {};
     for (const [key, value] of Object.entries(newRecord)) {
       if (columnDataTypes[key] === 'boolean') {
@@ -251,19 +256,6 @@ function AdminMain() {
     try {
       if (editMode) {
         confirmAction(() => updateDocument(collectionName, currentEditId, cleanedRecord), '?האם אתה בטוח שברצונך לערוך רשומה זו');
-      } else {
-        if (collectionName === 'Volunteers' && cleanedRecord.ID) {
-          confirmAction(async () => {
-            await addDocument('Volunteers', cleanedRecord, cleanedRecord.ID);
-            await handleApproveVolunteer(cleanedRecord.ID); // Create user like 'אשר מתנדב חדש'
-            window.location.reload(); // Refresh the page to show the new record
-          }, '?האם אתה בטוח שברצונך להוסיף רשומה זו');
-        } else {
-          confirmAction(async () => {
-            await addDocument(collectionName, cleanedRecord);
-            window.location.reload(); // Refresh the page to show the new record
-          }, '?האם אתה בטוח שברצונך להוסיף רשומה זו');
-        }
       }
     } catch (err) {
       console.error(`Error ${editMode ? 'updating' : 'adding'} document:`, err);
@@ -398,7 +390,6 @@ function AdminMain() {
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
     window.location.reload();
-
   };
 
   const handleLogout = () => {
@@ -422,10 +413,6 @@ function AdminMain() {
     setNewPassword("");
     setConfirmNewPassword("");
     setMessage("");
-  };
-
-  const openSignUpModal = () => {
-    setSignUpModalIsOpen(true);
   };
 
   const openStatsModal = () => {
@@ -575,7 +562,7 @@ function AdminMain() {
           <button onClick={openModal} className="btn btn-custom">שנה סיסמה</button>
 
           {isSuperAdmin && (
-            <button onClick={openSignUpModal} className="btn btn-custom">הוספת מנהל חדש</button>
+            <button onClick={openAdminManagementModal} className="btn btn-custom">ניהול מנהלים</button>
           )}
           <button onClick={handleViewStatistics} className="btn btn-custom">צפייה בדוחות</button>
           <button onClick={handleLogout} className="btn-logout">
@@ -644,7 +631,7 @@ function AdminMain() {
           </div>
         )}
 
-        <div className={`content ${showFilters ? 'sidebar-open' : ''}`}>
+        <div className={`content `}>
           {showAddForm && (
             editMode ? (
               <div className="add-form">
@@ -826,7 +813,7 @@ function AdminMain() {
         className="Modal"
         overlayClassName="Overlay"
       >
-        <h2>Confirm Action</h2>
+        <h2>אישור</h2>
         <p>{modalMessage}</p>
         <div className="modal-buttons">
           <button className="modal-button confirm" onClick={handleModalConfirm}>אשר</button>
@@ -867,8 +854,6 @@ function AdminMain() {
           >
             &times;
           </button>
-
-
 
         <div className='passwordVolUpdate'>
           <h1>שינוי סיסמה</h1>
@@ -924,6 +909,23 @@ function AdminMain() {
 
         <Statistics closeModal={closeStatsModal} />
       </Modal>
+
+      <AdminManagementModal
+        isOpen={isAdminManagementOpen}
+        onRequestClose={closeAdminManagementModal}
+        openSignUpModal={openSignUpModal}
+      />
+
+      <Modal
+        isOpen={isSignUpOpen}
+        onRequestClose={closeSignUpModal}
+        contentLabel="Sign Up Modal"
+        className="SignUp-Modal"
+        overlayClassName="SignUp-Overlay"
+      >
+        <SignUpNewAdmin onClose={closeSignUpModal} />
+      </Modal>
+
 
       <Modal
         isOpen={volunteerModalIsOpen}
