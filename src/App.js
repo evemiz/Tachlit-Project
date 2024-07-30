@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react
 import VolunteerForm from './Forms/Volunteers/Form';
 import RequestForm from './Forms/AidRequests/Form';
 import AdminMain from './Admin/AdminMain';
-import Lists from './Admin/Lists';
 import Login from './Admin/login';
 import SignUpNewAdmin from './Admin/SignUpNewAdmin';
 import FinishSignUp from './Admin/finishSignUp';
@@ -24,7 +23,7 @@ const Navigation = () => (
   <nav className='navMain'>
     <div className='mainPageNav'>
       <div className="navbar-buttons">
-        <button>      
+        <button>
           <Link to="/VolunteerForm">טופס התנדבות</Link>
         </button>
 
@@ -62,7 +61,6 @@ const App = () => {
         <Route path="/VolunteerForm" element={<VolunteerForm />} />
         <Route path="/RequestForm" element={<RequestForm />} />
         <Route path="/AdminMain" element={<AdminMain />} />
-        <Route path="/Lists" element={<Lists />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/SignUp" element={<SignUpNewAdmin />} />
         <Route path="/finishSignUp" element={<FinishSignUp />} />

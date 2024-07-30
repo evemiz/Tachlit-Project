@@ -11,7 +11,7 @@ import volunteerings from "./db/Volunteerings";
 
 Modal.setAppElement('#root');
 
-function RequestForm({ setIsSuccessModalOpen, setSuccessMessage }) {
+function RequestForm({ setIsSuccessModalOpen, setSuccessMessage,closeForm }) {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [id, setId] = useState("");
@@ -143,7 +143,21 @@ function RequestForm({ setIsSuccessModalOpen, setSuccessMessage }) {
     };
 
     return (
-        <div className="Form">
+        <div className="Form" >
+          <button
+            onClick={closeForm}
+            style={{
+              position: 'relative',
+              top: '-0.5rem',
+              left: '-23rem',
+              background: 'transparent',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
+          </button>
         <h1>הגשת בקשת סיוע </h1>
         <fieldset>
         <form action="#" method="get" onSubmit={handleSubmit}>

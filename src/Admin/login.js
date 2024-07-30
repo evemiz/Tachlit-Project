@@ -63,6 +63,8 @@ function Login() {
                 id="email"
                 placeholder='הכנס את כתובת הדוא"ל שלך'
                 value={email}
+                autoComplete="email"
+
                 onChange={(e) => setEmail(e.target.value)}
                 dir="rtl"
               />
@@ -74,6 +76,7 @@ function Login() {
                 className="form-control"
                 id="password"
                 placeholder='הכנס את הסיסמה שלך'
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 dir="rtl"

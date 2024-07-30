@@ -58,11 +58,21 @@ export const addDocument = async (collectionName, data, customId = null) => {
 // Function to delete a document from a collection
 export const deleteDocument = async (collectionName, id) => {
   try {
+    if (collectionName === 'Volunteers') {
+
+      // If the document is a volunteer, also delete the document from the Volunteers collection
+      const docRef = doc(db, collectionName, id);
+      const docSnap = await getDoc(docRef);
+      const docData = docSnap.data();
+      await deleteDoc(doc(db, 'users', docData.mail));
+    }
     await deleteDoc(doc(db, collectionName, id));
     console.log("Document deleted with ID: ", id);
+
     return true;
   } catch (error) {
     console.error("Error deleting document: ", error);
+
     return false;
   }
 };

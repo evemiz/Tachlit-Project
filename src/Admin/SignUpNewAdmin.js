@@ -4,7 +4,7 @@ import { sendSignInLinkToEmail } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import './SignUp.css'; // Ensure you import the CSS file
 
-function SignUp() {
+function SignUp({closeModal}) {
   const [email, setEmail] = useState("");
   const [superAdmin, setSuperAdmin] = useState(false);
   const [message, setMessage] = useState("");
@@ -45,10 +45,11 @@ function SignUp() {
   };
 
   return (
-    <div className="App">
+    <div className="SignUpNewAdmin">
       <form onSubmit={handleSignUp}>
         <input
           type="email"
+          id="email"
           placeholder="אימייל"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -63,7 +64,7 @@ function SignUp() {
           />
           <label htmlFor="superAdmin">סופר אדמין</label>
         </div>
-        <button type="submit">הוספת מנהל חדש</button>
+        <button  type="submit">הוסף</button>
       </form>
       {message && <p>{message}</p>}
     </div>
