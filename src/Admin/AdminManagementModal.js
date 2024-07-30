@@ -3,7 +3,6 @@ import Modal from 'react-modal';
 import { db } from "../firebaseConfig";
 import { collection, getDocs, deleteDoc, doc, query, where } from "firebase/firestore";
 import './List.css';
-import './SignUpNewAdmin';
 
 Modal.setAppElement('#root');
 
