@@ -105,7 +105,9 @@ function AdminMain() {
   const [modalMessage, setModalMessage] = useState('');
   const [modalAction, setModalAction] = useState(() => {});
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // New state for error modal
   const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(''); // New state for error message
   const [volunteers, setVolunteers] = useState([]);
   const [status, setStatus] = useState("");
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
@@ -376,15 +378,21 @@ function AdminMain() {
   const filteredDocuments = getFilteredDocuments();
 
   const handleModalConfirm = async () => {
-    await modalAction();
-    setIsModalOpen(false);
-    fetchDocuments();
-    setSuccessMessage('!הפעולה בוצעה בהצלחה');
-    setIsSuccessModalOpen(true);
-    setNewRecord({});
-    setEditMode(false);
-    setCurrentEditId(null);
-    setShowAddForm(false);
+    try {
+      await modalAction();
+      setIsSuccessModalOpen(true);
+      setSuccessMessage('!הפעולה בוצעה בהצלחה');
+    } catch (err) {
+      setIsErrorModalOpen(true); // Open error modal on failure
+      setErrorMessage('הפעולה נכשלה: ' + err.message); // Set error message
+    } finally {
+      setIsModalOpen(false);
+      fetchDocuments();
+      setNewRecord({});
+      setEditMode(false);
+      setCurrentEditId(null);
+      setShowAddForm(false);
+    }
   };
 
   const handleModalCancel = () => {
@@ -394,6 +402,10 @@ function AdminMain() {
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
     window.location.reload();
+  };
+
+  const handleErrorModalClose = () => {
+    setIsErrorModalOpen(false);
   };
 
   const handleLogout = () => {
@@ -839,6 +851,20 @@ function AdminMain() {
       </Modal>
 
       <Modal
+      isOpen={isErrorModalOpen} // New error modal
+      onRequestClose={handleErrorModalClose}
+      contentLabel="Error"
+      className="Modal"
+      overlayClassName="Overlay"
+      >
+      <h2>שגיאה</h2>
+      <p>{errorMessage}</p>
+      <div className="modal-buttons">
+      <button className="modal-button confirm" onClick={handleErrorModalClose}>סגור</button>
+      </div>
+      </Modal>
+
+      <Modal
       isOpen={modalIsOpen}
       onRequestClose={closeModal}
       contentLabel="Change Password Modal"
@@ -932,6 +958,7 @@ function AdminMain() {
             style={{
               position: 'absolute',
               top: '-0.5rem',
+              left: '0px',
               background: 'transparent',
               border: 'none',
               fontSize: '1.5rem',
