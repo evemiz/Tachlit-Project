@@ -55,7 +55,7 @@ const ListDisplay = ({ collectionName, status }) => {
       firstName: 'שם פרטי',
       lastName: 'שם משפחה',
       phoneNumber: 'מספר טלפון',
-      langueges: 'שפות',
+      languages: 'שפות',
       id: 'ת.ז.',
       city: 'עיר',
       days: 'ימים',

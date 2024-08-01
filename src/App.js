@@ -1,23 +1,23 @@
-import React from 'react';
+import {React , useEffect} from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react-router-dom';
 import VolunteerForm from './Forms/Volunteers/Form';
 import RequestForm from './Forms/AidRequests/Form';
 import AdminMain from './Admin/AdminMain';
 import Login from './Admin/login';
-import SignUpNewAdmin from './Admin/SignUpNewAdmin';
 import FinishSignUp from './Admin/finishSignUp';
-import LoginVolunteer from './volunteer/VolunteerLogIn';
 import VolunteerMain from './volunteer/VolunteerMain';
-import Statistics from './Admin/Statistics';
 import '@fontsource/rubik';
 import './styles.css';
 import logo from './images/logo.png';
 
-const Home = () => (
-  <div>
-    {/* Your home page content */}
-  </div>
-);
+
+const Home = () => {
+  useEffect(() => {
+    window.location.href = 'https://www.tachlit.org.il/';
+  }, []);
+
+  return null;
+};
 
 const Navigation = () => (
   <nav className='navMain'>
@@ -35,9 +35,6 @@ const Navigation = () => (
           <Link to="/Login">התחבר כמנהל</Link>
         </button>
 
-        <button>
-          <Link to="/LoginVolunteer">התחבר כמתנדב</Link>
-        </button>
       </div>
       <div className='navbar-logo'>
         <img
@@ -58,20 +55,18 @@ const App = () => {
     <div>
       {location.pathname === '/' && <Navigation />}
       <Routes>
-        <Route path="/VolunteerForm" element={<VolunteerForm />} />
+      <Route path="/VolunteerForm" element={<VolunteerForm />} />
         <Route path="/RequestForm" element={<RequestForm />} />
         <Route path="/AdminMain" element={<AdminMain />} />
         <Route path="/Login" element={<Login />} />
-        <Route path="/SignUp" element={<SignUpNewAdmin />} />
         <Route path="/finishSignUp" element={<FinishSignUp />} />
-        <Route path="/LoginVolunteer" element={<LoginVolunteer />} />
         <Route path="/VolunteerMain" element={<VolunteerMain />} />
-        <Route path="/Statistics" element={<Statistics />} />
-        <Route path="/" element={<Home />} />
+        <Route path="/TachlitHome" element={<Home />} />
       </Routes>
     </div>
   );
 };
+
 
 const AppWrapper = () => {
   return (

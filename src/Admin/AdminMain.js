@@ -3,15 +3,12 @@ import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePasswor
 import { auth, db } from "../firebaseConfig";
 import { collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
 import Modal from 'react-modal';
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useLocation} from "react-router-dom";
 import ListDisplay from '../ListDisplay';
 import Statistics from './Statistics';
-import { readDocuments, addDocument, deleteDocument, updateDocument } from './AdminFunctions';
+import { readDocumentsAdmin, addDocument, deleteDocument, updateDocument } from './AdminFunctions';
 import { handleApproveVolunteer } from './handleApproveVolunteer';
-import citiesInIsrael from "./db/Cities";
-import languages from "./db/Languges";
 import days from "./db/Days";
-import volunteerings from "./db/Volunteerings";
 import Select from 'react-select';
 import '@fontsource/rubik';
 import logo from '../images/logo.png';
@@ -24,6 +21,9 @@ import RequestForm from './RequestForm';
 import VolunteerForm from './VolunteerForm';
 import SignUpNewAdmin from './SignUpNewAdmin';
 import AdminManagementModal from './AdminManagementModal';
+import EditModal from "./EditModal";
+import {readDocuments} from "./EditFunctions";
+
 
 Modal.setAppElement('#root');
 
@@ -31,7 +31,7 @@ const columnMapping = {
   firstName: 'שם פרטי ',
   lastName: ' שם משפחה ',
   phoneNumber: 'מספר טלפון ',
-  langueges: 'שפות ',
+  languages: 'שפות ',
   ID: 'ת.ז. ',
   city: 'עיר ',
   days: ' ימים',
@@ -39,34 +39,53 @@ const columnMapping = {
   mail: 'Email ',
   date: ' תאריך ',
   time: 'שעה ',
-  comments: 'הערות ',
   emergency: 'חירום ',
   vehicle: 'רכב ',
   matches: 'התאמות ',
   volunteerMatch: 'מתנדב '
 };
 // Define the order of columns in the table
-const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail', 'langueges', 'city', 'days', 'volunteering', 'date', 'time', 'comments', 'emergency', 'vehicle'];
+const fixedColumnOrder = ['firstName', 'lastName', 'ID', 'phoneNumber', 'mail', 'languages', 'city', 'days', 'volunteering', 'date', 'time', 'emergency', 'vehicle'];
 // Define the options for filtering
 const filterOptions = {
-  city: citiesInIsrael,
-  langueges: languages,
+  city: [],
+  languages: [],
   days: days,
-  volunteering: volunteerings
+  volunteering: []
 };
+
+// Function to fetch and set cities
+const fetchAndSet = async () => {
+  try {
+    const citiesData = await readDocuments('Cities');
+    const cityNames = citiesData.map(city => city.heb); 
+    filterOptions.city = cityNames;
+    const langData = await readDocuments('Languages');
+    const langNames = langData.map(lang => lang.heb); 
+    filterOptions.languages = langNames;
+    const volData = await readDocuments('Volunteerings');
+    const volNames = volData.map(vol => vol.heb); 
+    filterOptions.volunteering = volNames;
+  } catch (error) {
+    console.error("Error fetching cities: ", error);
+  }
+};
+
+// Call the function to update filterOptions
+fetchAndSet();
+
 // Define the data types for each column
 const columnDataTypes = {
   firstName: 'string',
   lastName: 'string',
   phoneNumber: 'string',
-  langueges: 'array',
+  languages: 'array',
   city: 'string',
   days: 'array',
   volunteering: 'array',
   mail: 'string',
   date: 'date',
   time: 'string',
-  comments: 'string',
   vehicle: 'boolean',
   emergency: 'boolean',
   ID: 'string',
@@ -75,11 +94,15 @@ const columnDataTypes = {
 };
 
 function AdminMain() {
+  const location = useLocation();
+  const userId = location.state?.userId;
+
   const navigate = useNavigate();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [signUpModalIsOpen, setSignUpModalIsOpen] = useState(false);
   const [statsModalIsOpen, setStatsModalIsOpen] = useState(false);
   const [adminManagementModalIsOpen, setAdminManagementModalIsOpen] = useState(false);
+  const [editModalIsOpen, setEditModalIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -124,6 +147,10 @@ function AdminMain() {
   const openAdminManagementModal = () => setAdminManagementModalIsOpen(true);
   const closeAdminManagementModal = () => setAdminManagementModalIsOpen(false);
 
+  const openEditModal = () => setEditModalIsOpen(true);
+  const closeEditModal = () => setEditModalIsOpen(false);
+
+
   const openSignUpModal = () => {
     setSignUpModalIsOpen(true);
   };
@@ -131,6 +158,13 @@ function AdminMain() {
   const closeSignUpModal = () => {
     setSignUpModalIsOpen(false);
   };
+
+  useEffect(() => {
+    // Simulate loading
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000); // Simulate a 3-second loading time
+  }, []);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -148,7 +182,7 @@ function AdminMain() {
   useEffect(() => {
     const fetchVolunteers = async () => {
       try {
-        const volunteersData = await readDocuments('Volunteers');
+        const volunteersData = await readDocumentsAdmin('Volunteers');
         setVolunteers(volunteersData);
       } catch (error) {
         console.error('Error fetching volunteers:', error);
@@ -220,7 +254,7 @@ function AdminMain() {
       setLoading(true);
       setError(null);
       try {
-        const docs = await readDocuments(collectionName, status);
+        const docs = await readDocumentsAdmin(collectionName, status);
         setDocuments(docs || []);
       } catch (err) {
         console.error('Error fetching documents:', err);
@@ -411,7 +445,7 @@ function AdminMain() {
   const handleLogout = () => {
     signOut(auth)
     .then(() => {
-      navigate("/");
+      navigate("/TachlitHome");
     })
     .catch((error) => {
       console.error("Error logging out:", error);
@@ -565,6 +599,14 @@ function AdminMain() {
 
   return (
     <div className="AdminMainPage">
+      {userId == null && 
+        <div className="error">
+          <h1>404 - Page Not Found</h1>
+          <p>.The page you are looking for does not exist</p>
+        </div>
+      }
+      {userId != null && 
+      <div className="AdminMainPage">
     <div className="navbar-custom">
     <div className="navbar-logo">
     <img
@@ -575,11 +617,13 @@ function AdminMain() {
     />
     </div>
     <div className="navbar-buttons">
-    <button onClick={openModal} className="btn btn-custom">שנה סיסמה</button>
-
+    {isSuperAdmin && (
+      <button onClick={openEditModal} className="btn btn-custom">עריכת טפסים</button>
+    )}
     {isSuperAdmin && (
       <button onClick={openAdminManagementModal} className="btn btn-custom">ניהול מנהלים</button>
     )}
+    <button onClick={openModal} className="btn btn-custom">שנה סיסמה</button>
     <button onClick={handleViewStatistics} className="btn btn-custom">צפייה בדוחות</button>
     <button onClick={handleLogout} className="btn-logout">
     <FontAwesomeIcon icon={faSignOutAlt} />
@@ -733,7 +777,9 @@ function AdminMain() {
     {((collectionName === 'Volunteers')||((collectionName === 'AidRequests')&& status === 'open')) && (
       <button className="lists-button" onClick={() => setShowAddForm(true)}>הוסף רשומה חדשה</button>
     )}
-    {loading && <p>Loading...</p>}
+      {loading && (
+        <div className="spinner"></div> 
+      )}
     {error && <p style={{ color: 'red' }}>Error: {error}</p>}
     {filteredDocuments.length > 0 ? (
       <div className="table-container">
@@ -946,6 +992,11 @@ function AdminMain() {
       openSignUpModal={openSignUpModal}
       />
 
+    <EditModal
+      isOpen={editModalIsOpen}
+      onRequestClose={closeEditModal}
+      />
+
       <Modal
       isOpen={signUpModalIsOpen}
       onRequestClose={closeSignUpModal}
@@ -1060,6 +1111,8 @@ function AdminMain() {
 
       </div>
       </Modal>
+      </div>
+      }
       </div>
     );
   }

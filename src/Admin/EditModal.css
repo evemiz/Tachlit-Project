@@ -1,0 +1,82 @@
+  /* Style for the modal overlay */
+.Management-Overlay {
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .Edit-Modal-M {
+    width: 100%;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow-y: auto; /* Add this to handle overflow if content exceeds modal height */
+    height: 80%; /* Set a max height to avoid overflowing off the screen */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    align-items: center;
+  }
+
+  
+  /* Style for labels */
+  .Edit-Modal-M label {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    color: #333;
+  }
+
+  
+  /* Style for the input fields */
+  .Edit-Modal-M input {
+    width: 95%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-right: 10px;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+  
+  /* Style for the error input fields */
+  .Edit-Modal-M .input-error {
+    border-color: #e74c3c; /* Red border for errors */
+  }
+  
+  /* Style for the add and delete buttons */
+  .Edit-Modal-M button {
+    background-color: #009ba6; /* Primary color */
+    color: #fff; /* Text color */
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+  }
+  
+  .Edit-Modal-M button:hover {
+    background-color: #8fb5b9; /* Darker shade for hover effect */
+  }
+  
+  /* Style for the delete button */
+  .Edit-Modal-M button.delete {
+    background-color: #009ba6; /* Red background for delete button */
+    margin-top: 20px;
+  }
+  
+  .Edit-Modal-M button.delete:hover {
+    background-color: #8fb5b9; /* Darker red for hover effect */
+  }
+  
+  /* Container for item options and actions */
+  .Edit-Modal-M .item-container {
+    margin-bottom: 20px;
+  }
+  
+  

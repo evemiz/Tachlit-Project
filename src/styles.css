@@ -473,7 +473,7 @@ h2 {
   margin: auto;
 }
 
-.box button {
+.box button, .finish {
   background-color: #009ba6; /* Main background color */
   color: white; /* Text color */
   border: none; /* Remove default border */
@@ -488,7 +488,7 @@ h2 {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
 }
 
-.box button:hover {
+.box button:hover, .finish:hover{
   background-color: #086d74;
 }
 
@@ -557,4 +557,46 @@ h2 {
 
 .login .lang button:hover {
   color: #009ba6;
+}
+
+
+/* Style for the entire error page */
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+  color: #333;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+/* Style for the error title */
+.error h1 {
+  font-size: 4rem;
+  margin: 0;
+  color: #e74c3c;
+}
+
+/* Style for the error message */
+.error p {
+  font-size: 1.5rem;
+  margin-top: 10px;
+}
+
+/* Optional: Style for a button or link to return to the home page */
+.error a {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+}
+
+.error a:hover {
+  background-color: #2980b9;
 }

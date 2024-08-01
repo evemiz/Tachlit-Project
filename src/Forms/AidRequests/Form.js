@@ -1,8 +1,5 @@
 import '../style.css';
-import citiesInIsrael from '../Cities';
-import volunteerings from './Volunteerings.js';
-import langues from '../Languges';
-import { React, useState } from "react";
+import { React, useState , useEffect} from "react";
 import Select from 'react-select';
 import Modal from 'react-modal';
 import { addDocument, addFieldToDocument, addMatchToDocument } from "./RequestFunctions.js";
@@ -15,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../LanguageSwitcher.js';
+import { readDocuments , getHebValueByEn} from '../../Admin/EditFunctions.js'
 
 Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
 
@@ -41,54 +39,100 @@ function RequestForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
 
+  const [cityOptions, setCityOptions] = useState([]); 
+  const [langOptions, setLangOptions] = useState([]); 
+  const [volOptions, setVolOptions] = useState([]); 
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const data = await readDocuments('Cities'); 
+        const field = isEnglish ? 'en' : 'heb';
+        const formattedCities = data.map(doc => ({ value: doc[field], label: doc[field] }));
+        setCityOptions(formattedCities);
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+      }
+    };
+
+    fetchCities();
+  }, [isEnglish]);
+
+  useEffect(() => {
+    const fetchLang = async () => {
+      try {
+        const data = await readDocuments('Languages'); 
+        const field = isEnglish ? 'en' : 'heb';
+        const formattedLang = data.map(doc => ({ value: doc[field], label: doc[field] }));
+        setLangOptions(formattedLang);
+      } catch (error) {
+        console.error('Error fetching languages:', error);
+      }
+    };
+
+    fetchLang();
+  }, [isEnglish]);
+
+  useEffect(() => {
+    const fetchVol = async () => {
+      try {
+        const data = await readDocuments('VolunteeringsRequest'); 
+        const field = isEnglish ? 'en' : 'heb';
+        const formattedVol = data.map(doc => ({ value: doc[field], label: doc[field] }));
+        setVolOptions(formattedVol);
+      } catch (error) {
+        console.error('Error fetching volunteerings:', error);
+      }
+    };
+
+    fetchVol();
+  }, [isEnglish]);
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     let isValid = true;
-
-    if (!firstName || !lastName || !id || !contact || !citySelectedOption || !volSelectedOptions || !langSelectedOptions || !date || !time){
+  
+    if (!firstName || !lastName || !id || !contact || !citySelectedOption || !volSelectedOptions || !langSelectedOptions || !date || !time) {
       isValid = false;
     }
-
-    const phoneRegex = /^05\d{8}$/; 
-    if (!phoneRegex.test(contact)){
+  
+    const phoneRegex = /^05\d{8}$/;
+    if (!phoneRegex.test(contact)) {
       setContactValid(false);
       isValid = false;
     } else {
       setContactValid(true);
     }
-
-    const idRegex = /^\d{9}$/; 
-    if (!idRegex.test(id)){
+  
+    const idRegex = /^\d{9}$/;
+    if (!idRegex.test(id)) {
       setIdValid(false);
       isValid = false;
     } else {
       setIdValid(true);
     }
-
-    if (isValid ) {
-      let translatedLang;
-      let translatedVol;
-      let translatedCity;
-
+  
+    if (isValid) {
+      let translatedLang = langSelectedOptions ? langSelectedOptions.label : "";
+      let translatedVol = volSelectedOptions ? volSelectedOptions.label : "";
+      let translatedCity = citySelectedOption ? citySelectedOption.label : "";
+  
+      // Translate values to Hebrew if language is English
       if (isEnglish) {
-        translatedLang = langSelectedOptions ? t(`langs.${langSelectedOptions.label}`, { lng: 'he' }) : "";
-        translatedVol = volSelectedOptions ? t(`volunteering.${volSelectedOptions.label}`, { lng: 'he' }) : "";
-        translatedCity = citySelectedOption ? t(`${citySelectedOption.label}`, { lng: 'he' }) : "";
+        translatedLang = await getHebValueByEn('Languages', langSelectedOptions.label);
+        translatedVol = await getHebValueByEn('Volunteerings', volSelectedOptions.label);
+        translatedCity = await getHebValueByEn('Cities', citySelectedOption.label);
       }
-
-      else{
-        translatedLang = langSelectedOptions ? langSelectedOptions.label : "";
-        translatedVol = volSelectedOptions ? volSelectedOptions.label : "";
-        translatedCity = citySelectedOption ? citySelectedOption.label : "";
-      }
-
+  
+      console.log (translatedLang);
       const formData = {
         firstName: firstName,
         lastName: lastName,
         ID: id,
         phoneNumber: contact,
         city: translatedCity,
-        langueges: translatedLang,
+        languages: translatedLang,
         volunteering: translatedVol,
         date: date,
         day: dayOfWeek,
@@ -98,7 +142,7 @@ function RequestForm() {
         volunteerFeedback: "",
         seekerFeedback: "",
       };
-      
+  
       if (contactValid && idValid) {
         try {
           const docRef = await addDocument('AidRequests', formData);
@@ -113,7 +157,7 @@ function RequestForm() {
           if (translatedLang) {
             filteredDocs = filteredDocs.filter(doc => {
               const data = doc.data();
-              return data.langueges && data.langueges.includes(translatedLang);
+              return data.languages && data.languages.includes(translatedLang);
             });
           }
   
@@ -141,14 +185,13 @@ function RequestForm() {
           await addFieldToDocument('AidRequests', docRef.id, 'matches', volunteerIds);
   
           if (volunteerIds.length > 0) {
-            // Function to add a field to a specific document
-              try {
-                for (const id of volunteerIds) {
-                  await addMatchToDocument('Volunteers', id, docRef.id);
-                }
-              } catch (error) {
-                console.error(`Error updating volunteer documents: ${error}`);
+            try {
+              for (const id of volunteerIds) {
+                await addMatchToDocument('Volunteers', id, docRef.id);
               }
+            } catch (error) {
+              console.error(`Error updating volunteer documents: ${error}`);
+            }
           }
   
           setSuccessMessage(t(`The request has been sent successfully`)); // Set success message
@@ -156,9 +199,10 @@ function RequestForm() {
         } catch (error) {
           console.error('Error during handleSubmit:', error);
         }
+      }
     }
-  }
-};
+  };
+  
 
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
@@ -173,7 +217,7 @@ function RequestForm() {
 
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
-    navigate('/'); 
+    navigate("/TachlitHome");
   };
 
   const openWhatsAppChat = () => {
@@ -184,23 +228,8 @@ function RequestForm() {
   };
 
   const logoClick = () => {
-    navigate('/');
+    navigate("/TachlitHome");
   }
-
-  const translatedLangues = langues.map(lang => ({
-    value: lang,
-    label: t(`langs.${lang}`)
-  }));
-
-  const translatedVol = volunteerings.map(vol => ({
-    value: vol,
-    label: t(`volunteering.${vol}`)
-  }));
-
-  const translatedCity = citiesInIsrael.map(city => ({
-    value: city,
-    label: t(`${city}`)
-  }));
 
   return (
     <div className="page">
@@ -276,7 +305,7 @@ function RequestForm() {
             <Select
               name="city"
               id="city"
-              options={translatedCity}
+              options={cityOptions}
               value={citySelectedOption}
               onChange={setCitySelectedOption}
               placeholder={t('select_city')}
@@ -285,7 +314,7 @@ function RequestForm() {
 
             <label htmlFor="volunteerings">{t('vol')}</label>
             <Select
-              options={translatedVol}
+              options={volOptions}
               value={volSelectedOptions}
               onChange={setVolSelectedOptions}
               placeholder={t('volunteering_select')}
@@ -293,9 +322,9 @@ function RequestForm() {
               required
             />
 
-            <label htmlFor="langueges">{t('language')}</label>
+            <label htmlFor="languages">{t('language')}</label>
             <Select
-              options={translatedLangues}
+              options={langOptions}
               value={langSelectedOptions}
               onChange={setLangSelectedOptions}
               placeholder={t('select_language')}

@@ -194,12 +194,25 @@
   align-items: center;
 
 }
-
+.Edit-Modal {
+  width: 80%;
+  max-width: 800px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  overflow-y: auto; /* Add this to handle overflow if content exceeds modal height */
+  height: 80%; /* Set a max height to avoid overflowing off the screen */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  align-items: center;
+}
 .Management-Overlay {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.75); /* Dim the background */
   align-items: center;
 
 }
@@ -252,4 +265,19 @@
   background-color: #d32f2f;
   align-items: center;
 
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

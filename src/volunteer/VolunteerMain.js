@@ -4,17 +4,14 @@ import { signOut, reauthenticateWithCredential, EmailAuthProvider, updatePasswor
 import Modal from 'react-modal';
 import { auth, db } from "../firebaseConfig";
 import { arrayUnion, query, where, collection, getDocs, getDoc, doc, setDoc, updateDoc, arrayRemove } from "firebase/firestore";
-import citiesInIsrael from '../Forms/Cities.js';
-import volunteerings from '../Forms/Volunteerings.js';
 import Select from 'react-select';
-import days from '../Forms/Days.js';
-import langueges from '../Forms/Languges.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import logo from '../images/logo.png';
 import {  faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../LanguageSwitcher.js';
+import { readDocuments , getHebValueByEn} from '../Admin/EditFunctions.js'
 
 Modal.setAppElement('#root');
 
@@ -51,9 +48,98 @@ function VolunteerMain() {
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-  const [datePass, setDatePass] = useState(false);
   const isFetching = useRef(false);
   const [uid, setUid] = useState("");
+
+  const [dayOptions, setDayOptions] = useState([]); 
+  const [cityOptions, setCityOptions] = useState([]); 
+  const [langOptions, setLangOptions] = useState([]); 
+  const [volOptions, setVolOptions] = useState([]); 
+
+  const [volunteerDict, setVolunteerDict] = useState({});
+
+  useEffect(() => {
+    const fetchDays = async () => {
+      try {
+        const data = await readDocuments('Days'); 
+        const field = isEnglish ? 'en' : 'heb';
+        const formattedDays = data.map(doc => ({ value: doc[field], label: doc[field] }));
+        setDayOptions(formattedDays);
+      } catch (error) {
+        console.error('Error fetching days:', error);
+      }
+    };
+
+    fetchDays();
+  }, [isEnglish]);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const data = await readDocuments('Cities'); 
+        const field = isEnglish ? 'en' : 'heb';
+        const formattedCities = data.map(doc => ({ value: doc[field], label: doc[field] }));
+        setCityOptions(formattedCities);
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+      }
+    };
+
+    fetchCities();
+  }, [isEnglish]);
+
+  useEffect(() => {
+    const fetchLang = async () => {
+      try {
+        const data = await readDocuments('Languages'); 
+        const field = isEnglish ? 'en' : 'heb';
+        const formattedLang = data.map(doc => ({ value: doc[field], label: doc[field] }));
+        setLangOptions(formattedLang);
+      } catch (error) {
+        console.error('Error fetching languages:', error);
+      }
+    };
+
+    fetchLang();
+  }, [isEnglish]);
+
+  useEffect(() => {
+    const fetchVolList = async () => {
+      try {
+        const data = await readDocuments('Volunteerings'); 
+        const field = isEnglish ? 'en' : 'heb';
+        const formattedVol = data.map(doc => ({ value: doc[field], label: doc[field] }));
+        setVolOptions(formattedVol);
+      } catch (error) {
+        console.error('Error fetching volunteerings:', error);
+      }
+    };
+
+    fetchVolList();
+  }, [isEnglish]);
+
+  useEffect(() => {
+    const fetchVol = async () => {
+      try {
+        const data = await readDocuments('Volunteerings'); 
+
+        // Create dictionary with both Hebrew and English for each volunteering
+        const volDict = data.reduce((acc, doc) => {
+          acc[doc.heb] = { heb: doc.heb, en: doc.en };
+          return acc;
+        }, {});
+
+        setVolunteerDict(volDict);
+
+        // Log the dictionary
+        console.log('Volunteer Dictionary:', volDict);
+      } catch (error) {
+        console.error('Error fetching volunteerings:', error);
+      }
+    };
+
+    fetchVol();
+  }, []); 
 
   const fetchVolRecord = useCallback(async () => {
     try {
@@ -143,7 +229,7 @@ function VolunteerMain() {
     signOut(auth)
       .then(() => {
         console.log("User logged out");
-        navigate("/");
+        navigate("/TachlitHome");
       })
       .catch((error) => {
         console.error("Error logging out:", error);
@@ -224,16 +310,43 @@ function VolunteerMain() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const translatedLang = langSelectedOptions.map(option => t(`langs.${option.value}`, { lng: 'he' }));
-    const translatedVol = volSelectedOptions.map(option => t(`volunteering.${option.value}`, { lng: 'he' }));
-    const translatedDay = daySelectedOptions.map(option => t(`${option.value}`, { lng: 'he' }));
-    const translatedCity = citySelectedOption ? t(`${citySelectedOption.label}`, { lng: 'he' }) : "";
+    let translatedDay = daySelectedOptions.map(option => option.value);
+    let translatedLang = langSelectedOptions.map(option => option.value);
+    let translatedVol = volSelectedOptions.map(option => option.value);
+    let translatedCity = citySelectedOption ? citySelectedOption.label : "";
+
+    // Translate values to Hebrew if language is English
+    if (isEnglish) {
+      translatedCity = await getHebValueByEn('Cities', citySelectedOption.label);
+
+      const translatedLangPromises = langSelectedOptions.map(option =>
+        getHebValueByEn('Languages', option.label)
+      );
+
+      const translatedVolPromises = volSelectedOptions.map(option =>
+        getHebValueByEn('Volunteerings', option.label)
+      );
+
+      const translatedDaysPromises = daySelectedOptions.map(option =>
+        getHebValueByEn('Days', option.label)
+      );
+
+      const [translatedLangArray, translatedVolArray, translatedDaysArray] = await Promise.all([
+        Promise.all(translatedLangPromises),
+        Promise.all(translatedVolPromises),
+        Promise.all(translatedDaysPromises),
+      ]);
+
+      translatedLang = translatedLangArray;
+      translatedVol = translatedVolArray;
+      translatedDay = translatedDaysArray;
+    }
 
     const formData = {
       firstName: firstName,
       lastName: lastName,
       city: translatedCity,
-      langueges: translatedLang,
+      languages: translatedLang,
       days: translatedDay,
       emergency: available,
       volunteering: translatedVol,
@@ -401,30 +514,19 @@ function VolunteerMain() {
     const whatsappUrl = `https://wa.me/${phoneNumber}`;
     window.open(whatsappUrl, "_blank");
   };
-
-  const translatedLangues = langueges.map(lang => ({
-    value: lang,
-    label: t(`langs.${lang}`)
-  }));
-
-  const translatedVol = volunteerings.map(vol => ({
-    value: vol,
-    label: t(`volunteering.${vol}`)
-  }));
-
-  const translatedCity = citiesInIsrael.map(city => ({
-    value: city,
-    label: t(`${city}`)
-  }));
-
-  const translatedDay = days.map(day => ({
-    value: day,
-    label: t(`${day}`)
-  }));
+  
 
   return (
     <div className='VolunteerMain'>
-      <div className="navbar-custom">
+      {userId == null &&
+      <div className="error">
+        <h1>404 - Page Not Found</h1>
+        <p>.The page you are looking for does not exist</p>
+      </div>
+      }
+      {userId != null && 
+      <div className='VolunteerMain'>
+        <div className="navbar-custom">
         <div className="navbar-logo">
           <img
             src={logo}
@@ -490,7 +592,7 @@ function VolunteerMain() {
               <label>{t('city')}</label>
               <Select
                 name="select"
-                options={translatedCity}
+                options={cityOptions}
                 value={citySelectedOption}
                 onChange={setCitySelectedOption}
                 placeholder={t('select_city')}
@@ -503,7 +605,7 @@ function VolunteerMain() {
               <Select
                 isMulti
                 name="volunteerings"
-                options={translatedVol}
+                options={volOptions}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 value={volSelectedOptions}
@@ -516,7 +618,7 @@ function VolunteerMain() {
               <Select
                 isMulti
                 name="days"
-                options={translatedDay}
+                options={dayOptions}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 value={daySelectedOptions}
@@ -528,8 +630,8 @@ function VolunteerMain() {
               <label>{t('languages')}</label>
               <Select
                 isMulti
-                name="langueges"
-                options={translatedLangues}
+                name="languages"
+                options={langOptions}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 value={langSelectedOptions}
@@ -694,7 +796,11 @@ function VolunteerMain() {
                     </tr>
                     <tr>
                       <td><strong>{t('type_of_request')}</strong></td>
-                      <td>{t(`he-volunteering.${match.volunteering}`)}</td>
+                      <td>
+                          {isEnglish
+                            ? volunteerDict[match.volunteering]?.en || t('not_available')
+                            : volunteerDict[match.volunteering]?.heb || t('not_available')}
+                        </td>
                     </tr>
                     <tr>
                       <td><strong>{t('date')}</strong></td>
@@ -736,7 +842,11 @@ function VolunteerMain() {
                   </tr>
                   <tr>
                     <td><strong>{t('type_of_request')}</strong></td>
-                    <td>{t(`he-volunteering.${cur.volunteering}`)}</td>
+                    <td>
+                          {isEnglish
+                            ? volunteerDict[cur.volunteering]?.en || t('not_available')
+                            : volunteerDict[cur.volunteering]?.heb || t('not_available')}
+                        </td>
                   </tr>
                   <tr>
                     <td><strong>{t('date')}</strong></td>
@@ -790,6 +900,9 @@ function VolunteerMain() {
           <FontAwesomeIcon icon={faWhatsapp} size="2x" />
         </button>
       </div>
+      </div>
+      }
+      
     </div>
   );
 }

@@ -1,8 +1,8 @@
-const langueges = [
+const languages = [
     "Hebrew",
     "English",
     "French",
     "Russian",
     "Spanish",
   ];
-  export default langueges;
+  export default languages;

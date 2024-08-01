@@ -94,16 +94,21 @@ export const getDocumentById = async (collectionName, docId) => {
 };
 
 
+// Function to check if a document with a specific ID exists in a collection
+export const doesDocumentExist = async (collectionName, docId) => {
+  try {
+    const docRef = doc(db, collectionName, docId);
+    const docSnap = await getDoc(docRef);
 
-
-
-// TODO: make it work
-// Function to update a document in a collection
-export const updateDocument = async (collection, docId, data) => {
-        try {
-            await db.collection(collection).doc(docId).update(data);
-            console.log("Document updated with ID: ", docId);
-          } catch (error) {
-            console.error("Error updating document: ", error);
-          }
+    if (docSnap.exists()) {
+      console.log(`Document with ID: ${docId} exists in collection: ${collectionName}`);
+      return true;
+    } else {
+      console.log(`No document with ID: ${docId} found in collection: ${collectionName}`);
+      return false;
+    }
+  } catch (error) {
+    console.error("Error checking document existence: ", error);
+    throw error;
+  }
 };

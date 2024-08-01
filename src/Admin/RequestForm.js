@@ -1,13 +1,11 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import Select from 'react-select';
 import Modal from 'react-modal';
 import { addDocument, addFieldToDocument, addMatchToDocument } from "../Forms/AidRequests/RequestFunctions";
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-import citiesInIsrael from "./db/Cities";
-import languages from "./db/Languges";
 import days from "./db/Days";
-import volunteerings from "./db/Volunteerings";
+import { readDocuments } from "./EditFunctions";
 
 Modal.setAppElement('#root');
 
@@ -25,6 +23,26 @@ function RequestForm({ setIsSuccessModalOpen, setSuccessMessage,closeForm }) {
     const [time, setTime] = useState("");
     const [comments, setComments] = useState("");
     const [dayOfWeek, setDayOfWeek] = useState("");
+
+    const [cityOptions, setCityOptions] = useState([]); 
+    const [langOptions, setLangOptions] = useState([]); 
+    const [volOptions, setVolOptions] = useState([]); 
+
+    useEffect(() => {
+        const fetchDocuments = async () => {
+            const langData = await readDocuments('Languages');
+            setLangOptions(langData.map(doc => ({ value: doc.heb, label: doc.heb })));
+
+            const cityData = await readDocuments('Cities');
+            setCityOptions(cityData.map(doc => ({ value: doc.heb, label: doc.heb })));
+
+            const volData = await readDocuments('VolunteeringsRequest');
+            setVolOptions(volData.map(doc => ({ value: doc.heb, label: doc.heb })));
+          
+        };
+    
+        fetchDocuments();
+      }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -53,7 +71,7 @@ function RequestForm({ setIsSuccessModalOpen, setSuccessMessage,closeForm }) {
                 ID: id,
                 phoneNumber: contact,
                 city: citySelectedOption ? citySelectedOption.label : "",
-                langueges: langSelectedOptions ? langSelectedOptions.label : "",
+                languages: langSelectedOptions ? langSelectedOptions.label : "",
                 volunteering: volSelectedOptions ? volSelectedOptions.label : "",
                 date: date,
                 day: dayOfWeek,
@@ -76,7 +94,7 @@ function RequestForm({ setIsSuccessModalOpen, setSuccessMessage,closeForm }) {
                     if (langSelectedOptions.label) {
                         filteredDocs = filteredDocs.filter(doc => {
                             const data = doc.data();
-                            return data.langueges && data.langueges.includes(langSelectedOptions.label);
+                            return data.languages && data.languages.includes(langSelectedOptions.label);
                         });
                     }
 
@@ -213,7 +231,7 @@ function RequestForm({ setIsSuccessModalOpen, setSuccessMessage,closeForm }) {
         <Select
         name="select"
         id="select"
-        options={citiesInIsrael.map(city => ({ value: city, label: city }))}
+        options={cityOptions}
         value={citySelectedOption}
         onChange={setCitySelectedOption}
         placeholder="בחר עיר מגורים"
@@ -224,7 +242,7 @@ function RequestForm({ setIsSuccessModalOpen, setSuccessMessage,closeForm }) {
         <Select
         name="select"
         id="select"
-        options={languages.map(lang => ({ value: lang, label: lang }))}
+        options={langOptions}
         value={langSelectedOptions}
         onChange={setLangSelectedOptions}
         placeholder="בחר שפה "
@@ -235,7 +253,7 @@ function RequestForm({ setIsSuccessModalOpen, setSuccessMessage,closeForm }) {
         <Select
         name="volunteerings"
         id="volunteerings"
-        options={volunteerings.map(volunteer => ({ value: volunteer, label: volunteer }))}
+        options={volOptions}
         value={volSelectedOptions}
         onChange={setVolSelectedOptions}
         placeholder="בחר תחום לסיוע"

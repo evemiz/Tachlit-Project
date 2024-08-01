@@ -41,7 +41,7 @@ const SignUpVol = () => {
         phoneNumber: requestData.phoneNumber,
         mail: requestData.mail,
         city: requestData.city,
-        langueges: requestData.langueges,
+        languages: requestData.languages,
         days: requestData.days,
         emergency: requestData.emergency,
         volunteering: requestData.volunteering,

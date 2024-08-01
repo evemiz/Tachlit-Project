@@ -10,7 +10,7 @@ export function validateData(data) {
 }
 
 // Function to read documents from a collection
-export const readDocuments = async (collectionName, status) => {
+export const readDocumentsAdmin = async (collectionName, status) => {
   try {
     let q;
     if (status) {

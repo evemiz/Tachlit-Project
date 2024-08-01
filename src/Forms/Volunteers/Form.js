@@ -1,20 +1,17 @@
 import '../style.css';
-import citiesInIsrael from '../Cities';
-import volunteerings from '../Volunteerings';
-import { React, useState } from "react";
+import { React, useState , useEffect} from "react";
 import Select from 'react-select';
-import days from '../Days';
-import langues from '../Languges';
 import Modal from 'react-modal';
-import {addDocument } from "./VolunteerFunctions.js";
+import {addDocument , doesDocumentExist} from "./VolunteerFunctions.js";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
 import { useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../LanguageSwitcher.js';
+import { readDocuments , getHebValueByEn} from '../../Admin/EditFunctions.js'
 
-Modal.setAppElement('#root'); // Ensure modal works correctly with screen readers
+Modal.setAppElement('#root');
 
 function VolunteerForm() {
   const { t, i18n } = useTranslation();
@@ -37,8 +34,74 @@ function VolunteerForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [idValid, setIdValid] = useState(true);
+  const [userExist, setUserExist] = useState(false);
   const [contactValid, setContactValid] = useState(true);
   const [emailValid, setEmailValid] = useState(true);
+
+  const [dayOptions, setDayOptions] = useState([]); 
+  const [cityOptions, setCityOptions] = useState([]); 
+  const [langOptions, setLangOptions] = useState([]); 
+  const [volOptions, setVolOptions] = useState([]); 
+
+  useEffect(() => {
+    const fetchDays = async () => {
+      try {
+        const data = await readDocuments('Days'); 
+        const field = isEnglish ? 'en' : 'heb';
+        const formattedDays = data.map(doc => ({ value: doc[field], label: doc[field] }));
+        setDayOptions(formattedDays);
+      } catch (error) {
+        console.error('Error fetching days:', error);
+      }
+    };
+
+    fetchDays();
+  }, [isEnglish]);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const data = await readDocuments('Cities'); 
+        const field = isEnglish ? 'en' : 'heb';
+        const formattedCities = data.map(doc => ({ value: doc[field], label: doc[field] }));
+        setCityOptions(formattedCities);
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+      }
+    };
+
+    fetchCities();
+  }, [isEnglish]);
+
+  useEffect(() => {
+    const fetchLang = async () => {
+      try {
+        const data = await readDocuments('Languages'); 
+        const field = isEnglish ? 'en' : 'heb';
+        const formattedLang = data.map(doc => ({ value: doc[field], label: doc[field] }));
+        setLangOptions(formattedLang);
+      } catch (error) {
+        console.error('Error fetching languages:', error);
+      }
+    };
+
+    fetchLang();
+  }, [isEnglish]);
+
+  useEffect(() => {
+    const fetchVol = async () => {
+      try {
+        const data = await readDocuments('Volunteerings'); 
+        const field = isEnglish ? 'en' : 'heb';
+        const formattedVol = data.map(doc => ({ value: doc[field], label: doc[field] }));
+        setVolOptions(formattedVol);
+      } catch (error) {
+        console.error('Error fetching volunteerings:', error);
+      }
+    };
+
+    fetchVol();
+  }, [isEnglish]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,12 +133,48 @@ function VolunteerForm() {
 
     if (isValid) {
 
-    const translatedLang = langSelectedOptions.map(option => t(`langs.${option.value}`, { lng: 'he' }));
-    const translatedVol = volSelectedOptions.map(option => t(`volunteering.${option.value}`, { lng: 'he' }));
-    const translatedDay = daySelectedOptions.map(option => t(`${option.value}`, { lng: 'he' }));
-    const translatedCity = citySelectedOption ? t(`${citySelectedOption.label}`, { lng: 'he' }) : "";
+      const docExists1 = await doesDocumentExist("Volunteers", id);
+      const docExists2 = await doesDocumentExist("NewVolunteers", id);
+        if (docExists1 || docExists2) {
+            console.log("The user exists");
+            setUserExist(true);
+            return;
+        }
+        else {
+          setUserExist(false);
+        }
 
+    let translatedDay = daySelectedOptions.map(option => option.value);
+    let translatedLang = langSelectedOptions.map(option => option.value);
+    let translatedVol = volSelectedOptions.map(option => option.value);
+    let translatedCity = citySelectedOption ? citySelectedOption.label : "";
 
+    // Translate values to Hebrew if language is English
+    if (isEnglish) {
+      translatedCity = await getHebValueByEn('Cities', citySelectedOption.label);
+
+      const translatedLangPromises = langSelectedOptions.map(option =>
+        getHebValueByEn('Languages', option.label)
+      );
+
+      const translatedVolPromises = volSelectedOptions.map(option =>
+        getHebValueByEn('Volunteerings', option.label)
+      );
+
+      const translatedDaysPromises = daySelectedOptions.map(option =>
+        getHebValueByEn('Days', option.label)
+      );
+
+      const [translatedLangArray, translatedVolArray, translatedDaysArray] = await Promise.all([
+        Promise.all(translatedLangPromises),
+        Promise.all(translatedVolPromises),
+        Promise.all(translatedDaysPromises),
+      ]);
+
+      translatedLang = translatedLangArray;
+      translatedVol = translatedVolArray;
+      translatedDay = translatedDaysArray;
+    }
 
       const formData = {
         firstName: firstName,
@@ -100,7 +199,7 @@ function VolunteerForm() {
 
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
-    navigate('/'); 
+    navigate("/TachlitHome");
   };
 
   const openWhatsAppChat = () => {
@@ -111,28 +210,8 @@ function VolunteerForm() {
   };
 
   const logoClick = () => {
-    navigate('/');
+    navigate("/TachlitHome");
   }
-
-  const translatedLangues = langues.map(lang => ({
-    value: lang,
-    label: t(`langs.${lang}`)
-  }));
-
-  const translatedVol = volunteerings.map(vol => ({
-    value: vol,
-    label: t(`volunteering.${vol}`)
-  }));
-
-  const translatedCity = citiesInIsrael.map(city => ({
-    value: city,
-    label: t(`${city}`)
-  }));
-
-  const translatedDay = days.map(day => ({
-    value: day,
-    label: t(`${day}`)
-  }));
 
   return (
     <div className="page">
@@ -223,7 +302,7 @@ function VolunteerForm() {
           <label>{t('city')}</label>
           <Select
             name="select"
-            options={translatedCity}
+            options={cityOptions}
             value={citySelectedOption}
             onChange={setCitySelectedOption}
             placeholder= {t('select_city')}
@@ -234,7 +313,7 @@ function VolunteerForm() {
           <Select
             isMulti
             name="volunteerings"
-            options={translatedVol}
+            options={volOptions}
             className="basic-multi-select"
             classNamePrefix="select"
             value={volSelectedOptions}
@@ -247,7 +326,7 @@ function VolunteerForm() {
           <Select
             isMulti
             name="days"
-            options={translatedDay}
+            options={dayOptions}
             className="basic-multi-select"
             classNamePrefix="select"
             value={daySelectedOptions}
@@ -260,7 +339,7 @@ function VolunteerForm() {
           <Select
             isMulti
             name="languages"
-            options={translatedLangues}
+            options={langOptions}
             className="basic-multi-select"
             classNamePrefix="select"
             value={langSelectedOptions}
@@ -330,6 +409,9 @@ function VolunteerForm() {
           </div>
 
           </div>
+          {userExist && (
+            <label style={{ color: 'red', fontSize: '12px' }}>{t('User Exist')}</label>
+          )}
           <button
             type="submit"
             value="Submit"

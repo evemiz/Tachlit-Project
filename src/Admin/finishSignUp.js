@@ -55,7 +55,7 @@ function FinishSignUp() {
           .then(() => {
             setMessage("הסיסמה הוגדרה בהצלחה.");
 
-            navigate('/');
+            navigate('/Login');
           })
           .catch((error) => {
             console.error("Error setting password:", error);
@@ -93,7 +93,7 @@ function FinishSignUp() {
           onChange={(e) => setConfirmPassword(e.target.value)}
           dir="rtl"
         />
-        <button type="submit">הגדר סיסמה</button>
+        <button className="finish" type="submit">הגדר סיסמה</button>
       </form>
       {message && <p>{message}</p>}
     </div>

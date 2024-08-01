@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import Select from 'react-select';
-import citiesInIsrael from "./db/Cities";
-import languages from "./db/Languges";
 import days from "./db/Days";
-import volunteerings from "./db/Volunteerings";
 import Modal from 'react-modal';
 import { addDocument } from "./AdminFunctions";
 import { handleApproveVolunteer } from './handleApproveVolunteer';
+import { readDocuments } from "./EditFunctions";
+
 
 Modal.setAppElement('#root');
 
@@ -25,6 +24,26 @@ function VolunteerForm({ setIsSuccessModalOpen, setSuccessMessage, closeForm }) 
   const [idValid, setIdValid] = useState(true);
   const [contactValid, setContactValid] = useState(true);
   const [emailValid, setEmailValid] = useState(true);
+
+  const [cityOptions, setCityOptions] = useState([]); 
+  const [langOptions, setLangOptions] = useState([]); 
+  const [volOptions, setVolOptions] = useState([]); 
+
+  useEffect(() => {
+      const fetchDocuments = async () => {
+          const langData = await readDocuments('Languages');
+          setLangOptions(langData.map(doc => ({ value: doc.heb, label: doc.heb })));
+
+          const cityData = await readDocuments('Cities');
+          setCityOptions(cityData.map(doc => ({ value: doc.heb, label: doc.heb })));
+
+          const volData = await readDocuments('Volunteerings');
+          setVolOptions(volData.map(doc => ({ value: doc.heb, label: doc.heb })));
+        
+      };
+  
+      fetchDocuments();
+    }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,7 +81,7 @@ function VolunteerForm({ setIsSuccessModalOpen, setSuccessMessage, closeForm }) 
         phoneNumber: contact,
         mail: email,
         city: citySelectedOption ? citySelectedOption.label : "",
-        langueges: langSelectedOptions.map(option => option.value),
+        languages: langSelectedOptions.map(option => option.value),
         days: daySelectedOptions.map(option => option.value),
         emergency: available,
         volunteering: volSelectedOptions.map(option => option.value),
@@ -178,7 +197,7 @@ function VolunteerForm({ setIsSuccessModalOpen, setSuccessMessage, closeForm }) 
             <label>עיר מגורים</label>
             <Select
               name="select"
-              options={citiesInIsrael.map(city => ({ value: city, label: city }))}
+              options={cityOptions}
               value={citySelectedOption}
               onChange={setCitySelectedOption}
               placeholder="בחר עיר מגורים"
@@ -189,7 +208,7 @@ function VolunteerForm({ setIsSuccessModalOpen, setSuccessMessage, closeForm }) 
             <Select
               isMulti
               name="volunteerings"
-              options={volunteerings.map(volunteer => ({ value: volunteer, label: volunteer }))}
+              options={volOptions}
               className="basic-multi-select"
               classNamePrefix="select"
               value={volSelectedOptions}
@@ -215,7 +234,7 @@ function VolunteerForm({ setIsSuccessModalOpen, setSuccessMessage, closeForm }) 
             <Select
               isMulti
               name="languages"
-              options={languages.map(lang => ({ value: lang, label: lang }))}
+              options={langOptions}
               className="basic-multi-select"
               classNamePrefix="select"
               value={langSelectedOptions}
