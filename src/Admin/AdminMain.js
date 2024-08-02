@@ -23,6 +23,7 @@ import SignUpNewAdmin from './SignUpNewAdmin';
 import AdminManagementModal from './AdminManagementModal';
 import EditModal from "./EditModal";
 import {readDocuments} from "./EditFunctions";
+import { FaChevronDown } from 'react-icons/fa';
 
 
 Modal.setAppElement('#root');
@@ -80,7 +81,7 @@ const columnDataTypes = {
   lastName: 'string',
   phoneNumber: 'string',
   languages: 'array',
-  city: 'string',
+  city: 'array',
   days: 'array',
   volunteering: 'array',
   mail: 'string',
@@ -578,6 +579,10 @@ function AdminMain() {
           isMulti
           onChange={selectedOptions => handleFilterChange(column, selectedOptions.map(option => option.value))}
           value={(filters[column] || []).map(value => ({ value, label: value }))}
+          menuPortalTarget={document.body}
+          className="select-menu" // Apply custom CSS class
+          classNamePrefix="react-select"
+          placeholder= ""
           />
         ) : null
       );
@@ -740,10 +745,11 @@ function AdminMain() {
               <Select
               name={column}
               options={filterOptions[column]?.map(item => ({ value: item, label: item })) || []}
-              isMulti
+              isMulti={column !== 'city'}
               value={newRecord[column]}
               onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-              placeholder={``}
+              placeholder= ""
+              menuPortalTarget={document.body}
               />
             ) : columnDataTypes[column] === 'object' ? (
               <Select
@@ -751,7 +757,8 @@ function AdminMain() {
               options={filterOptions[column]?.map(item => ({ value: item, label: item })) || []}
               value={newRecord[column]}
               onChange={(selectedOption) => handleSelectChange(selectedOption, column)}
-              placeholder={``}
+              placeholder= ""
+              menuPortalTarget={document.body}
               />
             ) : columnDataTypes[column] === 'date' ? (
               <input
@@ -806,17 +813,17 @@ function AdminMain() {
       <thead>
       <tr>
       {columns.map((key) => (
-        <th key={key}>
-        {columnMapping[key]}
-        <span
-        className="filter-arrow"
-        onClick={() => toggleFilterVisibility(key)}
-        >
-        ▼
-        </span>
-        {filterVisibility[key] && renderFilterForColumn(key)}
-        </th>
-      ))}
+  <th key={key}>
+    {columnMapping[key]}
+    <span
+      className={`filter-arrow ${filterVisibility[key] ? 'open' : ''}`} // Apply 'open' class if filter is visible
+      onClick={() => toggleFilterVisibility(key)}
+    >
+      <FaChevronDown />
+    </span>
+    {filterVisibility[key] && renderFilterForColumn(key)}
+  </th>
+))}
       <th>פעולות</th>
       </tr>
       </thead>

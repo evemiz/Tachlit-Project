@@ -281,3 +281,19 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.filter-arrow {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.filter-arrow.open {
+  transform: rotate(180deg); /* Rotate arrow when filter is open */
+}
+
+/* Additional styling for the select box */
+.react-select__menu {
+  width: auto !important; /* Override default width */
+}
