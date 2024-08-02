@@ -13,7 +13,7 @@
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     overflow-y: auto; /* Add this to handle overflow if content exceeds modal height */
-    height: 80%; /* Set a max height to avoid overflowing off the screen */
+    height: 50%; /* Set a max height to avoid overflowing off the screen */
     position: fixed;
     top: 50%;
     left: 50%;

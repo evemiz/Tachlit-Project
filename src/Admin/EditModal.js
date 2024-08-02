@@ -25,7 +25,10 @@ const EditModal = ({ isOpen, onRequestClose }) => {
     const fetchDocuments = async () => {
       if (selectedCollection) {
         const data = await readDocuments(selectedCollection.value);
-        setItems(data.map(doc => ({ value: doc.heb, label: doc.heb })));
+        setItems(data.map(doc => ({
+          value: doc.heb, // Value is still Hebrew for internal handling
+          label: `${doc.heb} (${doc.en})` // Display both Hebrew and English names
+        })));
       }
     };
 

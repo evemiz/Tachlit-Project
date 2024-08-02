@@ -315,7 +315,7 @@ function AdminMain() {
 
     try {
       if (editMode) {
-        confirmAction(() => updateDocument(collectionName, currentEditId, cleanedRecord), '?האם אתה בטוח שברצונך לערוך רשומה זו');
+        confirmAction(() => updateDocument(collectionName, currentEditId, cleanedRecord), 'האם אתה בטוח שברצונך לערוך רשומה זו ?');
       }
     } catch (err) {
       console.error(`Error ${editMode ? 'updating' : 'adding'} document:`, err);
@@ -351,12 +351,12 @@ function AdminMain() {
 
   const handleDeleteRecord = (id) => {
     if (collectionName) {
-      confirmAction(() => deleteDocument(collectionName, id), '?האם אתה בטוח שברצונך למחוק רשומה זו');
+      confirmAction(() => deleteDocument(collectionName, id), 'האם אתה בטוח שברצונך למחוק רשומה זו ?');
     }
   };
 
   const handleApproveNewVolunteer = (id) => {
-    confirmAction(() => handleApproveVolunteer(id), '? האם אתה בטוח שברצונך לאשר מתנדב חדש זה');
+    confirmAction(() => handleApproveVolunteer(id), 'האם אתה בטוח שברצונך לאשר מתנדב חדש זה ?'  );
   };
 
   const handleEditRecord = (doc) => {
@@ -435,7 +435,7 @@ function AdminMain() {
     try {
       await modalAction();
       setIsSuccessModalOpen(true);
-      setSuccessMessage('!הפעולה בוצעה בהצלחה');
+      setSuccessMessage('הפעולה בוצעה בהצלחה !');
     } catch (err) {
       setIsErrorModalOpen(true); // Open error modal on failure
       setErrorMessage('הפעולה נכשלה: ' + err.message); // Set error message
@@ -496,7 +496,7 @@ function AdminMain() {
   const handleChangePassword = (e) => {
     e.preventDefault();
     if (newPassword !== confirmNewPassword) {
-      setMessage(".הסיסמאות אינן תואמות");
+      setMessage("הסיסמאות אינן תואמות.");
       return;
     }
 
@@ -518,7 +518,7 @@ function AdminMain() {
       })
       .catch((error) => {
         console.error("Error reauthenticating user:", error);
-        setMessage(".שגיאה באימות המשתמש. נא לבדוק את הסיסמה הישנה");
+        setMessage("שגיאה באימות המשתמש. נא לבדוק את הסיסמה הישנה");
       });
     } else {
       setMessage("האימייל שהוזן אינו תואם את האימייל של המשתמש המחובר");
