@@ -133,7 +133,6 @@ function AdminMain() {
   const [errorMessage, setErrorMessage] = useState(''); // New state for error message
   const [volunteers, setVolunteers] = useState([]);
   const [status, setStatus] = useState("");
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [filterVisibility, setFilterVisibility] = useState({});
   const [date, setDate] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("");
@@ -150,6 +149,11 @@ function AdminMain() {
   const openEditModal = () => setEditModalIsOpen(true);
   const closeEditModal = () => setEditModalIsOpen(false);
 
+  const [isSuperAdmin, setIsSuperAdmin] = useState(() => {
+    const storedIsSuperAdmin = localStorage.getItem('isSuperAdmin');
+    return storedIsSuperAdmin === 'true'; // convert the string to a boolean
+  });
+
 
   const openSignUpModal = () => {
     setSignUpModalIsOpen(true);
@@ -158,6 +162,21 @@ function AdminMain() {
   const closeSignUpModal = () => {
     setSignUpModalIsOpen(false);
   };
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.email));
+        if (userDoc.exists()) {
+          const isSuperAdmin = userDoc.data().superAdmin === true;
+          setIsSuperAdmin(isSuperAdmin);
+          localStorage.setItem('isSuperAdmin', isSuperAdmin.toString()); // convert the boolean to a string
+        }
+      }
+    };
+    fetchCurrentUser();
+  }, []);
 
   useEffect(() => {
     // Simulate loading
@@ -807,7 +826,9 @@ function AdminMain() {
         {columns.map((column) => (
           <td key={`${doc.id}-${column}`}>
           {column === 'volunteerMatch' ? (
-            <span onClick={() => handleVolunteerClick(doc[column])}>
+            <span 
+            style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
+            onClick={() => handleVolunteerClick(doc[column])}>
             {getVolunteerNameById(doc[column])}
             </span>
           ) : column === 'matches' ? (
